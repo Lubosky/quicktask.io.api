@@ -1,0 +1,27 @@
+en:
+  errors:
+    invalid_token:
+      title: 'Unauthorized'
+      detail: 'Invalid password reset token'
+  email:
+    footer:
+      made_by_html: Made with ❤️ by <a href='%{href}' target='_blank'>%{name}</a>
+      blog: Our Blog
+      facebook: Facebook
+      twitter: Twitter
+    password_change_request:
+      subject: Reset your password
+      headline: Change your password
+      intro: We have received a password change request for your %{app} account (%{email}).
+      intro_html: We have received a password change request for your %{app} account (<b>%{email}</b>).
+      button: Create a new password
+      text: "To recover your account and reset your password, please click at the following URL: %{url}."
+      outro: If you didn't mean to reset your password, just ignore this email. Your password will not be changed.
+
+  date:
+    formats:
+      for_this_year: "%e %b"
+      for_another_year: "%-d/%-m/%y"
+  time:
+    formats:
+      for_today: "%l:%M %P"

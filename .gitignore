@@ -1,0 +1,10 @@
+!.keep
+.bundle
+.env.*
+!.env.sample
+/coverage/
+/log/
+/public/assets/*
+/spec/examples.txt
+/tmp/
+dump.rdb

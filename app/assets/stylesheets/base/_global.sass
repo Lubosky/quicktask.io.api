@@ -1,0 +1,144 @@
+body
+  +pad(0)
+  background: $white
+  line-height: $line-height-base
+  margin: 0
+  -ms-text-size-adjust: 100%
+  -webkit-font-smoothing: antialiased
+  -webkit-text-size-adjust: 100%
+
+div,
+h1,
+h2,
+h3,
+ol,
+p,
+ul
+  +pad(0 30px)
+
+p
+  padding-bottom: 2px
+
+p,
+ul,
+ol
+  margin-bottom: 15px
+
+ul,
+ol
+  > li
+    list-style-position: inside
+    margin-left: 5px
+
+p,
+ul,
+ol
+  margin-bottom: 15px
+
+ul > li,
+ol > li
+  list-style-position: inside
+  margin-left: 5px
+
+h1,
+h2,
+h3
+  color: $text-color
+  display: block
+  margin-bottom: 15px
+
+a
+  color: $blue
+  text-decoration: none
+
+  &:hover,
+  &:focus
+    text-decoration: underline !important
+
+table,
+td
+    mso-table-lspace: 0pt !important
+    mso-table-rspace: 0pt !important
+
+table
+  border-collapse: collapse
+  border-spacing: 0 !important
+  margin: 0 auto !important
+  width: 100%
+
+  td
+    vertical-align: top
+
+img
+  -ms-interpolation-mode: bicubic
+  border: none
+  max-width: 100%
+
+.gp-email
+  width: 100% !important
+  margin: auto !important
+
+  &__header-logo
+    +border-radius($border-radius)
+    +size(40px)
+    margin: 0 30px 15px 30px
+
+  &__body
+    display: block
+    margin: 0 auto
+    width: 600px
+
+    .container
+      +pad(30px 0 40px)
+      box-sizing: border-box
+      display: block
+      margin: 0 auto
+
+  &__footer
+    +font-size($font-size-base)
+    +pad(0 30px 40px)
+    border-top: 1px solid $footer-border-color
+    line-height: $line-height-base
+    text-align: center
+    width: 100%
+
+    .container
+      background-color: $white
+      margin-top: 20px
+
+    a,
+    p,
+    span,
+    td
+      color: $text-muted
+      text-align: center
+
+    td
+      padding-top: 20px
+
+    a
+      color: $footer-text !important
+
+.expand-on-mobile
+  +mq($max, $mobile-screen)
+    width: 100% !important
+
+.center-on-mobile
+  +mq($max, $mobile-screen)
+    text-align: center !important
+
+.auto-width-on-mobile
+  +mq($max, $mobile-screen)
+    width: auto !important
+
+.auto-height-on-mobile
+  +mq($max, $mobile-screen)
+    height: auto !important
+
+.fluid-on-mobile
+  +mq($max, $mobile-screen)
+    +size(100%, auto !important)
+
+.reset-on-mobile
+  +mq($max, $mobile-screen)
+    +pad(null 0 null 0 !important)

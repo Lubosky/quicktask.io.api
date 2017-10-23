@@ -1,0 +1,110 @@
+// BORDER RADIUS
+=border-radius($radius, $important: '')
+  border-radius: $radius#{$important}
+
+// COMPACT SHORTHAND
+@function compactify($values)
+  $output: null
+
+  $a: nth($values, 1)
+  $b: if(length($values) < 2, $a, nth($values, 2))
+  $c: if(length($values) < 3, $a, nth($values, 3))
+  $d: if(length($values) < 2, $a, nth($values, if(length($values) < 4, 2, 4)))
+
+  @if $a == 0
+    $a: 0
+  @if $b == 0
+    $b: 0
+  @if $c == 0
+    $c: 0
+  @if $d == 0
+    $d: 0
+
+  @if $a == $b and $a == $c and $a == $d
+    $output: $a
+  @else if $a == $c and $b == $d
+    $output: $a $b
+  @else if $b == $d
+    $output: $a $b $c
+  @else
+    $output: $a $b $c $d
+  @return $output
+
+// CONTAINS FALSY
+@function containsFalsy($list)
+  @each $item in $list
+    @if not $item
+      @return true
+  @return false
+
+// FONT SIZE
+@function calculateRem($size)
+  $remSize: $size / 16px
+  @return $remSize * 1rem
+
+=font-size($size)
+  font-size: $size
+  font-size: calculateRem($size)
+
+// MEDIA QUERIES
+=mq($constraint, $viewport1, $viewport2: null)
+  @if $constraint == $min
+    @media screen and ($min: $viewport1)
+      @content
+  @else if $constraint == $max
+    @media screen and ($max: $viewport1)
+      @content
+  @else
+    @media screen and ($min: $viewport1) and ($max: $viewport2)
+      @content
+
+// PADDING
+=pad($values)
+  +directional-property(padding, null, $values)
+
+// SIZE
+=size($width, $height: $width)
+  width: $width
+  height: $height
+
+// DIRECTIONAL PROPERTY
+=directional-property($property, $suffix, $values)
+  $top: $property + '-top' + if($suffix, '-#{$suffix}', '')
+  $bottom: $property + '-bottom' + if($suffix, '-#{$suffix}', '')
+  $left: $property + '-left' + if($suffix, '-#{$suffix}', '')
+  $right: $property + '-right' + if($suffix, '-#{$suffix}', '')
+  $all: $property + if($suffix, '-#{$suffix}', '')
+
+  $values: compactify($values)
+
+  @if containsFalsy($values)
+    @if nth($values, 1)
+      #{$top}: nth($values, 1)
+
+    @if length($values) == 1
+      @if nth($values, 1)
+        #{$right}: nth($values, 1)
+    @else
+      @if nth($values, 2)
+        #{$right}: nth($values, 2)
+
+    @if length($values) == 2
+      @if nth($values, 1)
+        #{$bottom}: nth($values, 1)
+
+      @if nth($values, 2)
+        #{$left}: nth($values, 2)
+    @else if length($values) == 3
+      @if nth($values, 3)
+        #{$bottom}: nth($values, 3)
+
+      @if nth($values, 2)
+        #{$left}: nth($values, 2)
+    @else if length($values) == 4
+      @if nth($values, 3)
+        #{$bottom}: nth($values, 3)
+
+      @if nth($values, 4)
+        #{$left}: nth($values, 4)
+  @else
+    #{$all}: $values

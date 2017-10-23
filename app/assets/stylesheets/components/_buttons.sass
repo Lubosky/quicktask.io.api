@@ -1,0 +1,41 @@
+.button
+  +border-radius($border-radius)
+  +font-size($font-size-large)
+  display: inline-block
+  font-weight: 900
+  min-width: 235px
+  text-align: center
+
+  &:not(.button--outline)
+    color: $white
+    text-decoration: none !important
+
+  +mq($max, $mobile-screen)
+    @extend .auto-width-on-mobile
+    display: block !important
+
+  @each $name, $color in (primary: $green, secondary: $purple)
+    &--#{$name}
+      border: 10px solid $color
+      background: $color
+
+      &:hover,
+      &:focus
+        border-color: darken($color, 9%) !important
+        background-color: darken($color, 9%) !important
+
+  &--outline
+    +font-size($font-size-small)
+    background-color: $button-bg-color
+    border: 1px solid $border-color
+    color: $button-text
+    line-height: 40px
+    line-height: 40px
+
+    &:hover,
+    &:focus
+      text-decoration: underline !important
+
+.button-wrapper
+  +pad(0 30px)
+  margin-bottom: 30px

@@ -41,6 +41,7 @@ gem 'sass-rails'
 gem 'sidekiq'
 gem 'sidekiq-unique-jobs'
 gem 'sinatra', require: false
+gem 'stripe'
 gem 'twemoji'
 
 # Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible

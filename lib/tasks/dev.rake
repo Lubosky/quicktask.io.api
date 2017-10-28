@@ -1,6 +1,6 @@
 namespace :dev do
   desc 'Creates sample data for local development'
-  task prime: ['db:setup'] do
+  task :prime do
     unless Rails.env.development?
       raise 'This task can only be run in the development environment'
     end
@@ -8,7 +8,14 @@ namespace :dev do
     require 'factory_bot_rails'
     include FactoryBot::Syntax::Methods
 
+    Rake::Task['db:drop'].invoke
+    Rake::Task['db:create'].invoke
+    Rake::Task['db:migrate'].invoke
+
+    `bin/rails db:migrate RAILS_ENV=test`
+
     create_users
+    create_plans
   end
 
   def create_users
@@ -55,6 +62,12 @@ namespace :dev do
       email: 'deactivated@example.dev'
     )
     puts_user user, 'deactivated user'
+  end
+
+  def create_plans
+    header 'Plans'
+
+    Rake::Task['stripe:plan:sync'].invoke
   end
 
   def header(msg)

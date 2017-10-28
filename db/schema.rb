@@ -10,10 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171008064041) do
+ActiveRecord::Schema.define(version: 20171024162318) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "plans", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.string "stripe_plan_id", null: false
+    t.string "name", null: false
+    t.decimal "price", precision: 6, scale: 2, null: false
+    t.int4range "range", null: false
+    t.integer "billing_interval", null: false
+    t.integer "trial_period_days"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["uuid"], name: "index_plans_on_uuid", unique: true
+  end
 
   create_table "tokens", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
     t.bigint "subject_id", null: false

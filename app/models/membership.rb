@@ -65,6 +65,11 @@ class Membership < ApplicationRecord
     update_column(:deactivated_on, Time.zone.today)
   end
 
+  def reactivate
+    update_column(:scheduled_for_deactivation_on, nil)
+    reactivate_stripe_subscription
+  end
+
   def coupon
     @coupon ||= Coupon.new(stripe_coupon)
   end
@@ -94,8 +99,18 @@ class Membership < ApplicationRecord
     stripe_subscription.create
   end
 
+  def reactivate_stripe_subscription
+    subscription = stripe_customer.subscriptions.retrieve(stripe_subscription_id)
+    subscription.plan = subscription.plan.id
+    subscription.save
+  end
+
   def update_stripe_customer_id
     workspace.update(stripe_customer_id: stripe_customer_id)
+  end
+
+  def stripe_customer
+    @stripe_customer ||= Stripe::Customer.retrieve(stripe_customer_id)
   end
 
   def stripe_subscription

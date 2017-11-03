@@ -2,7 +2,10 @@ module EnsureUUID
   extend ActiveSupport::Concern
 
   included do
-    before_validation :ensure_uuid
+    before_validation :ensure_uuid, on: :create
+
+    validates_presence_of :uuid
+    validates_uniqueness_of :uuid, on: :create
 
     private
 

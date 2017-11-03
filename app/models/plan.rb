@@ -17,6 +17,8 @@ class Plan < ApplicationRecord
 
   enum billing_interval: { month: 0, year: 1 }
 
+  has_many :memberships, inverse_of: :plan
+
   validates_presence_of :name
   validates :stripe_plan_id, presence: true, uniqueness: true, inclusion: PLAN_OPTIONS
 

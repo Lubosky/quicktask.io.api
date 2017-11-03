@@ -52,6 +52,7 @@ RSpec.configure do |config|
   end
 
   config.include FactoryBot::Syntax::Methods
+  config.include StripeHelper
 end
 
 def fixture_for(*path, filetype: 'image/jpeg')

@@ -71,6 +71,7 @@ group :test do
   gem 'rspec-rails'
   gem 'shoulda-matchers'
   gem 'simplecov', require: false
+  gem 'stripe-ruby-mock', require: 'stripe_mock'
   gem 'timecop'
   gem 'webmock'
 end

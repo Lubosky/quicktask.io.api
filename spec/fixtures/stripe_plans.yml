@@ -1,0 +1,48 @@
+-
+  id: 'tms.GliderPath.AirborneBucket.Monthly'
+  amount: 2999
+  currency: 'usd'
+  interval: 'month'
+  interval_count: 1
+  name: 'GliderPath TMS - Airborne Bucket [M]'
+  trial_period_days: 14
+-
+  id: 'tms.GliderPath.AirborneBucket.Annually'
+  amount: 29900
+  currency: 'usd'
+  interval: 'year'
+  interval_count: 1
+  name: 'GliderPath TMS - Airborne Bucket [A]'
+  trial_period_days: 14
+-
+  id: 'tms.GliderPath.SoaringBucket.Monthly'
+  amount: 2699
+  currency: 'usd'
+  interval: 'month'
+  interval_count: 1
+  name: 'GliderPath TMS - Soaring Bucket [M]'
+  trial_period_days: 14
+-
+  id: 'tms.GliderPath.SoaringBucket.Annually'
+  amount: 26900
+  currency: 'usd'
+  interval: 'year'
+  interval_count: 1
+  name: 'GliderPath TMS - Soaring Bucket [A]'
+  trial_period_days: 14
+-
+  id: 'tms.GliderPath.CruisingBucket.Monthly'
+  amount: 2399
+  currency: 'usd'
+  interval: 'month'
+  interval_count: 1
+  name: 'GliderPath TMS - Cruising Bucket [M]'
+  trial_period_days: 14
+-
+  id: 'tms.GliderPath.CruisingBucket.Annually'
+  amount: 23900
+  currency: 'usd'
+  interval: 'year'
+  interval_count: 1
+  name: 'GliderPath TMS - Cruising Bucket [A]'
+  trial_period_days: 14

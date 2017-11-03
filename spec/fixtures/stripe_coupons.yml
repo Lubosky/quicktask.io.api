@@ -1,0 +1,17 @@
+-
+  id: '5OFF'
+  amount_off: 500
+  currency: 'usd'
+  duration: 'once'
+-
+  id: '25OFF'
+  currency: 'usd'
+  duration: 'repeating'
+  duration_in_months: 3
+  percent_off: 25
+-
+  id: '50OFF'
+  currency: 'usd'
+  duration: 'repeating'
+  percent_off: 50
+  valid: false

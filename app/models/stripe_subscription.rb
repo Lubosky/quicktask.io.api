@@ -22,7 +22,7 @@ class StripeSubscription
   end
 
   def workspace
-    @_workspace ||= @membership.workspace
+    @membership.workspace
   end
 
   def ensure_customer_exists

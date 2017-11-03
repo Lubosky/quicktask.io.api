@@ -61,6 +61,10 @@ class Membership < ApplicationRecord
     end
   end
 
+  def deactivate
+    update_column(:deactivated_on, Time.zone.today)
+  end
+
   def coupon
     @coupon ||= Coupon.new(stripe_coupon)
   end

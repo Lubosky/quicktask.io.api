@@ -240,6 +240,17 @@ RSpec.describe Membership, type: :model do
     end
   end
 
+  describe '#deactivate' do
+    it 'updates the membership record by setting deactivated_on to today' do
+      membership = create(:active_membership)
+
+      membership.deactivate
+      membership.reload
+
+      expect(membership.deactivated_on).to eq Time.zone.today
+    end
+  end
+
   context '#coupon' do
     before { StripeMock.start }
     after { StripeMock.stop }

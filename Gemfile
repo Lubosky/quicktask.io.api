@@ -40,6 +40,7 @@ gem 'sanitize'
 gem 'sass-rails'
 gem 'sidekiq'
 gem 'sidekiq-unique-jobs'
+gem 'stateful_enum'
 gem 'sinatra', require: false
 gem 'stripe'
 gem 'twemoji'

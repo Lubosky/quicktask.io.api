@@ -63,7 +63,7 @@ GEM
     commonmarker (0.17.5)
       ruby-enum (~> 0.5)
     concurrent-ruby (1.0.5)
-    config (1.5.1)
+    config (1.6.0)
       activesupport (>= 3.0)
       deep_merge (~> 1.1.1)
       dry-validation (~> 0.10.4)
@@ -349,6 +349,7 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
+    stateful_enum (0.4.0)
     stripe (3.8.0)
       faraday (~> 0.10)
     stripe-ruby-mock (2.5.0)
@@ -429,6 +430,7 @@ DEPENDENCIES
   sinatra
   spring
   spring-watcher-listen (~> 2.0.0)
+  stateful_enum
   stripe
   stripe-ruby-mock
   timecop

@@ -64,12 +64,14 @@ FactoryBot.define do
   factory :membership, aliases: [:active_membership] do
     uuid
     quantity 1
+    status :trialing
     association :owner, factory: :user
     association :workspace
     plan { Plan.first || create(:plan) }
 
     factory :inactive_membership do
       deactivated_on { Time.zone.today }
+      status :deactivated
 
       factory :paused_membership_restarting_today do
         scheduled_for_reactivation_on { Time.zone.today }
@@ -119,8 +121,18 @@ FactoryBot.define do
     currency :usd
     association :owner, factory: :user
 
+    trait :with_inactive_membership do
+      status :deactivated
+      stripe_customer_id "customer123"
+
+      after :create do |instance|
+        create(:inactive_membership, workspace: instance)
+      end
+    end
 
     trait :with_membership do
+      status :active
+
       transient do
         plan { create(:plan) }
       end

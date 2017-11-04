@@ -22,7 +22,7 @@ class Cancellation
   end
 
   def process
-    if @membership.active?
+    unless @membership.deactivated?
       @membership.deactivate
     end
   end

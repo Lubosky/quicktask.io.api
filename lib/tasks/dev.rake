@@ -16,6 +16,8 @@ namespace :dev do
 
     create_users
     create_plans
+    create_workspaces
+    create_memberships
   end
 
   def create_users
@@ -70,11 +72,62 @@ namespace :dev do
     Rake::Task['stripe:plan:sync'].invoke
   end
 
+  def create_workspaces
+    header 'Workspaces'
+
+    workspace = create(
+      :workspace,
+      name: 'Pending Space',
+      owner: User.find_by(email: 'basic@example.dev')
+    )
+    puts_workspace workspace, 'pending workspace'
+  end
+
+  def create_memberships
+    header 'Memberships'
+
+    workspace = create(
+      :workspace,
+      name: 'Subscribed Space',
+      owner: User.find_by(email: 'google@example.dev')
+    )
+
+    membership = build(
+      :membership,
+      workspace: workspace,
+      owner: workspace.owner,
+      stripe_token: generate_stripe_token
+    )
+
+    membership.fulfill
+
+    puts_membership membership
+  end
+
+  def generate_stripe_token
+    Stripe::Token.create(
+      card: {
+        number: '4242424242424242',
+        exp_month: Date.current.month.next,
+        exp_year: Date.current.year.next,
+        cvc: rand.to_s[2..4]
+      }
+    )
+  end
+
   def header(msg)
     puts "\n\n*** #{msg.upcase} *** \n\n"
   end
 
   def puts_user(user, description)
     puts "#{user.email} / #{user.password} (#{description})"
+  end
+
+  def puts_workspace(workspace, description)
+    puts "#{workspace.name} / #{workspace.slug} (#{description})"
+  end
+
+  def puts_membership(membership)
+    puts "Membership for workspace: #{membership.workspace.name} / #{membership.workspace.slug}"
   end
 end

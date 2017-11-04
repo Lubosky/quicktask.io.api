@@ -33,17 +33,32 @@ class Membership < ApplicationRecord
   delegate :stripe_customer_id, to: :workspace
   delegate :stripe_plan_id, :trial_period_days, to: :plan
 
-  alias_attribute :quantity, :team_member_limit
+  attr_accessor :stripe_coupon, :stripe_token
 
-  attr_accessor :quantity, :stripe_coupon, :stripe_token
-
-  enum status: { trialing: 0, active: 1, past_due: 2, unpaid: 3, deactivated: 4 } do
+  enum status: { trialing: 0, active: 1, unpaid: 2, deactivated: 3 } do
     event :activate do
-      transition all - [:active] => :active
+      transition all - [:active, :deactivated] => :active
+    end
+
+    event :mark_as_unpaid do
+      transition [:trialing, :active] => :unpaid
     end
 
     event :deactivate do
+      before do
+        self.deactivated_on = Time.zone.today
+      end
+
       transition all - [:deactivated] => :deactivated
+    end
+
+    event :reactivate do
+      before do
+        self.scheduled_for_deactivation_on = nil
+        reactivate_stripe_subscription
+      end
+
+      transition all => :active
     end
   end
 
@@ -59,15 +74,6 @@ class Membership < ApplicationRecord
     transaction do
       create_membership
     end
-  end
-
-  def deactivate
-    update_column(:deactivated_on, Time.zone.today)
-  end
-
-  def reactivate
-    update_column(:scheduled_for_deactivation_on, nil)
-    reactivate_stripe_subscription
   end
 
   def coupon
@@ -87,6 +93,7 @@ class Membership < ApplicationRecord
   def create_membership
     if create_stripe_subscription && save
       self.tap do |membership|
+        membership.status ||= :trialing
         membership.stripe_subscription_id = stripe_subscription.id
         membership.trial_period_end_date = Time.current + trial_period_days.days
         membership.save
@@ -106,7 +113,8 @@ class Membership < ApplicationRecord
   end
 
   def update_stripe_customer_id
-    workspace.update(stripe_customer_id: stripe_customer_id)
+    workspace.stripe_customer_id = stripe_customer_id
+    workspace.activate
   end
 
   def stripe_customer

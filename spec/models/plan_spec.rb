@@ -18,12 +18,12 @@ RSpec.describe Plan, type: :model do
   end
 
   describe '.find_by' do
-    it 'returns the plan where the count is in range and interval matches' do
+    it 'returns the plan where the quantity is in range and interval matches' do
       plan_option = create(:plan, :with_range_up_to_15)
       create(:plan, :with_range_up_to_15, :annual)
       create(:plan, :with_range_up_to_100)
 
-      plan = Plan.find_by(count: 7, interval: :month)
+      plan = Plan.find_by(quantity: 7, interval: :month)
 
       expect(plan.allowance).to eq plan_option.range.max
       expect(plan.name).to eq plan_option.name

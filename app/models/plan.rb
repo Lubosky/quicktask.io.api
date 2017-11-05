@@ -22,9 +22,9 @@ class Plan < ApplicationRecord
   validates_presence_of :name
   validates :stripe_plan_id, presence: true, uniqueness: true, inclusion: PLAN_OPTIONS
 
-  def self.find_by(count:, interval:)
+  def self.find_by(quantity:, interval:)
     where(billing_interval: interval).
-      detect { |plan| plan&.range.include?(count) }
+      detect { |plan| plan&.range.include?(quantity) }
   end
 
   def allowance

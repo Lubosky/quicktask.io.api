@@ -24,33 +24,12 @@ FactoryBot.define do
     billing_interval 'month'
     trial_period_days 14
 
-    trait :annual do
-      name 'Airborne Bucket [A]'
-      stripe_plan_id 'tms.GliderPath.AirborneBucket.Annually'
-      price 299.00
-      range 1..5
-      billing_interval 'year'
-
-      trait :with_range_up_to_15 do
-        name 'Soaring Bucket [A]'
-        stripe_plan_id 'tms.GliderPath.SoaringBucket.Annually'
-        price 269.00
-        range 6..15
-      end
-
-      trait :with_range_up_to_100 do
-        name 'Cruising Bucket [A]'
-        stripe_plan_id 'tms.GliderPath.CruisingBucket.Annually'
-        price 239.00
-        range 16..100
-      end
-    end
-
     trait :with_range_up_to_15 do
       name 'Soaring Bucket [M]'
       stripe_plan_id 'tms.GliderPath.SoaringBucket.Monthly'
       price 26.99
       range 6..15
+      billing_interval 'month'
     end
 
     trait :with_range_up_to_100 do
@@ -58,6 +37,31 @@ FactoryBot.define do
       stripe_plan_id 'tms.GliderPath.CruisingBucket.Monthly'
       price 23.99
       range 16..100
+      billing_interval 'month'
+    end
+
+    trait :annual do
+      name 'Airborne Bucket [A]'
+      stripe_plan_id 'tms.GliderPath.AirborneBucket.Annually'
+      price 299.00
+      range 1..5
+      billing_interval 'year'
+    end
+
+    trait :annual_with_range_up_to_15 do
+      name 'Soaring Bucket [A]'
+      stripe_plan_id 'tms.GliderPath.SoaringBucket.Annually'
+      price 269.00
+      range 6..15
+      billing_interval 'year'
+    end
+
+    trait :annual_with_range_up_to_100 do
+      name 'Cruising Bucket [A]'
+      stripe_plan_id 'tms.GliderPath.CruisingBucket.Annually'
+      price 239.00
+      range 16..100
+      billing_interval 'year'
     end
   end
 

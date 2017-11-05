@@ -240,6 +240,64 @@ RSpec.describe Membership, type: :model do
     end
   end
 
+  context '#fulfill_update' do
+    before :each do
+      StripeMock.start
+      stub_stripe_plans
+    end
+
+    after :each do
+      StripeMock.stop
+    end
+
+    it 'updates the membership\'s plan for given quantity and interval in Stripe' do
+      customer = Stripe::Customer.create(id: 'original')
+      customer.subscriptions.create(plan: 'tms.GliderPath.AirborneBucket.Monthly')
+      plan = create(:plan)
+      create(:plan, :annual_with_range_up_to_15)
+
+      workspace = create(:workspace, stripe_customer_id: 'original')
+      membership = build(:membership, workspace: workspace, plan: plan)
+
+      membership.fulfill && membership.reload
+
+      subscription = Stripe::Subscription.retrieve(membership.stripe_subscription_id)
+
+      expect(subscription.customer).to eq('original')
+      expect(subscription.quantity).to eq(1)
+      expect(subscription.plan.interval).to eq('month')
+
+      membership.fulfill_update(interval: 'year', quantity: 10)
+
+      updated_subscription = Stripe::Subscription.retrieve(membership.stripe_subscription_id)
+
+      expect(updated_subscription.customer).to eq('original')
+      expect(updated_subscription.quantity).to eq(10)
+      expect(updated_subscription.plan.interval).to eq('year')
+    end
+
+    it 'updates the membership\'s quantity' do
+      customer = Stripe::Customer.create(id: 'original')
+      customer.subscriptions.create(plan: 'tms.GliderPath.AirborneBucket.Monthly')
+      plan = create(:plan)
+      create(:plan, :annual_with_range_up_to_15)
+
+      workspace = create(:workspace, stripe_customer_id: 'original')
+      membership = build(:membership, workspace: workspace, plan: plan)
+
+      membership.fulfill && membership.reload
+
+      expect(membership.quantity).to eq(1)
+      expect(membership.billing_interval).to eq('month')
+
+      membership.fulfill_update(interval: 'year', quantity: 10)
+      membership.reload
+
+      expect(membership.quantity).to eq(10)
+      expect(membership.billing_interval).to eq('year')
+    end
+  end
+
   describe '#deactivate' do
     it 'updates the membership record by setting deactivated_on to today' do
       membership = create(:active_membership)

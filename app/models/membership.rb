@@ -30,8 +30,8 @@ class Membership < ApplicationRecord
   validates :plan_id, presence: true
   validates :workspace_id, presence: true, uniqueness: { conditions: -> { where(deleted_at: nil) } }
 
+  delegate :billing_interval, :stripe_plan_id, :trial_period_days, to: :plan
   delegate :stripe_customer_id, to: :workspace
-  delegate :stripe_plan_id, :trial_period_days, to: :plan
 
   attr_accessor :stripe_coupon, :stripe_token
 
@@ -73,6 +73,16 @@ class Membership < ApplicationRecord
   def fulfill
     transaction do
       create_membership
+      update_next_invoice_info
+    end
+  end
+
+  def fulfill_update(interval:, quantity:)
+    plan = find_plan(interval: interval, quantity: quantity)
+
+    transaction do
+      update_membership(plan: plan, quantity: quantity)
+      update_next_invoice_info
     end
   end
 
@@ -106,6 +116,25 @@ class Membership < ApplicationRecord
     stripe_subscription.create
   end
 
+  def update_membership(plan:, quantity:)
+    if update_stripe_subscription(plan: plan, quantity: quantity)
+      self.tap do |membership|
+        membership.plan = plan
+        membership.quantity = quantity
+        membership.save
+      end
+    end
+  end
+
+  def update_stripe_subscription(plan:, quantity:)
+    subscription = stripe_customer.subscriptions.retrieve(stripe_subscription_id)
+    subscription.plan = plan.stripe_plan_id
+    subscription.quantity = quantity
+    subscription.prorate = true
+
+    subscription.save
+  end
+
   def reactivate_stripe_subscription
     subscription = stripe_customer.subscriptions.retrieve(stripe_subscription_id)
     subscription.plan = subscription.plan.id
@@ -117,11 +146,19 @@ class Membership < ApplicationRecord
     workspace.activate
   end
 
+  def update_next_invoice_info
+    MembershipUpcomingInvoiceUpdater.new([self]).process
+  end
+
+  def find_plan(quantity:, interval:)
+    @_plan ||= Plan.find_by(quantity: quantity, interval: interval)
+  end
+
   def stripe_customer
-    @stripe_customer ||= Stripe::Customer.retrieve(stripe_customer_id)
+    @_stripe_customer ||= Stripe::Customer.retrieve(stripe_customer_id)
   end
 
   def stripe_subscription
-    @stripe_subscription ||= StripeSubscription.new(self)
+    @_stripe_subscription ||= StripeSubscription.new(self)
   end
 end

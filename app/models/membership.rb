@@ -5,6 +5,8 @@ class Membership < ApplicationRecord
   belongs_to :plan, inverse_of: :memberships
   belongs_to :workspace, inverse_of: :membership
 
+  has_many :charges, through: :workspace, inverse_of: :membership
+
   scope :active_as_of, ->(time) {
     where('deactivated_on is null OR deactivated_on > ?', time)
   }

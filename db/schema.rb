@@ -10,10 +10,24 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171029214257) do
+ActiveRecord::Schema.define(version: 20171105191532) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "charges", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "workspace_id", null: false
+    t.string "stripe_charge_id"
+    t.string "stripe_invoice_id"
+    t.decimal "amount", default: "0.0", null: false
+    t.string "description"
+    t.date "paid_through_date"
+    t.jsonb "source", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["workspace_id"], name: "index_charges_on_workspace_id"
+  end
 
   create_table "memberships", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
     t.string "uuid", limit: 24, null: false

@@ -5,6 +5,8 @@ class Workspace < ApplicationRecord
 
   belongs_to :owner, inverse_of: :workspaces, class_name: 'User', foreign_key: :owner_id
 
+  has_many :charges, inverse_of: :workspace
+
   has_one :membership, inverse_of: :workspace, dependent: :destroy
 
   before_validation :generate_unique_slug, on: :create

@@ -15,6 +15,33 @@ FactoryBot.define do
     "uuid_#{n}"
   end
 
+  factory :membership, aliases: [:active_membership] do
+    uuid
+    quantity 1
+    status :trialing
+    association :owner, factory: :user
+    association :workspace
+    plan { Plan.first || create(:plan) }
+
+    factory :inactive_membership do
+      deactivated_on { Time.zone.today }
+      status :deactivated
+
+      factory :paused_membership_restarting_today do
+        scheduled_for_reactivation_on { Time.zone.today }
+      end
+
+      factory :paused_membership_restarting_tomorrow do
+        scheduled_for_reactivation_on { Time.zone.tomorrow }
+      end
+    end
+  end
+
+  factory :charge do
+    uuid
+    association :workspace
+  end
+
   factory :plan do
     uuid
     name 'Airborne Bucket [M]'
@@ -62,28 +89,6 @@ FactoryBot.define do
       price 239.00
       range 16..100
       billing_interval 'year'
-    end
-  end
-
-  factory :membership, aliases: [:active_membership] do
-    uuid
-    quantity 1
-    status :trialing
-    association :owner, factory: :user
-    association :workspace
-    plan { Plan.first || create(:plan) }
-
-    factory :inactive_membership do
-      deactivated_on { Time.zone.today }
-      status :deactivated
-
-      factory :paused_membership_restarting_today do
-        scheduled_for_reactivation_on { Time.zone.today }
-      end
-
-      factory :paused_membership_restarting_tomorrow do
-        scheduled_for_reactivation_on { Time.zone.tomorrow }
-      end
     end
   end
 

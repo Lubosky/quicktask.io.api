@@ -6,7 +6,7 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
-gem 'active_interaction'
+gem 'active_interaction', github: 'AaronLasseigne/active_interaction', branch: 'v4.0.0'
 gem 'addressable'
 gem 'bcrypt'
 gem 'bootsnap'
@@ -39,7 +39,7 @@ gem 'readthis'
 gem 'rinku'
 gem 'sanitize'
 gem 'sass-rails'
-gem 'sentry-raven', '~> 2.7'
+gem 'sentry-raven'
 gem 'sidekiq'
 gem 'sidekiq-unique-jobs'
 gem 'stateful_enum'

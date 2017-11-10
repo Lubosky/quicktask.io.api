@@ -28,7 +28,7 @@ class SlugGenerator
   end
 
   def last_sequence_number
-    new_slug = /#{name}-(\d+)\z/
+    new_slug = /#{slug}-(\d+)\z/
     taken_names.reject{ |conflict| !new_slug.match(conflict) }.map do |conflict|
       new_slug.match(conflict)[1].to_i
     end.max

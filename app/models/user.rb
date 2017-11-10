@@ -12,8 +12,8 @@ class User < ApplicationRecord
   validate :password_or_google_uid_present
 
   has_many :owned_memberships, inverse_of: :owner, class_name: 'Membership', foreign_key: :owner_id, dependent: :restrict_with_error
+  has_many :owned_workspaces, inverse_of: :owner, class_name: 'Workspace', foreign_key: :owner_id, dependent: :restrict_with_error
   has_many :tokens, foreign_key: :subject_id, dependent: :delete_all
-  has_many :workspaces, inverse_of: :owner, foreign_key: :owner_id, dependent: :restrict_with_error
 
   def password=(value)
     password_digest_will_change!

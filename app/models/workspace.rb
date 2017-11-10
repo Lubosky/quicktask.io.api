@@ -3,7 +3,7 @@ class Workspace < ApplicationRecord
 
   include EnsureUUID
 
-  belongs_to :owner, inverse_of: :workspaces, class_name: 'User', foreign_key: :owner_id
+  belongs_to :owner, inverse_of: :owned_workspaces, class_name: 'User', foreign_key: :owner_id
 
   has_many :charges, inverse_of: :workspace
 

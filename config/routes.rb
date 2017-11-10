@@ -3,12 +3,21 @@ require 'constraints/api.rb'
 Rails.application.routes.draw do
   namespace :api, defaults: { format: :json }, constraints: { subdomain: 'backend' } do
     scope module: :v1, constraints: Constraints::API.new(version: 1, default: true) do
-      resources :users, only: [:index, :create] do
+
+      resources :users, only: [:index] do
         get :me, on: :collection
+      end
+
+      scope path: ':workspace_identifier', as: :workspace, constraints: Constraints::WorkspaceSlug.new do
+        resource :membership, only: [:create], path: 'subscribe'
+
+        resource :workspace, only: [:show], path: 'workspace'
       end
     end
 
     namespace :auth do
+      resource :signup, only: [:create]
+
       post 'login', to: 'token#create'
       delete 'logout', to: 'token#destroy'
 

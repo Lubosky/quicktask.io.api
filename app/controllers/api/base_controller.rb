@@ -14,6 +14,7 @@ module Api
 
     rescue_from(ActionController::UnpermittedParameters) { |e| respond_with_standard_error e, 400 }
     rescue_from(ActionController::ParameterMissing)      { |e| respond_with_standard_error e, 400 }
+    rescue_from(ActionController::RoutingError)          { |e| respond_with_standard_error e, 404 }
     rescue_from(ActiveRecord::RecordNotFound)            { |e| respond_with_standard_error e, 404 }
 
     rescue_from NotAuthorizedError do |e|

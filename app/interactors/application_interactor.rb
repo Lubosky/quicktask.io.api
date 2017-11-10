@@ -7,6 +7,7 @@ class ApplicationInteractor < ActiveInteraction::Base
     included do
       hash :context, default: {} do
         object :current_user, default: nil, class: User
+        object :current_workspace, default: nil, class: Workspace
       end
     end
 
@@ -14,6 +15,10 @@ class ApplicationInteractor < ActiveInteraction::Base
 
     def current_user
       context[:current_user]
+    end
+
+    def current_workspace
+      context[:current_workspace]
     end
   end
   include Context

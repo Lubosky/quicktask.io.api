@@ -131,8 +131,7 @@ module ZanpakutoController
              cache: opts[:cache],
              fields: opts[:fields],
              include: opts[:include],
-             meta: opts[:meta],
-             relationship: opts[:relationship]
+             meta: opts[:meta]
     else
       respond_with_errors(action.errors)
     end
@@ -145,8 +144,7 @@ module ZanpakutoController
              cache: opts[:cache],
              fields: opts[:fields],
              include: opts[:include],
-             meta: opts[:meta],
-             relationship: opts[:relationship]
+             meta: opts[:meta]
     else
       respond_with_errors(resource.errors)
     end
@@ -158,8 +156,7 @@ module ZanpakutoController
            cache: opts[:cache],
            fields: opts[:fields],
            include: opts[:include],
-           meta: opts[:meta],
-           relationship: opts[:relationship]
+           meta: opts[:meta]
   end
 
   def respond_with_standard_error(error, status)

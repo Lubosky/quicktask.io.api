@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171105191532) do
+ActiveRecord::Schema.define(version: 20171112160048) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,6 +27,24 @@ ActiveRecord::Schema.define(version: 20171105191532) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["workspace_id"], name: "index_charges_on_workspace_id"
+  end
+
+  create_table "contractors", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "workspace_id", null: false
+    t.string "first_name", default: "", null: false
+    t.string "last_name", default: "", null: false
+    t.string "business_name"
+    t.string "email"
+    t.string "phone"
+    t.jsonb "business_settings", default: {}
+    t.jsonb "tax_settings", default: {}
+    t.string "currency", limit: 3, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["uuid"], name: "index_contractors_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_contractors_on_workspace_id"
   end
 
   create_table "memberships", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
@@ -56,6 +74,42 @@ ActiveRecord::Schema.define(version: 20171105191532) do
     t.index ["stripe_subscription_id"], name: "index_memberships_on_stripe_subscription_id"
     t.index ["uuid"], name: "index_memberships_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_memberships_on_workspace_id"
+  end
+
+  create_table "organization_accounts", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.string "account_type", null: false
+    t.bigint "account_id", null: false
+    t.bigint "role_id", null: false
+    t.bigint "workspace_id", null: false
+    t.bigint "user_id", null: false
+    t.integer "status"
+    t.jsonb "workspace_settings", default: {}
+    t.jsonb "metadata", default: {}
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.datetime "deactivated_at"
+    t.index ["account_type", "account_id"], name: "index_organization_accounts_on_account_type_and_account_id"
+    t.index ["role_id"], name: "index_organization_accounts_on_role_id"
+    t.index ["user_id"], name: "index_organization_accounts_on_user_id"
+    t.index ["uuid"], name: "index_organization_accounts_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_organization_accounts_on_workspace_id"
+  end
+
+  create_table "organization_roles", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "workspace_id", null: false
+    t.string "permission_level", null: false
+    t.string "name", limit: 45, null: false
+    t.boolean "default", default: false, null: false
+    t.jsonb "permissions", default: [], null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["permissions"], name: "index_organization_roles_on_permissions", using: :gin
+    t.index ["uuid"], name: "index_organization_roles_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_organization_roles_on_workspace_id"
   end
 
   create_table "organizations", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
@@ -95,6 +149,20 @@ ActiveRecord::Schema.define(version: 20171105191532) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.index ["uuid"], name: "index_plans_on_uuid", unique: true
+  end
+
+  create_table "team_members", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "workspace_id", null: false
+    t.string "title"
+    t.string "first_name", default: "", null: false
+    t.string "last_name", default: "", null: false
+    t.string "email", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["uuid"], name: "index_team_members_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_team_members_on_workspace_id"
   end
 
   create_table "tokens", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|

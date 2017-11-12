@@ -12,6 +12,15 @@ Rails.application.routes.draw do
         resource :membership, only: [:create], path: 'subscribe'
 
         resource :workspace, only: [:show], path: 'workspace'
+
+        namespace '/v', module: :contractor, as: :contractor do
+        end
+
+        namespace '/c', module: :client, as: :client do
+        end
+
+        namespace '/t', module: :team, as: :team do
+        end
       end
     end
 

@@ -1,0 +1,24 @@
+client:
+  - manage_tasklists
+  - manage_tasks
+
+collaborator:
+  - manage_tasklists
+  - manage_tasks
+
+member:
+  - manage_clients
+  - manage_contractors
+  - manage_projects
+  - manage_tasklists
+  - manage_tasks
+
+owner:
+  - manage_clients
+  - manage_contractors
+  - manage_membership
+  - manage_projects
+  - manage_tasklists
+  - manage_tasks
+  - manage_team_members
+  - manage_workspace

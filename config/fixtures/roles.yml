@@ -1,0 +1,40 @@
+-
+  permission_level: 'owner'
+  name: 'Account owner'
+  default: true
+  permissions:
+    - 'manage_clients'
+    - 'manage_contractors'
+    - 'manage_membership'
+    - 'manage_projects'
+    - 'manage_tasklists'
+    - 'manage_tasks'
+    - 'manage_team_members'
+    - 'manage_workspace'
+
+-
+  permission_level: 'member'
+  name: 'Team member'
+  default: true
+  permissions:
+    - 'manage_clients'
+    - 'manage_contractors'
+    - 'manage_projects'
+    - 'manage_tasklists'
+    - 'manage_tasks'
+
+-
+  permission_level: 'collaborator'
+  name: 'Contractor'
+  default: true
+  permissions:
+    - 'manage_tasklists'
+    - 'manage_tasks'
+
+-
+  permission_level: 'client'
+  name: 'Client'
+  default: true
+  permissions:
+    - 'manage_tasklists'
+    - 'manage_tasks'

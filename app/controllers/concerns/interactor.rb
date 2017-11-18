@@ -22,6 +22,7 @@ module Interactor
     {
       current_user: current_user,
       current_workspace: current_workspace,
+      current_workspace_user: current_workspace_user,
       request: {
         remote_ip: request.remote_ip,
         host: request.host,

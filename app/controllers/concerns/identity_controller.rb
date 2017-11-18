@@ -8,14 +8,18 @@ module IdentityController
     public_send(:current_user)
   end
 
-  def revoke_for
-    revoke_current_token
+  def ensure_for
+    define_current_workspace
+    public_send(:current_workspace)
   end
 
-  def ensure_for(entity_class)
-    getter_name = :"current_#{entity_class.to_s.parameterize.underscore}"
-    define_current_workspace
-    public_send(getter_name)
+  def ensure_workspace_for
+    define_current_workspace_user
+    public_send(:current_workspace_user)
+  end
+
+  def revoke_for
+    revoke_current_token
   end
 
   private
@@ -29,7 +33,7 @@ module IdentityController
   end
 
   def workspace_identifier
-    params[:workspace_identifier]
+    params[:identifier] || params[:workspace_identifier]
   end
 
   def workspace_identifier?
@@ -42,10 +46,15 @@ module IdentityController
     end
   end
 
-  def ensure_entity(entity_name)
+  def ensure_entity
     if workspace_identifier?
-      entity_class = entity_name.camelize.constantize
-      send(:ensure_for, entity_class)
+      send(:ensure_for)
+    end
+  end
+
+  def ensure_workspace_entity
+    if current_user && current_workspace
+      send(:ensure_workspace_for)
     end
   end
 
@@ -66,15 +75,20 @@ module IdentityController
   end
 
   def method_missing(method, *args)
-    prefix, entity_name = method.to_s.split('_', 2)
-    case prefix
-    when 'authenticate'
+    case method.to_sym
+    when :authenticate_user
       unauthorized_entity unless authenticate_entity
-    when 'current'
+    when :ensure_workspace
+      unauthorized_entity unless ensure_entity
+    when :ensure_workspace_user
+      unauthorized_entity unless ensure_workspace_entity
+    when :current_user
       authenticate_entity
-    when 'ensure'
-      unauthorized_entity unless ensure_entity(entity_name)
-    when 'revoke'
+    when :current_workspace
+      ensure_entity
+    when :current_workspace_user
+      ensure_workspace_entity
+    when :revoke_token
       revoke_entity
     else
       super
@@ -117,11 +131,33 @@ module IdentityController
     end
   end
 
+  def define_current_workspace_user
+    unless self.respond_to?(:current_workspace_user)
+      memoization_variable_name = :@_current_workspace_user
+      self.class.send(:define_method, :current_workspace_user) do
+        unless instance_variable_defined?(memoization_variable_name)
+          current =
+            begin
+              set_current_workspace_user
+            rescue ActiveRecord::RecordNotFound
+              nil
+            end
+          instance_variable_set(memoization_variable_name, current)
+        end
+        instance_variable_get(memoization_variable_name)
+      end
+    end
+  end
+
   def revoke_current_token
     begin
       AuthenticationToken.new(token: authentication_token).revoke_for(Token)
     rescue ActiveRecord::RecordNotFound, JWT::DecodeError
       nil
     end
+  end
+
+  def set_current_workspace_user
+    current_workspace.members.find_by(user: current_user)
   end
 end

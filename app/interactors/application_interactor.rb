@@ -8,6 +8,7 @@ class ApplicationInteractor < ActiveInteraction::Base
       hash :context, default: {} do
         object :current_user, default: nil, class: User
         object :current_workspace, default: nil, class: Workspace
+        object :current_workspace_user, default: nil, class: WorkspaceUser
       end
     end
 
@@ -19,6 +20,10 @@ class ApplicationInteractor < ActiveInteraction::Base
 
     def current_workspace
       context[:current_workspace]
+    end
+
+    def current_workspace_user
+      context[:current_workspace_user]
     end
   end
   include Context
@@ -127,6 +132,7 @@ class ApplicationInteractor < ActiveInteraction::Base
 
   module Authorization
     extend ActiveSupport::Concern
+
     class NotAuthorized < ::Pundit::NotAuthorizedError
       attr_reader :query, :model, :policy
 

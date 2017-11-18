@@ -6,7 +6,7 @@ class User < ApplicationRecord
 
   has_secure_password validations: false
 
-  validates :email, email: { strict_mode: true }, presence: true, uniqueness: true
+  validates :email, email: true, presence: true, uniqueness: true
   validates :google_uid, presence: true, uniqueness: true, unless: :skip_google_uid_validation?
   validates :password, confirmation: true, length: { minimum: 8 }, unless: :skip_password_validation?
   validate :password_or_google_uid_present

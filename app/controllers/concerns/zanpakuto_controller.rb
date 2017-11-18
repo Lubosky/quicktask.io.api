@@ -165,9 +165,9 @@ module ZanpakutoController
   end
 
   def respond_with_error(error, status)
-    title = I18n.t("errors.#{error}.title")
+    code = I18n.t("errors.#{error}.code")
     detail = I18n.t("errors.#{error}.detail")
-    serializable_error = SerializableError.create(status: status, title: title, detail: detail)
+    serializable_error = SerializableError.create(status: status, code: code, detail: detail)
     render jsonapi_errors: serializable_error.as_jsonapi, status: status
   end
 

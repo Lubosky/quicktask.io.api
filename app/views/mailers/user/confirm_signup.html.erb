@@ -1,0 +1,15 @@
+<% content_for(:title) { t(:'email.confirm_signup.subject') } %>
+
+<h1>
+  <%= t(:'email.confirm_signup.headline', app: Settings.app.name) %>
+</h1>
+<p>
+  <%= t(:'email.confirm_signup.confirm') %>
+</p>
+<div class='button-wrapper'>
+  <%= link_to t(:'email.confirm_signup.button'), @link, class: 'button button--primary' %>
+</div>
+<p class='display-as-mini'>
+  <span class='text-muted'><%= t(:'email.confirm_signup.outro') %></span>
+  <%= link_to @link, @link %>
+</p>

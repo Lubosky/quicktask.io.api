@@ -1,6 +1,15 @@
 class Api::V1::WorkspacesController < Api::BaseController
   before_action :authenticate_user
-  before_action :ensure_workspace
+  before_action :ensure_workspace, except: [:create]
+  before_action :ensure_workspace_user, except: [:create]
+
+  deserializable_resource :workspace, only: [:create]
+
+  def create
+    run Onboarding::CreateWorkspace do |action|
+      respond_with_result(action: action)
+    end
+  end
 
   def show
     self.resource = current_workspace

@@ -18,6 +18,9 @@ class StripeSubscription
     yield
     true
   rescue Stripe::StripeError => exception
+    @membership.
+      errors.
+      add(:base, exception.message)
     false
   end
 

@@ -110,7 +110,8 @@ class Membership < ApplicationRecord
         membership.trial_period_end_date = Time.current + trial_period_days.days
         membership.save
       end
-      update_stripe_customer_id
+
+      activate_workspace
     end
   end
 
@@ -143,9 +144,8 @@ class Membership < ApplicationRecord
     subscription.save
   end
 
-  def update_stripe_customer_id
-    workspace.stripe_customer_id = stripe_customer_id
-    workspace.activate
+  def activate_workspace
+    workspace.tap(&:activate) unless workspace.stripe_customer_id.blank?
   end
 
   def update_next_invoice_info

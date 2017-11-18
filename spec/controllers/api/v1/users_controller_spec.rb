@@ -1,30 +1,94 @@
 require 'rails_helper'
 
 RSpec.describe Api::V1::UsersController, type: :controller do
-  describe '#index' do
-    it 'returns a 401 when user is not authenticated' do
-      get :index
+  describe '#create' do
+    it 'returns a 401 when no signup token is supplied' do
+      params = {
+        _jsonapi: {
+          data: {
+            type: 'user',
+            attributes: {
+              email: 'dev@example.dev',
+              first_name: 'Frank',
+              last_name: 'Catton',
+              password: 'password',
+              password_confirmation: 'password',
+              signup_token: ''
+            }
+          }
+        }
+      }
+
+      post :create, params: params
 
       expect(response).to have_http_status(:unauthorized)
     end
 
-    it 'returns a 401 when invalid token is supplied' do
-      invalid_token_authentication
-      get :index
+    it 'returns a 401 when invalid signup token is supplied' do
+      params = {
+        _jsonapi: {
+          data: {
+            type: 'user',
+            attributes: {
+              email: 'dev@example.dev',
+              first_name: 'Frank',
+              last_name: 'Catton',
+              password: 'password',
+              password_confirmation: 'password',
+              signup_token: 'abcd1234'
+            }
+          }
+        }
+      }
+
+      post :create, params: params
 
       expect(response).to have_http_status(:unauthorized)
     end
 
-    it 'returns a 401 when invalid entity is supplied' do
-      invalid_entity_authentication
-      get :index
+    it 'returns a 409 when email is already registered' do
+      token = signup_token_for(email: 'dev@example.dev')
+      create(:user, email: 'dev@example.dev')
+      params = {
+        _jsonapi: {
+          data: {
+            type: 'user',
+            attributes: {
+              email: 'dev@example.dev',
+              first_name: 'Frank',
+              last_name: 'Catton',
+              password: 'password',
+              password_confirmation: 'password',
+              signup_token: token
+            }
+          }
+        }
+      }
 
-      expect(response).to have_http_status(:unauthorized)
+      post :create, params: params
+
+      expect(response).to have_http_status(:conflict)
     end
 
-    it 'returns a 200 when entity is successfully authenticated' do
-      valid_token_authentication
-      get :index
+    it 'returns a 200 when user is successfully created' do
+      token = signup_token_for(email: 'dev@example.dev')
+      params = {
+        _jsonapi: {
+          data: {
+            type: 'user',
+            attributes: {
+              email: 'dev@example.dev',
+              first_name: 'Frank',
+              last_name: 'Catton',
+              password: 'password',
+              password_confirmation: 'password',
+              signup_token: token
+            }
+          }
+        }
+      }
+
+      post :create, params: params
 
       expect(response).to have_http_status(:success)
     end
@@ -73,7 +137,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
     authentication_token = token_for(user_id: user.id, token_id: token.id)
     request.env['HTTP_AUTHORIZATION'] = "Other #{authentication_token}"
 
-    get :index
+    get :me
 
     expect(response).to have_http_status(:success)
   end
@@ -84,7 +148,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
     authentication_token = token_for(user_id: user.id, token_id: token.id)
     request.env['HTTP_AUTHORIZATION'] = "#{authentication_token}"
 
-    get :index
+    get :me
 
     expect(response).to have_http_status(:success)
   end
@@ -151,5 +215,9 @@ RSpec.describe Api::V1::UsersController, type: :controller do
         iss: token_issuer
       }
     ).token
+  end
+
+  def signup_token_for(email:)
+    SignupToken.generate_for(email).to_s
   end
 end

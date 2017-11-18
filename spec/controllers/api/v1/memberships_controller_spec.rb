@@ -27,11 +27,18 @@ RSpec.describe Api::V1::MembershipsController, type: :controller do
     end
   end
 
+  def build_workspace_with_user
+    @user = create(:user)
+    @workspace = create(:workspace, :with_roles, owner: @user, name: 'Subscribed Space')
+    role = @workspace.roles.find_by(permission_level: :owner)
+    team_member = create(:team_member, workspace: @workspace)
+    create(:workspace_user, role: role, user: @user, workspace: @workspace)
+    @token = create(:token, user: @user)
+  end
+
   def valid_token_authentication
-    user = create(:user)
-    @workspace = create(:workspace, owner: user, name: 'Subscribed Space')
-    token = create(:token, user: user)
-    authentication_token = token_for(user_id: user.id, token_id: token.id)
+    build_workspace_with_user
+    authentication_token = token_for(user_id: @user.id, token_id: @token.id)
     request.env['HTTP_AUTHORIZATION'] = "Bearer #{authentication_token}"
   end
 

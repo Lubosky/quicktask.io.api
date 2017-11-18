@@ -15,6 +15,12 @@ FactoryBot.define do
     "uuid_#{n}"
   end
 
+  factory :contractor do
+    uuid
+    currency :usd
+    association :workspace, factory: :workspace
+  end
+
   factory :membership, aliases: [:active_membership] do
     uuid
     quantity 1
@@ -92,6 +98,22 @@ FactoryBot.define do
     end
   end
 
+  factory :role, class: Rolify::Base do
+    uuid
+    name
+    permission_level :member
+    association :workspace
+
+    factory :client_role, class: Rolify::Client
+    factory :collaborator_role, class: Rolify::Collaborator
+    factory :owner_role, class: Rolify::Owner
+  end
+
+  factory :team_member do
+    uuid
+    association :workspace, factory: :workspace
+  end
+
   factory :token do
     association :user, factory: :user
     issued_at Time.current
@@ -154,6 +176,28 @@ FactoryBot.define do
           owner: instance.owner
         )
       end
+    end
+
+    trait :with_roles do
+      after :create do |instance|
+        Rolify::Base.create_for(instance)
+      end
+    end
+  end
+
+  factory :workspace_user do
+    uuid
+    association :member, factory: :team_member
+    association :role, factory: :role
+    association :workspace, factory: :workspace
+    association :user, factory: :user
+
+    trait :with_client do
+      association :member, factory: :client
+    end
+
+    trait :with_collaborator do
+      association :member, factory: :collaborator
     end
   end
 end

@@ -1,7 +1,11 @@
 class Membership < ApplicationRecord
   include EnsureUUID
 
-  belongs_to :owner, inverse_of: :owned_memberships, class_name: 'User', foreign_key: :owner_id
+  belongs_to :owner,
+             inverse_of: :owned_memberships,
+             class_name: 'User',
+             foreign_key: :owner_id
+
   belongs_to :plan, inverse_of: :memberships
   belongs_to :workspace, inverse_of: :membership
 
@@ -30,7 +34,9 @@ class Membership < ApplicationRecord
 
   validates :owner_id, presence: true
   validates :plan_id, presence: true
-  validates :workspace_id, presence: true, uniqueness: { conditions: -> { where(deleted_at: nil) } }
+  validates :workspace_id,
+            presence: true,
+            uniqueness: { conditions: -> { where(deleted_at: nil) } }
 
   delegate :billing_interval, :stripe_plan_id, :trial_period_days, to: :plan
   delegate :stripe_customer_id, to: :workspace

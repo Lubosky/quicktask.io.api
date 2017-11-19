@@ -15,7 +15,7 @@ class WorkspaceUser < ApplicationRecord
   delegate :first_name, :last_name, :locale, :time_zone, :settings, to: :user
   delegate :permission_level, to: :role
 
-  default_scope { includes(:role, :user) }
+  default_scope { includes(:role) }
 
   def contractor?
     symbolized_member_type == :contractor

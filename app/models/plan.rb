@@ -20,7 +20,10 @@ class Plan < ApplicationRecord
   has_many :memberships, inverse_of: :plan
 
   validates_presence_of :name
-  validates :stripe_plan_id, presence: true, uniqueness: true, inclusion: PLAN_OPTIONS
+  validates :stripe_plan_id,
+            presence: true,
+            uniqueness: true,
+            inclusion: PLAN_OPTIONS
 
   def self.find_by(quantity:, interval:)
     where(billing_interval: interval).

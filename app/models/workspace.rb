@@ -3,13 +3,39 @@ class Workspace < ApplicationRecord
 
   include EnsureUUID
 
-  belongs_to :owner, inverse_of: :owned_workspaces, class_name: 'User', foreign_key: :owner_id
+  belongs_to :owner,
+             inverse_of: :owned_workspaces,
+             class_name: 'User',
+             foreign_key: :owner_id
 
-  has_many :contractors, through: :members, inverse_of: :workspace, source: :member, source_type: 'Contractor', dependent: :destroy
-  has_many :members, inverse_of: :workspace, class_name: 'WorkspaceUser', foreign_key: :workspace_id, dependent: :destroy
+  has_many :members,
+           inverse_of: :workspace,
+           class_name: 'WorkspaceUser',
+           foreign_key: :workspace_id,
+           dependent: :destroy
+
+  has_many :contractors,
+           inverse_of: :workspace,
+           dependent: :destroy
+
+  has_many :team_members,
+           inverse_of: :workspace,
+           dependent: :destroy
+
+  has_many :collaborating_team_members,
+           -> { where(member_type: 'TeamMember') },
+           inverse_of: :workspace,
+           class_name: 'WorkspaceUser',
+           foreign_key: :workspace_id
+
+  has_many :collaborating_contractors,
+           -> { where(member_type: 'Contractor') },
+           inverse_of: :workspace,
+           class_name: 'WorkspaceUser',
+           foreign_key: :workspace_id
+
   has_many :charges, inverse_of: :workspace, dependent: :destroy
   has_many :roles, class_name: 'Rolify::Base', dependent: :destroy
-  has_many :team_members, through: :members, inverse_of: :workspace, source: :member, source_type: 'TeamMember', dependent: :destroy
 
   has_one :membership, inverse_of: :workspace, dependent: :destroy
 

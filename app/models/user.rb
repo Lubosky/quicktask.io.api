@@ -6,16 +6,39 @@ class User < ApplicationRecord
 
   has_secure_password validations: false
 
-  validates :email, email: true, presence: true, uniqueness: true
-  validates :google_uid, presence: true, uniqueness: true, unless: :skip_google_uid_validation?
-  validates :password, confirmation: true, length: { minimum: 8 }, unless: :skip_password_validation?
-  validate :password_or_google_uid_present
-
   has_many :members, class_name: 'WorkspaceUser', foreign_key: :user_id
-  has_many :owned_memberships, inverse_of: :owner, class_name: 'Membership', foreign_key: :owner_id, dependent: :restrict_with_error
-  has_many :owned_workspaces, inverse_of: :owner, class_name: 'Workspace', foreign_key: :owner_id, dependent: :restrict_with_error
-  has_many :workspaces, through: :members, class_name: 'Workspace', foreign_key: :workspace_id
+
+  has_many :workspaces,
+           through: :members,
+           class_name: 'Workspace',
+           foreign_key: :workspace_id
+
+  has_many :owned_workspaces,
+           inverse_of: :owner,
+           class_name: 'Workspace',
+           foreign_key: :owner_id,
+           dependent: :restrict_with_error
+
+  has_many :owned_memberships,
+           inverse_of: :owner,
+           class_name: 'Membership',
+           foreign_key: :owner_id,
+           dependent: :restrict_with_error
+
   has_many :tokens, foreign_key: :subject_id, dependent: :delete_all
+
+  validates :email, email: true, presence: true, uniqueness: true
+  validates :google_uid,
+            presence: true,
+            uniqueness: true,
+            unless: :skip_google_uid_validation?
+
+  validates :password,
+            confirmation: true,
+            length: { minimum: 8 },
+            unless: :skip_password_validation?
+
+  validate :password_or_google_uid_present
 
   def password=(value)
     password_digest_will_change!

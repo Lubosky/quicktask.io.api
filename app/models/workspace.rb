@@ -14,11 +14,12 @@ class Workspace < ApplicationRecord
            foreign_key: :workspace_id,
            dependent: :destroy
 
-  has_many :contractors,
-           inverse_of: :workspace,
-           dependent: :destroy
+  has_many :clients, inverse_of: :workspace, dependent: :destroy
+  has_many :contractors, inverse_of: :workspace, dependent: :destroy
+  has_many :team_members, inverse_of: :workspace, dependent: :destroy
 
-  has_many :team_members,
+  has_many :client_contacts,
+           through: :clients,
            inverse_of: :workspace,
            dependent: :destroy
 
@@ -30,6 +31,12 @@ class Workspace < ApplicationRecord
 
   has_many :collaborating_contractors,
            -> { where(member_type: 'Contractor') },
+           inverse_of: :workspace,
+           class_name: 'WorkspaceUser',
+           foreign_key: :workspace_id
+
+  has_many :collaborating_clients,
+           -> { where(member_type: 'ClientContact') },
            inverse_of: :workspace,
            class_name: 'WorkspaceUser',
            foreign_key: :workspace_id

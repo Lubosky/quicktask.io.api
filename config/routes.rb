@@ -12,7 +12,19 @@ Rails.application.routes.draw do
       end
 
       resources :workspaces, only: [:index, :show, :create, :update],
-                             param: :identifier
+                             param: :identifier do
+
+        resource :membership, only: [:create]
+
+        namespace :v, module: :contractor, as: :contractor do
+        end
+
+        namespace :c, module: :client, as: :client do
+        end
+
+        namespace :t, module: :team, as: :team do
+        end
+      end
     end
 
     namespace :auth do

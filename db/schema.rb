@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171112160048) do
+ActiveRecord::Schema.define(version: 20171119164400) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -27,6 +27,41 @@ ActiveRecord::Schema.define(version: 20171112160048) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["workspace_id"], name: "index_charges_on_workspace_id"
+  end
+
+  create_table "client_contacts", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "client_id", null: false
+    t.bigint "workspace_id", null: false
+    t.string "title"
+    t.string "first_name", default: "", null: false
+    t.string "last_name", default: "", null: false
+    t.string "email"
+    t.string "phone_office"
+    t.string "phone_mobile"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["client_id"], name: "index_client_contacts_on_client_id"
+    t.index ["uuid"], name: "index_client_contacts_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_client_contacts_on_workspace_id"
+  end
+
+  create_table "clients", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "workspace_id", null: false
+    t.boolean "internal", default: false, null: false
+    t.string "name", null: false
+    t.string "email"
+    t.string "phone"
+    t.jsonb "business_settings", default: {}
+    t.jsonb "tax_settings", default: {}
+    t.string "currency", limit: 3, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["uuid"], name: "index_clients_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_clients_on_workspace_id"
   end
 
   create_table "contractors", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|

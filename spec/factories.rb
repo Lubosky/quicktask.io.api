@@ -15,8 +15,25 @@ FactoryBot.define do
     "uuid_#{n}"
   end
 
+  factory :client do
+    uuid
+    name
+    currency :usd
+    association :workspace, factory: :workspace
+  end
+
+  factory :client_contact do
+    uuid
+    first_name Faker::Name.first_name
+    last_name Faker::Name.last_name
+    email
+    association :client, factory: :client
+    association :workspace, factory: :workspace
+  end
+
   factory :contractor do
     uuid
+    email
     currency :usd
     association :workspace, factory: :workspace
   end
@@ -111,6 +128,7 @@ FactoryBot.define do
 
   factory :team_member do
     uuid
+    email
     association :workspace, factory: :workspace
   end
 

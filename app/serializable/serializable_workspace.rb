@@ -10,7 +10,9 @@ class SerializableWorkspace < SerializableBase
   attribute :slug
   attribute :status
   attribute :business_name
-  attribute :business_data
+  attribute :business_settings
+  attribute :tax_settings
+  attribute :workspace_settings
   # TODO: Add Shrine
   # attribute :logo
 

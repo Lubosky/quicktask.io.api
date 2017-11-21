@@ -11,6 +11,10 @@ FactoryBot.define do
     "name_#{n}"
   end
 
+  sequence :slug do |n|
+    "slug-#{n}"
+  end
+
   sequence :uuid do |n|
     "uuid_#{n}"
   end
@@ -167,6 +171,7 @@ FactoryBot.define do
   factory :workspace do
     uuid
     name
+    slug
     currency :usd
     association :owner, factory: :user
 
@@ -201,6 +206,12 @@ FactoryBot.define do
         Rolify::Base.create_for(instance)
       end
     end
+  end
+
+  factory :workspace_currency do
+    uuid
+    code :jpy
+    association :workspace, factory: :workspace
   end
 
   factory :workspace_user do

@@ -11,6 +11,7 @@ RSpec.describe Workspace, type: :model do
     it { is_expected.to belong_to(:owner).class_name('User').with_foreign_key(:owner_id) }
 
     it { is_expected.to have_many(:charges) }
+    it { is_expected.to have_many(:supported_currencies).class_name('WorkspaceCurrency').with_foreign_key(:workspace_id) }
 
     it { is_expected.to have_one(:membership) }
 

@@ -19,6 +19,7 @@ namespace :dev do
     create_workspaces
     create_memberships
     create_roles
+    create_workspace_currencies
     create_clients
     create_client_contacts
     create_workspace_users
@@ -193,6 +194,16 @@ namespace :dev do
     end
   end
 
+  def create_workspace_currencies
+    header 'Workspace Currencies'
+
+    Workspace.find_each do |workspace|
+      WorkspaceCurrency.create_for(workspace)
+
+      puts_workspace_currency workspace
+    end
+  end
+
   def create_workspace_users
     header 'Workspace Users'
 
@@ -275,6 +286,10 @@ namespace :dev do
 
   def puts_role(workspace)
     puts "Roles for workspace: #{workspace.name} / #{workspace.slug}"
+  end
+
+  def puts_workspace_currency(workspace)
+    puts "Currencies for workspace: #{workspace.name} / #{workspace.slug}"
   end
 
   def puts_client(client)

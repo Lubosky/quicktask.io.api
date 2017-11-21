@@ -44,13 +44,22 @@ class Workspace < ApplicationRecord
   has_many :charges, inverse_of: :workspace, dependent: :destroy
   has_many :roles, class_name: 'Rolify::Base', dependent: :destroy
 
+  has_many :supported_currencies,
+           inverse_of: :workspace,
+           class_name: 'WorkspaceCurrency',
+           foreign_key: :workspace_id,
+           dependent: :destroy
+
   has_one :membership, inverse_of: :workspace, dependent: :destroy
 
   before_validation :generate_unique_slug, on: :create
-  after_initialize :set_default_status, on: :create
+  after_initialize :set_default_attributes, on: :create
+  after_update :update_exchange_rates
 
+  validates :currency, presence: true, length: { is: 3 }
   validates :slug, :name, :owner_id, presence: true
-  validates :slug, length: { minimum: 2, maximum: 18 },
+  validates :slug, format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]\z/ },
+                   length: { minimum: 2, maximum: 18 },
                    uniqueness: { conditions: -> { where(deleted_at: nil) } }
 
   enum status: { pending: 0, active: 1, deactivated: 2 } do
@@ -101,8 +110,14 @@ class Workspace < ApplicationRecord
 
   private
 
-  def set_default_status
+  def set_default_attributes
+    self.currency ||= :usd
     self.status ||= :pending
+  end
+
+  def update_exchange_rates
+    return unless saved_change_to_currency?
+    ExchangeRateUpdaterJob.perform_async(id, currency)
   end
 
   def stripe_customer

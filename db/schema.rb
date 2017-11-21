@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171119164400) do
+ActiveRecord::Schema.define(version: 20171119222815) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -109,6 +109,19 @@ ActiveRecord::Schema.define(version: 20171119164400) do
     t.index ["stripe_subscription_id"], name: "index_memberships_on_stripe_subscription_id"
     t.index ["uuid"], name: "index_memberships_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_memberships_on_workspace_id"
+  end
+
+  create_table "organization_currencies", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "workspace_id", null: false
+    t.string "code", null: false
+    t.decimal "exchange_rate", precision: 22, scale: 11, default: "1.0", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["code", "workspace_id"], name: "index_organization_currencies_on_code_and_workspace_id"
+    t.index ["uuid"], name: "index_organization_currencies_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_organization_currencies_on_workspace_id"
   end
 
   create_table "organization_accounts", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|

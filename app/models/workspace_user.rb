@@ -8,6 +8,11 @@ class WorkspaceUser < ApplicationRecord
   belongs_to :user
   belongs_to :workspace
 
+  has_many :owned_projects,
+           inverse_of: :project,
+           class_name: 'Project',
+           dependent: :destroy
+
   validates_presence_of :member, :role, :user, :workspace
   validates_uniqueness_of :user_id, scope: [:member_type, :member_id]
   validate :member_allowed_for_role?, if: :role_id_changed?

@@ -42,7 +42,10 @@ class Workspace < ApplicationRecord
            foreign_key: :workspace_id
 
   has_many :charges, inverse_of: :workspace, dependent: :destroy
+  has_many :project_groups, inverse_of: :workspace, dependent: :destroy
   has_many :roles, class_name: 'Role::Base', dependent: :destroy
+
+  has_many :projects, inverse_of: :workspace, dependent: :destroy
 
   has_many :supported_currencies,
            inverse_of: :workspace,

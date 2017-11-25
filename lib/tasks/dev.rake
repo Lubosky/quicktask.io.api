@@ -23,6 +23,8 @@ namespace :dev do
     create_clients
     create_client_contacts
     create_workspace_users
+    create_project_groups
+    create_projects
   end
 
   def create_users
@@ -120,7 +122,7 @@ namespace :dev do
     header 'Roles'
 
     Workspace.find_each do |workspace|
-      Rolify::Base.create_for(workspace)
+      Role::Base.create_for(workspace)
 
       puts_role workspace
     end
@@ -191,6 +193,54 @@ namespace :dev do
         email: Faker::Internet.email
       )
       puts_client_contact client_contact
+    end
+  end
+
+  def create_project_groups
+    header 'Project Groups'
+
+    workspace = Workspace.active.first
+
+    workspace.clients.find_each do |client|
+      project_group = create(
+        :project_group,
+        client: client,
+        workspace: workspace
+      )
+      puts_project_group(project_group, workspace)
+    end
+  end
+
+  def create_projects
+    header 'Projects'
+
+    workspace = Workspace.active.first
+    owner = WorkspaceUser.where(member_type: 'TeamMember', workspace: workspace).first
+
+    workspace.clients.find_each do |client|
+      project = create(
+        :project,
+        client: client,
+        owner: owner,
+        workspace: workspace
+      )
+      puts_project(project, workspace)
+
+      project = create(
+        :project,
+        client: client,
+        owner: owner,
+        workspace: workspace
+      )
+      puts_project(project, workspace)
+
+      project = create(
+        :project,
+        client: client,
+        owner: owner,
+        workspace: workspace
+      )
+      puts_project(project, workspace)
     end
   end
 
@@ -272,6 +322,30 @@ namespace :dev do
     puts "\n\n*** #{msg.upcase} *** \n\n"
   end
 
+  def puts_client(client)
+    puts "Client #{client.name} / #{client.email} in workspace: #{client.workspace.name}"
+  end
+
+  def puts_client_contact(client_contact)
+    puts "Contact #{client_contact.first_name} #{client_contact.last_name} / #{client_contact.email} for client #{client_contact.client.name} in workspace: #{client_contact.workspace.name}"
+  end
+
+  def puts_membership(membership)
+    puts "Membership for workspace: #{membership.workspace.name} / #{membership.workspace.slug}"
+  end
+
+  def puts_project_group(project_group, workspace)
+    puts "Project group #{project_group.name} in workspace: #{workspace.name}"
+  end
+
+  def puts_project(project, workspace)
+    puts "Project #{project.name} in workspace: #{workspace.name}"
+  end
+
+  def puts_role(workspace)
+    puts "Roles for workspace: #{workspace.name} / #{workspace.slug}"
+  end
+
   def puts_user(user, description)
     puts "#{user.email} / #{user.password} (#{description})"
   end
@@ -280,24 +354,8 @@ namespace :dev do
     puts "#{workspace.name} / #{workspace.slug} (#{description})"
   end
 
-  def puts_membership(membership)
-    puts "Membership for workspace: #{membership.workspace.name} / #{membership.workspace.slug}"
-  end
-
-  def puts_role(workspace)
-    puts "Roles for workspace: #{workspace.name} / #{workspace.slug}"
-  end
-
   def puts_workspace_currency(workspace)
     puts "Currencies for workspace: #{workspace.name} / #{workspace.slug}"
-  end
-
-  def puts_client(client)
-    puts "Client #{client.name} / #{client.email} in workspace: #{client.workspace.name}"
-  end
-
-  def puts_client_contact(client_contact)
-    puts "Contact #{client_contact.first_name} #{client_contact.last_name} / #{client_contact.email} for client #{client_contact.client.name} in workspace: #{client_contact.workspace.name}"
   end
 
   def puts_workspace_user(workspace_user)

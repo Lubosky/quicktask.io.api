@@ -119,15 +119,30 @@ FactoryBot.define do
     end
   end
 
-  factory :role, class: Rolify::Base do
+  factory :project_group do
+    uuid
+    name
+    association :client
+    association :workspace
+  end
+
+  factory :project do
+    uuid
+    name
+    association :client
+    association :owner, factory: :workspace_user
+    association :workspace
+  end
+
+  factory :role, class: Role::Base do
     uuid
     name
     permission_level :member
     association :workspace
 
-    factory :client_role, class: Rolify::Client
-    factory :collaborator_role, class: Rolify::Collaborator
-    factory :owner_role, class: Rolify::Owner
+    factory :client_role, class: Role::Client
+    factory :collaborator_role, class: Role::Collaborator
+    factory :owner_role, class: Role::Owner
   end
 
   factory :team_member do
@@ -203,7 +218,7 @@ FactoryBot.define do
 
     trait :with_roles do
       after :create do |instance|
-        Rolify::Base.create_for(instance)
+        Role::Base.create_for(instance)
       end
     end
   end

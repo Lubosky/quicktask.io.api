@@ -4,7 +4,7 @@ class WorkspaceUser < ApplicationRecord
   include EnsureUUID
 
   belongs_to :member, polymorphic: true
-  belongs_to :role, class_name: 'Rolify::Base'
+  belongs_to :role, class_name: 'Role::Base'
   belongs_to :user
   belongs_to :workspace
 

@@ -1,11 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe Rolify::Base, type: :model do
+RSpec.describe Role::Base, type: :model do
   subject { build(:owner_role) }
 
   context 'validations' do
     before do
-      Rolify::Base.any_instance.stubs(:ensure_uuid).returns(true)
+      Role::Base.any_instance.stubs(:ensure_uuid).returns(true)
     end
 
     it { is_expected.to belong_to(:workspace) }

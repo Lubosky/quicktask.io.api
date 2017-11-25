@@ -1,4 +1,4 @@
-class Rolify::Base < ApplicationRecord
+class Role::Base < ApplicationRecord
   self.table_name = :organization_roles
 
   include EnsureUUID
@@ -9,7 +9,7 @@ class Rolify::Base < ApplicationRecord
 
   has_many :members, through: :workspace, class_name: 'WorkspaceUser'
 
-  discriminate Rolify, on: :permission_level
+  discriminate Role, on: :permission_level
 
   before_destroy :check_deletable
 
@@ -54,7 +54,7 @@ class Rolify::Base < ApplicationRecord
   end
 
   def permission_allowed_for_role?
-  if !permissions.is_a?(Array) || permissions.detect { |permission| !permission.in?(allowed_permissions) }
+    if !permissions.is_a?(Array) || permissions.detect { |permission| !permission.in?(allowed_permissions) }
       errors.add(:permissions, :invalid)
     end
   end

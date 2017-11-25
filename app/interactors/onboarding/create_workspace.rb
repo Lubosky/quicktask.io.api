@@ -29,7 +29,7 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
   end
 
   def create_workspace_roles
-    Rolify::Base.create_for(workspace)
+    Role::Base.create_for(workspace)
   end
 
   def create_workspace_user

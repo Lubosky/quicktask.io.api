@@ -9,7 +9,7 @@ RSpec.describe WorkspaceUser, type: :model do
     end
 
     it { is_expected.to belong_to(:member) }
-    it { is_expected.to belong_to(:role).class_name('Rolify::Base') }
+    it { is_expected.to belong_to(:role).class_name('Role::Base') }
     it { is_expected.to belong_to(:user) }
     it { is_expected.to belong_to(:workspace) }
 

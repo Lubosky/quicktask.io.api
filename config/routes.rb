@@ -4,6 +4,9 @@ Rails.application.routes.draw do
   namespace :api, defaults: { format: :json }, constraints: { subdomain: 'backend' } do
     scope module: :v1, constraints: Constraints::API.new(version: 1, default: true) do
 
+      resource :env, only: [:show], controller: 'env'
+      resource :status, only: [:show], controller: 'status'
+
       post :signup, to: 'signup_tokens#create'
       get 'signup/confirm', to: 'signup_tokens#verify'
 

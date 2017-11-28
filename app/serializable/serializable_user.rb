@@ -8,7 +8,7 @@ class SerializableUser < SerializableBase
   # TODO: Add Shrine
   # attribute :avatar
 
-  attribute :locale
+  attribute :language
   attribute :timezone do
     @object.time_zone
   end

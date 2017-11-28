@@ -34,6 +34,7 @@ gem 'puma', '~> 3.7'
 gem 'pundit'
 gem 'rack-attack'
 gem 'rack-canonical-host'
+gem 'rack-cors'
 gem 'rack-timeout'
 gem 'rails', '~> 5.1.4'
 gem 'rbtrace'
@@ -48,9 +49,6 @@ gem 'stateful_enum'
 gem 'sinatra', require: false
 gem 'stripe'
 gem 'twemoji'
-
-# Use Rack CORS for handling Cross-Origin Resource Sharing (CORS), making cross-origin AJAX possible
-# gem 'rack-cors'
 
 group :development, :test do
   gem 'dotenv-rails'

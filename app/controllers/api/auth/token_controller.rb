@@ -21,7 +21,11 @@ class Api::Auth::TokenController < Api::BaseController
   end
 
   def permitted_params
-    params.permit([:email, :password])
+    if params.has_key?(:_jsonapi)
+      params.require(:_jsonapi).permit([:email, :password])
+    else
+      params.permit([:email, :password])
+    end
   end
 
   def entity

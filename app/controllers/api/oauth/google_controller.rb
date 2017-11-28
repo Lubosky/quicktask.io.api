@@ -22,7 +22,11 @@ class Api::Oauth::GoogleController < Api::BaseController
   end
 
   def permitted_params
-    params.permit(:code)
+    if params.has_key?(:_jsonapi)
+      params.require(:_jsonapi).permit(:code)
+    else
+      params.permit(:code)
+    end
   end
 
   def entity

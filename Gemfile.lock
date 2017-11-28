@@ -245,6 +245,7 @@ GEM
     rack-canonical-host (0.2.3)
       addressable (> 0, < 3)
       rack (>= 1.0.0, < 3)
+    rack-cors (1.0.2)
     rack-protection (2.0.0)
       rack
     rack-test (0.8.2)
@@ -438,6 +439,7 @@ DEPENDENCIES
   pundit
   rack-attack
   rack-canonical-host
+  rack-cors
   rack-timeout
   rails (~> 5.1.4)
   rbtrace

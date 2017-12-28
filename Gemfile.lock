@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/AaronLasseigne/active_interaction.git
-  revision: 2f4e1cf676991930921e6436c4be27637ae8a17a
+  revision: d5db08250bc2eea63d2eb8098609cb36888a5edf
   branch: v4.0.0
   specs:
     active_interaction (3.6.1)
@@ -60,13 +60,13 @@ GEM
     arel (8.0.0)
     ast (2.3.0)
     bcrypt (3.1.11)
-    bootsnap (1.1.5)
+    bootsnap (1.1.7)
       msgpack (~> 1.0)
     bson (4.2.2)
     builder (3.2.3)
     byebug (9.1.0)
     coderay (1.1.2)
-    commonmarker (0.17.6)
+    commonmarker (0.17.7.1)
       ruby-enum (~> 0.5)
     concurrent-ruby (1.0.5)
     config (1.6.1)
@@ -95,7 +95,7 @@ GEM
     dry-container (0.6.0)
       concurrent-ruby (~> 1.0)
       dry-configurable (~> 0.1, >= 0.1.3)
-    dry-core (0.4.1)
+    dry-core (0.4.2)
       concurrent-ruby (~> 1.0)
     dry-equalizer (0.2.0)
     dry-logic (0.4.2)
@@ -127,8 +127,8 @@ GEM
     factory_bot_rails (4.8.2)
       factory_bot (~> 4.8.2)
       railties (>= 3.0.0)
-    faker (1.8.4)
-      i18n (~> 0.5)
+    faker (1.8.7)
+      i18n (>= 0.7)
     faraday (0.13.1)
       multipart-post (>= 1.2, < 3)
     ffi (1.9.18)
@@ -141,6 +141,15 @@ GEM
       jwt (>= 1)
     google_currency (3.4.0)
       money (~> 6.7)
+    graphiql-rails (1.4.8)
+      rails
+    graphql (1.7.7)
+    graphql-batch (0.3.8)
+      graphql (>= 0.8, < 2)
+      promise.rb (~> 0.7.2)
+    graphql-pundit (0.5.1)
+      graphql (>= 1.6.4, < 1.8.0)
+      pundit (~> 1.1.0)
     has_scope (0.7.1)
       actionpack (>= 4.1, < 5.2)
       activesupport (>= 4.1, < 5.2)
@@ -152,8 +161,7 @@ GEM
     htmlentities (4.3.4)
     httparty (0.15.6)
       multi_xml (>= 0.5.2)
-    i18n (0.9.1)
-      concurrent-ruby (~> 1.0)
+    i18n (0.8.6)
     inflecto (0.0.2)
     json (2.1.0)
     jsonapi-deserializable (0.2.0)
@@ -169,6 +177,10 @@ GEM
       activesupport (>= 5.0)
       pg (>= 0.18.1)
     jwt (2.1.0)
+    kaminari-activerecord (1.1.1)
+      activerecord
+      kaminari-core (= 1.1.1)
+    kaminari-core (1.1.1)
     launchy (2.4.3)
       addressable (~> 2.3)
     listen (3.1.5)
@@ -195,27 +207,27 @@ GEM
     minitest (5.10.3)
     mocha (1.3.0)
       metaclass (~> 0.0.1)
-    monetize (1.4.0)
-      money (~> 6.7)
-    money (6.10.0)
-      i18n (>= 0.6.4, < 1.0)
-    money-rails (1.7.0)
+    monetize (1.7.0)
+      money (~> 6.9)
+    money (6.9.0)
+      i18n (>= 0.6.4, < 0.9)
+    money-rails (1.9.0)
       activesupport (>= 3.0)
-      monetize (~> 1.4.0)
-      money (~> 6.7)
+      monetize (~> 1.7.0)
+      money (~> 6.9.0)
       railties (>= 3.0)
-    msgpack (1.1.0)
+    msgpack (1.2.0)
     multi_json (1.12.2)
     multi_xml (0.6.0)
     multipart-post (2.0.0)
     mustermann (1.0.1)
-    nio4r (2.1.0)
+    nio4r (2.2.0)
     nokogiri (1.8.1)
       mini_portile2 (~> 2.3.0)
     nokogumbo (1.4.13)
       nokogiri
     oj (3.3.9)
-    parallel (1.12.0)
+    parallel (1.12.1)
     parser (2.4.0.2)
       ast (~> 2.3)
     pg (0.21.0)
@@ -224,13 +236,14 @@ GEM
       addressable
       css_parser (>= 1.6.0)
       htmlentities (>= 4.0.0)
-    premailer-rails (1.10.0)
+    premailer-rails (1.10.1)
       actionmailer (>= 3, < 6)
       premailer (~> 1.7, >= 1.7.9)
+    promise.rb (0.7.4)
     pry (0.11.3)
       coderay (~> 1.1.0)
       method_source (~> 0.9.0)
-    pry-byebug (3.5.0)
+    pry-byebug (3.5.1)
       byebug (~> 9.1)
       pry (~> 0.10)
     pry-rails (0.3.6)
@@ -289,7 +302,7 @@ GEM
       redis (>= 3.0, < 5.0)
     redis (4.0.1)
     request_store (1.3.2)
-    rinku (2.0.3)
+    rinku (2.0.4)
     rspec-collection_matchers (1.1.3)
       rspec-expectations (>= 2.99.0.beta1)
     rspec-core (3.7.0)
@@ -328,7 +341,7 @@ GEM
       crass (~> 1.0.2)
       nokogiri (>= 1.4.4)
       nokogumbo (~> 1.4.1)
-    sass (3.5.3)
+    sass (3.5.4)
       sass-listen (~> 4.0.0)
     sass-listen (4.0.0)
       rb-fsevent (~> 0.9, >= 0.9.4)
@@ -374,7 +387,7 @@ GEM
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
     stateful_enum (0.4.0)
-    stripe (3.8.0)
+    stripe (3.9.1)
       faraday (~> 0.10)
     stripe-ruby-mock (2.5.0)
       dante (>= 0.2.0)
@@ -418,6 +431,10 @@ DEPENDENCIES
   fuubar
   google-id-token
   google_currency
+  graphiql-rails
+  graphql
+  graphql-batch
+  graphql-pundit
   has_scope
   hiredis
   html-pipeline
@@ -425,6 +442,7 @@ DEPENDENCIES
   jsonapi-rails!
   jsonb_accessor
   jwt
+  kaminari-activerecord
   listen (>= 3.0.5, < 3.2)
   lograge
   marginalia
@@ -467,7 +485,7 @@ DEPENDENCIES
   webmock
 
 RUBY VERSION
-   ruby 2.4.2p198
+   ruby 2.5.0p0
 
 BUNDLED WITH
-   1.16.0.pre.3
+   1.16.1

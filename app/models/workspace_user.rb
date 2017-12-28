@@ -18,7 +18,17 @@ class WorkspaceUser < ApplicationRecord
   validate :member_allowed_for_role?, if: :role_id_changed?
 
   delegate :first_name, :last_name, :locale, :time_zone, :settings, to: :user
-  delegate :permission_level, to: :role
+  delegate :permission_level, :permissions, to: :role
+
+  enum status: { pending: 0, active: 1, deactivated: 2 } do
+    event :activate do
+      transition all - [:active] => :active
+    end
+
+    event :deactivate do
+      transition all - [:deactivated] => :deactivated
+    end
+  end
 
   def client?
     symbolized_member_type == :client_contact

@@ -1,7 +1,13 @@
 require 'constraints/api.rb'
 
 Rails.application.routes.draw do
+  if Rails.env.development?
+    mount GraphiQL::Rails::Engine, at: '/graphiql', graphql_path: '/api/graphql'
+  end
+
   namespace :api, defaults: { format: :json }, constraints: { subdomain: 'backend' } do
+    post '/graphql', to: 'graphql#execute'
+
     scope module: :v1, constraints: Constraints::API.new(version: 1, default: true) do
 
       resource :env, only: [:show], controller: 'env'

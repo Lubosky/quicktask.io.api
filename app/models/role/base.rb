@@ -11,6 +11,14 @@ class Role::Base < ApplicationRecord
 
   discriminate Role, on: :permission_level
 
+  scope :assigned_to, ->(user) {
+    includes(workspace: :members).where(organization_members: { user_id: user.id })
+  }
+
+  scope :by_workspace, ->(workspace) {
+    where(workspace_id: workspace.id)
+  }
+
   before_destroy :check_deletable
 
   validates :permission_level, presence: true

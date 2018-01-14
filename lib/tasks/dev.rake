@@ -311,7 +311,7 @@ namespace :dev do
     Stripe::Token.create(
       card: {
         number: '4242424242424242',
-        exp_month: Date.current.month.next,
+        exp_month: Date.current.next_month.month,
         exp_year: Date.current.year.next,
         cvc: rand.to_s[2..4]
       }

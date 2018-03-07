@@ -25,13 +25,13 @@ Rails.application.routes.draw do
 
         resource :membership, only: [:create]
 
-        namespace :v, module: :contractor, as: :contractor do
+        namespace :client, module: :client, as: :client do
         end
 
-        namespace :c, module: :client, as: :client do
+        namespace :member, module: :member, as: :member do
         end
 
-        namespace :t, module: :team, as: :team do
+        namespace :vendor, module: :vendor, as: :vendor do
         end
       end
     end

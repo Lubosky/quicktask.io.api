@@ -53,7 +53,7 @@ module GliderPathApi
         authentication: ENV.fetch('SMTP_AUTHENTICATION', nil),
         user_name: ENV.fetch('SMTP_USERNAME', nil),
         password: ENV.fetch('SMTP_PASSWORD', nil),
-        domain: ENV.fetch('SMTP_DOMAIN', 'gliderpath.dev'),
+        domain: ENV.fetch('SMTP_DOMAIN', 'gliderpath.test'),
         openssl_verify_mode: 'none'
       }.compact
     else

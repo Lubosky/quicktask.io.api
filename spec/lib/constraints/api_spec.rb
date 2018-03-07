@@ -8,7 +8,7 @@ RSpec.describe Constraints::API do
   describe '#matches?' do
     context 'when the version matches the \'Accept\' header' do
       it 'returns true' do
-        request = stub(host: 'backend.gliderpath.dev',
+        request = stub(host: 'backend.gliderpath.test',
                        headers: { 'Accept' => 'application/vnd.gliderpath.v1+json' })
 
         expect(api_v1.matches?(request)).to be true
@@ -17,7 +17,7 @@ RSpec.describe Constraints::API do
 
     context 'when \'default\' option is specified' do
       it 'returns the default version' do
-        request = stub(host: 'backend.gliderpath.dev')
+        request = stub(host: 'backend.gliderpath.test')
 
         expect(api_v2.matches?(request)).to be true
       end
@@ -25,7 +25,7 @@ RSpec.describe Constraints::API do
 
     context 'when default option is not specified and there are no headers' do
       it 'returns false' do
-        request = stub(host: 'backend.gliderpath.dev')
+        request = stub(host: 'backend.gliderpath.test')
 
         expect(api_v1.matches?(request)).to be false
       end

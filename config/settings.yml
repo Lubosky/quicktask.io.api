@@ -1,11 +1,11 @@
 app:
   name: 'GliderPath'
   domain: gliderpath.com
-  default_email_address: <%= "gliderbot@#{ENV.fetch('SMTP_DOMAIN', 'gliderpath.dev')}" %>
-  notifications_email_address: <%= "notifications@#{ENV.fetch('SMTP_DOMAIN', 'gliderpath.dev')}" %>
+  default_email_address: <%= "gliderbot@#{ENV.fetch('SMTP_DOMAIN', 'gliderpath.test')}" %>
+  notifications_email_address: <%= "notifications@#{ENV.fetch('SMTP_DOMAIN', 'gliderpath.test')}" %>
 
 client:
-  url: <%= ENV.fetch('CLIENT_URL', 'http://app.gliderpath.dev:5000') %>
+  url: <%= ENV.fetch('CLIENT_URL', 'http://localhost:3000') %>
 
 company:
   name: GliderPath Limited

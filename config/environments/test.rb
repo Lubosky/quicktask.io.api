@@ -14,7 +14,7 @@ Rails.application.configure do
 
   config.action_dispatch.show_exceptions = false
 
-  config.action_mailer.default_url_options = { host: 'gliderpath.dev' }
+  config.action_mailer.default_url_options = { host: 'gliderpath.test' }
 
   config.active_support.deprecation = :stderr
 

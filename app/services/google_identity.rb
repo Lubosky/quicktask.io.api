@@ -8,9 +8,6 @@ class GoogleIdentity
   class_attribute :client_secret
   self.client_secret = Rails.application.secrets.google_secret
 
-  class_attribute :redirect_uri
-  self.redirect_uri = Rails.application.secrets.google_redirect_uri
-
   class_attribute :token_expiry
   self.token_expiry = 5.minutes
 
@@ -123,7 +120,7 @@ class GoogleIdentity
         code: authorization_code,
         client_id: client_id,
         client_secret: client_secret,
-        redirect_uri: redirect_uri,
+        redirect_uri: 'postmessage',
         grant_type: 'authorization_code'
       }
     }

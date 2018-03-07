@@ -24,5 +24,4 @@ Rails.application.configure do
   ENV['SECRET_SALT']          = 'xxxxxxxxx'
   ENV['GOOGLE_KEY']           = '123456789.apps.googleusercontent.com'
   ENV['GOOGLE_SECRET']        = '999000999'
-  ENV['GOOGLE_REDIRECT_URI']  = "#{URI.join(Settings.client.url, 'callback-google')}"
 end

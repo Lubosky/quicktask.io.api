@@ -141,29 +141,6 @@ RSpec.describe Api::Auth::PasswordController, type: :controller do
       expect(response.code).to eq '200'
     end
 
-    it 'returns a 401 when submitted email doesn\'t match email from token' do
-      user = create(:user, email: 'dev@example.com')
-      token = password_token_for(user: user)
-      params = {
-        _jsonapi: {
-          data: {
-            type: 'password',
-            attributes: {
-              email: 'dev@example.dev',
-              password: 'password',
-              password_confirmation: 'password',
-              token: token
-            }
-          }
-        }
-      }
-
-      post :reset, params: params
-
-      expect(response).to have_http_status(:unauthorized)
-      expect(response.code).to eq '401'
-    end
-
     it 'returns a 401 when token isn\'t valid' do
       user = create(:user, email: 'dev@example.com')
       params = {

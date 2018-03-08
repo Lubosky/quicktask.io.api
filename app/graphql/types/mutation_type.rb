@@ -1,12 +1,7 @@
 Types::MutationType = GraphQL::ObjectType.define do
   name 'Mutation'
-  description 'Base mutation type to rule them all'
+  description 'Base mutation type to rule them all.'
 
-  # TODO: Remove me
-  field :testField, types.String do
-    description "An example field added by the generator"
-    resolve ->(obj, args, ctx) {
-      "Hello World!"
-    }
-  end
+  field :authenticateUser, Mutations::AuthenticateUserMutation
+  field :authenticateUserWithGoogle, Mutations::AuthenticateUserWithGoogleMutation
 end

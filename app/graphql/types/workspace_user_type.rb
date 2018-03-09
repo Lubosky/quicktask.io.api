@@ -1,9 +1,9 @@
 Types::WorkspaceUserType = GraphQL::ObjectType.define do
   name 'WorkspaceUser'
-  description 'Data of a workspace member'
+  description 'Data of a workspace member.'
 
   field :id, !types.ID do
-    description 'Globally unique ID of the user.'
+    description 'Globally unique ID of the workspace user.'
   end
 
   field :uuid, !types.String do
@@ -13,6 +13,16 @@ Types::WorkspaceUserType = GraphQL::ObjectType.define do
   field :type, !types.String do
     description ''
     property :member_type
+  end
+
+  field :workspaceId, !types.ID do
+    description 'Globally unique ID of the workspace.'
+    property :workspace_id
+  end
+
+  field :userId, !types.ID do
+    description 'Globally unique ID of the user.'
+    property :user_id
   end
 
   field :status, types.String do

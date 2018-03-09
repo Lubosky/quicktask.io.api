@@ -74,7 +74,24 @@ Types::UserType = GraphQL::ObjectType.define do
 
   field :workspaces, !types[!Types::WorkspaceType] do
     description 'Workspaces and organizations this user may access.'
-    scope ->(obj, _args, ctx) { Workspace.accessible_by(obj) }
+    scope ->(obj, _args, _ctx) { Workspace.accessible_by(obj) }
+
+    argument :limit, types.Int do
+      description 'A limit on the number of objects to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
+    end
+
+    argument :page, types.Int do
+      description 'Indicates the number of the page. All paginated queries start at page 1.'
+    end
+
+    resolve ->(collection, args, _ctx) {
+      collection.page(args['page']).per(args['limit'])
+    }
+  end
+
+  field :workspaceUsers, !types[!Types::WorkspaceUserType] do
+    description ''
+    scope ->(obj, _args, _ctx) { obj.members }
 
     argument :limit, types.Int do
       description 'A limit on the number of objects to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'

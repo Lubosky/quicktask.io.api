@@ -49,27 +49,10 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     resolve ->(obj, _args, _ctx) { obj.membership }
   end
 
-  field :members do
-    type !types[!Types::WorkspaceUserType]
-    description 'Array of users who are members of this workspace.'
-    scope ->(obj, _args, _ctx) { obj.members }
-
-    argument :limit, types.Int do
-      description 'A limit on the number of objects to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
-    end
-
-    argument :page, types.Int do
-      description 'Indicates the number of the page. All paginated queries start at page 1.'
-    end
-
-    resolve ->(collection, args, _ctx) {
-      collection.page(args['page']).per(args['limit'])
-    }
-  end
-
-  field :roles do
+  field :userRoles do
     type !types[!Types::WorkspaceUserType]
     description ''
+
     scope ->(obj, _args, ctx) { obj.members.where(user_id: ctx[:current_user].id) }
 
     resolve ->(collection, _args, _ctx) {

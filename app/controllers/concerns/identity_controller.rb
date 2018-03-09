@@ -33,7 +33,9 @@ module IdentityController
   end
 
   def workspace_identifier
-    params[:identifier] || params[:workspace_identifier]
+    params[:identifier] ||
+    params[:workspace_identifier] ||
+    graphql_variables[:workspaceIdentifier]
   end
 
   def workspace_identifier?
@@ -71,6 +73,14 @@ module IdentityController
   def token_from_request_headers
     unless request.headers['Authorization'].nil?
       request.headers['Authorization'].split.last
+    end
+  end
+
+  def graphql_variables
+    if params[:variables]
+      params[:variables]
+    else
+      {}
     end
   end
 
@@ -158,6 +168,23 @@ module IdentityController
   end
 
   def set_current_workspace_user
-    current_workspace.members.find_by(user: current_user)
+    if workspace_user_identifier = graphql_variables[:workspaceUserIdentifier]
+      set_current_workspace_user_for(workspace_user_identifier)
+    else
+      current_workspace.members.find_by(user: current_user)
+    end
+  end
+
+  def set_current_workspace_user_for(identifier)
+    case identifier.underscore.to_sym
+    when :team_member
+      current_workspace.collaborating_team_members.find_by(user: current_user)
+    when :contractor
+      current_workspace.collaborating_contractors.find_by(user: current_user)
+    when :client_contact
+      current_workspace.collaborating_clients.find_by(user: current_user)
+    else
+      nil
+    end
   end
 end

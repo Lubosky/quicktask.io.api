@@ -10,10 +10,6 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description 'A unique substitute for a Workspace ID.'
   end
 
-  field :slug, !types.String do
-    description 'The URL slug of the workspace.'
-  end
-
   field :name, !types.String do
     description 'The name of the workspace.'
   end

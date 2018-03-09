@@ -17,9 +17,6 @@ RSpec.describe Workspace, type: :model do
 
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:owner_id) }
-    it { is_expected.to validate_uniqueness_of(:slug) }
-    it { is_expected.to validate_length_of(:slug).is_at_least(2) }
-    it { is_expected.to validate_length_of(:slug).is_at_most(18) }
     it { is_expected.to validate_presence_of(:uuid) }
     it { is_expected.to validate_uniqueness_of(:uuid) }
   end

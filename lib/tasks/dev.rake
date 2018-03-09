@@ -331,7 +331,7 @@ namespace :dev do
   end
 
   def puts_membership(membership)
-    puts "Membership for workspace: #{membership.workspace.name} / #{membership.workspace.slug}"
+    puts "Membership for workspace: #{membership.workspace.name}"
   end
 
   def puts_project_group(project_group, workspace)
@@ -343,7 +343,7 @@ namespace :dev do
   end
 
   def puts_role(workspace)
-    puts "Roles for workspace: #{workspace.name} / #{workspace.slug}"
+    puts "Roles for workspace: #{workspace.name}"
   end
 
   def puts_user(user, description)
@@ -351,11 +351,11 @@ namespace :dev do
   end
 
   def puts_workspace(workspace, description)
-    puts "#{workspace.name} / #{workspace.slug} (#{description})"
+    puts "#{workspace.name} (#{description})"
   end
 
   def puts_workspace_currency(workspace)
-    puts "Currencies for workspace: #{workspace.name} / #{workspace.slug}"
+    puts "Currencies for workspace: #{workspace.name}"
   end
 
   def puts_workspace_user(workspace_user)

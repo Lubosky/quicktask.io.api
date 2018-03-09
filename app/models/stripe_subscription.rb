@@ -97,8 +97,7 @@ class StripeSubscription
   def metadata_attributes
     {
       owner_uuid: workspace&.owner&.uuid,
-      workspace_id: workspace.uuid,
-      workspace_slug: workspace.slug,
+      workspace_uuid: workspace.uuid,
       workspace_name: workspace.name
     }
   end

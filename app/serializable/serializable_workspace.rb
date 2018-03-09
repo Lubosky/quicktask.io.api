@@ -7,7 +7,6 @@ class SerializableWorkspace < SerializableBase
   end
 
   attribute :name
-  attribute :slug
   attribute :status
   attribute :business_name
   attribute :business_settings

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20171121215127) do
+ActiveRecord::Schema.define(version: 20180309085300) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -164,7 +164,6 @@ ActiveRecord::Schema.define(version: 20171121215127) do
     t.string "uuid", limit: 24, null: false
     t.bigint "owner_id", null: false
     t.string "stripe_customer_id"
-    t.string "slug", null: false
     t.string "name", null: false
     t.string "business_name"
     t.jsonb "business_settings", default: {}
@@ -180,7 +179,6 @@ ActiveRecord::Schema.define(version: 20171121215127) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.index ["owner_id"], name: "index_organizations_on_owner_id"
-    t.index ["slug"], name: "index_organizations_on_slug", unique: true
     t.index ["stripe_customer_id"], name: "index_organizations_on_stripe_customer_id"
     t.index ["uuid"], name: "index_organizations_on_uuid", unique: true
   end

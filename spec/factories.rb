@@ -11,10 +11,6 @@ FactoryBot.define do
     "name_#{n}"
   end
 
-  sequence :slug do |n|
-    "slug-#{n}"
-  end
-
   sequence :uuid do |n|
     "uuid_#{n}"
   end
@@ -186,7 +182,6 @@ FactoryBot.define do
   factory :workspace do
     uuid
     name
-    slug
     currency :usd
     association :owner, factory: :user
 

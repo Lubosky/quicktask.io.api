@@ -3,29 +3,29 @@ require 'rails_helper'
 RSpec.describe Api::V1::WorkspacesController, type: :controller do
   describe '#show' do
     it 'returns a 401 when user is not authenticated' do
-      workspace = build_stubbed(:workspace, slug: 'subscribed-space')
-      get :show, params: { identifier: workspace.slug }
+      workspace = build_stubbed(:workspace)
+      get :show, params: { identifier: workspace.id }
 
       expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns a 401 when invalid token is supplied' do
       invalid_token_authentication
-      get :show, params: { identifier: @workspace.slug }
+      get :show, params: { identifier: @workspace.id }
 
       expect(response).to have_http_status(:unauthorized)
     end
 
     it 'returns a 401 when invalid user is supplied' do
       invalid_entity_authentication
-      get :show, params: { identifier: @workspace.slug }
+      get :show, params: { identifier: @workspace.id }
 
       expect(response).to have_http_status(:unauthorized)
     end
 
-    it 'returns a 401 when invalid workspace slug is supplied' do
+    it 'returns a 401 when invalid workspace ID is supplied' do
       valid_token_authentication
-      workspace = build_stubbed(:workspace, slug: 'subscribed-space')
+      workspace = build_stubbed(:workspace)
       get :show, params: { identifier: 'subscribed' }
 
       expect(response).to have_http_status(:unauthorized)
@@ -34,17 +34,17 @@ RSpec.describe Api::V1::WorkspacesController, type: :controller do
 
     it 'returns a 200 when user is successfully authenticated and workspace exists' do
       valid_token_authentication
-      get :show, params: { identifier: @workspace.slug }
+      get :show, params: { identifier: @workspace.id }
 
       expect(response).to have_http_status(:success)
     end
 
     it 'returns current_workspace upon successful authentication' do
       valid_token_authentication
-      get :show, params: { identifier: @workspace.slug }
+      get :show, params: { identifier: @workspace.id }
 
       expect(response).to have_http_status(:success)
-      expect(@controller.current_workspace.slug).to eq @workspace.slug
+      expect(@controller.current_workspace.id).to eq @workspace.id
     end
   end
 

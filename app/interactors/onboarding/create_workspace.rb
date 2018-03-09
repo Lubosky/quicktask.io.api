@@ -1,6 +1,5 @@
 class Onboarding::CreateWorkspace < ApplicationInteractor
   string :name
-  string :slug, default: nil
 
   def execute
     transaction do
@@ -68,7 +67,7 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
   end
 
   def workspace_attributes
-    attributes.slice(:name, :slug).tap do |hash|
+    attributes.slice(:name).tap do |hash|
       hash[:owner] = user
     end
   end

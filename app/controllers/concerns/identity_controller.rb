@@ -130,7 +130,7 @@ module IdentityController
         unless instance_variable_defined?(memoization_variable_name)
           current =
             begin
-              Workspace.find_by!(slug: workspace_identifier.downcase)
+              Workspace.find_by!(id: workspace_identifier)
             rescue ActiveRecord::RecordNotFound
               nil
             end

@@ -20,7 +20,7 @@ RSpec.describe Api::V1::MembershipsController, type: :controller do
         membership: {
           stripe_token: card_token, quantity: 1, interval: 'month'
         },
-        workspace_identifier: @workspace.slug
+        workspace_identifier: @workspace.id
       }
 
       expect(response).to have_http_status(:success)

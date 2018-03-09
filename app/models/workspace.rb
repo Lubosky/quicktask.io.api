@@ -59,15 +59,11 @@ class Workspace < ApplicationRecord
     joins(:members).where(organization_members: { user_id: user.id }).distinct
   }
 
-  before_validation :generate_unique_slug, on: :create
   after_initialize :set_default_attributes, on: :create
   after_update :update_exchange_rates
 
   validates :currency, presence: true, length: { is: 3 }
-  validates :slug, :name, :owner_id, presence: true
-  validates :slug, format: { with: /\A[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]\z/ },
-                   length: { minimum: 2, maximum: 18 },
-                   uniqueness: { conditions: -> { where(deleted_at: nil) } }
+  validates :name, :owner_id, presence: true
 
   enum status: { pending: 0, active: 1, deactivated: 2 } do
     event :activate do
@@ -111,10 +107,6 @@ class Workspace < ApplicationRecord
     stripe_customer_id.present?
   end
 
-  def generate_unique_slug
-    self.slug ||= slugify
-  end
-
   private
 
   def set_default_attributes
@@ -131,9 +123,5 @@ class Workspace < ApplicationRecord
     if stripe_customer?
       @stripe_customer ||= Stripe::Customer.retrieve(stripe_customer_id)
     end
-  end
-
-  def slugify
-    SlugGenerator.slugify(self.name)
   end
 end

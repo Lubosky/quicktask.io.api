@@ -56,7 +56,7 @@ class Workspace < ApplicationRecord
   has_one :membership, inverse_of: :workspace, dependent: :destroy
 
   scope :accessible_by, ->(user) {
-    includes(:members).where(organization_members: { user_id: user.id })
+    joins(:members).where(organization_members: { user_id: user.id }).distinct
   }
 
   before_validation :generate_unique_slug, on: :create

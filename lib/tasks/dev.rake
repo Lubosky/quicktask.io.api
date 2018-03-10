@@ -116,6 +116,23 @@ namespace :dev do
     membership.fulfill
 
     puts_membership membership
+
+    workspace = create(
+      :workspace,
+      name: 'Awesome Space',
+      owner: User.find_by(email: 'google@example.dev')
+    )
+
+    membership = build(
+      :membership,
+      workspace: workspace,
+      owner: workspace.owner,
+      stripe_token: generate_stripe_token
+    )
+
+    membership.fulfill
+
+    puts_membership membership
   end
 
   def create_roles
@@ -131,83 +148,83 @@ namespace :dev do
   def create_clients
     header 'Clients'
 
-    workspace = Workspace.find_by(name: 'Subscribed Space')
+    Workspace.active.find_each do |workspace|
+      client = create(
+        :client,
+        workspace: workspace,
+        name: Faker::Name.name,
+        email: Faker::Internet.email
+      )
+      puts_client client
 
-    client = create(
-      :client,
-      workspace: workspace,
-      name: Faker::Name.name,
-      email: Faker::Internet.email
-    )
-    puts_client client
+      client = create(
+        :client,
+        workspace: workspace,
+        name: Faker::Name.name,
+        email: Faker::Internet.email
+      )
+      puts_client client
 
-    client = create(
-      :client,
-      workspace: workspace,
-      name: Faker::Name.name,
-      email: Faker::Internet.email
-    )
-    puts_client client
-
-    client = create(
-      :client,
-      workspace: workspace,
-      name: Faker::Name.name,
-      email: Faker::Internet.email
-    )
-    puts_client client
+      client = create(
+        :client,
+        workspace: workspace,
+        name: Faker::Name.name,
+        email: Faker::Internet.email
+      )
+      puts_client client
+    end
   end
 
   def create_client_contacts
     header 'Client Contacts'
 
-    workspace = Workspace.find_by(name: 'Subscribed Space')
+    Workspace.active.find_each do |workspace|
+      workspace.clients.find_each do |client|
+        client_contact = create(
+          :client_contact,
+          client: client,
+          workspace: workspace,
+          first_name: Faker::Name.first_name,
+          last_name: Faker::Name.last_name,
+          email: Faker::Internet.email
+        )
+        puts_client_contact client_contact
 
-    workspace.clients.find_each do |client|
-      client_contact = create(
-        :client_contact,
-        client: client,
-        workspace: workspace,
-        first_name: Faker::Name.first_name,
-        last_name: Faker::Name.last_name,
-        email: Faker::Internet.email
-      )
-      puts_client_contact client_contact
+        client_contact = create(
+          :client_contact,
+          client: client,
+          workspace: workspace,
+          first_name: Faker::Name.first_name,
+          last_name: Faker::Name.last_name,
+          email: Faker::Internet.email
+        )
+        puts_client_contact client_contact
 
-      client_contact = create(
-        :client_contact,
-        client: client,
-        workspace: workspace,
-        first_name: Faker::Name.first_name,
-        last_name: Faker::Name.last_name,
-        email: Faker::Internet.email
-      )
-      puts_client_contact client_contact
-
-      client_contact = create(
-        :client_contact,
-        client: client,
-        workspace: workspace,
-        first_name: Faker::Name.first_name,
-        last_name: Faker::Name.last_name,
-        email: Faker::Internet.email
-      )
-      puts_client_contact client_contact
+        client_contact = create(
+          :client_contact,
+          client: client,
+          workspace: workspace,
+          first_name: Faker::Name.first_name,
+          last_name: Faker::Name.last_name,
+          email: Faker::Internet.email
+        )
+        puts_client_contact client_contact
+      end
     end
   end
 
   def create_project_groups
     header 'Project Groups'
 
-    workspace = Workspace.active.first
-
-    workspace.clients.find_each do |client|
-      project_group = create(
-        :project_group,
-        client: client,
-        workspace: workspace
-      )
-      puts_project_group(project_group, workspace)
+    Workspace.active.find_each do |workspace|
+      workspace.clients.find_each do |client|
+        project_group = create(
+          :project_group,
+          client: client,
+          workspace: workspace
+        )
+        puts_project_group(project_group, workspace)
+      end
     end
   end
 
@@ -257,53 +274,53 @@ namespace :dev do
   def create_workspace_users
     header 'Workspace Users'
 
-    workspace = Workspace.find_by(name: 'Subscribed Space')
-
-    team_member = create(
-      :team_member,
-      workspace: workspace,
-      first_name: Faker::Name.first_name,
-      last_name: Faker::Name.last_name,
-      email: Faker::Internet.email
-    )
-
-    workspace_user = create(
-      :workspace_user,
-      member: team_member,
-      role: workspace.roles.find_by(permission_level: :owner),
-      workspace: workspace,
-      user: workspace.owner
-    )
-    puts_workspace_user workspace_user
-
-    contractor = create(
-      :contractor,
-      workspace: workspace,
-      first_name: Faker::Name.first_name,
-      last_name: Faker::Name.last_name,
-      email: Faker::Internet.email
-    )
-
-    workspace_user = create(
-      :workspace_user,
-      member: contractor,
-      role: workspace.roles.find_by(permission_level: :collaborator),
-      workspace: workspace,
-      user: User.find_by(email: 'contractor@example.dev')
-    )
-    puts_workspace_user workspace_user
-
-    workspace.clients.find_each do |client|
-      cc = client.client_contacts.first
+    Workspace.active.find_each do |workspace|
+      team_member = create(
+        :team_member,
+        workspace: workspace,
+        first_name: Faker::Name.first_name,
+        last_name: Faker::Name.last_name,
+        email: Faker::Internet.email
+      )
 
       workspace_user = create(
         :workspace_user,
-        member: cc,
-        role: workspace.roles.find_by(permission_level: :client),
+        member: team_member,
+        role: workspace.roles.find_by(permission_level: :owner),
         workspace: workspace,
-        user: create(:user, :confirmed_user, first_name: cc.first_name, last_name: cc.first_name, email: cc.email)
+        user: workspace.owner
       )
       puts_workspace_user workspace_user
+
+      contractor = create(
+        :contractor,
+        workspace: workspace,
+        first_name: Faker::Name.first_name,
+        last_name: Faker::Name.last_name,
+        email: Faker::Internet.email
+      )
+
+      workspace_user = create(
+        :workspace_user,
+        member: contractor,
+        role: workspace.roles.find_by(permission_level: :collaborator),
+        workspace: workspace,
+        user: User.find_by(email: 'contractor@example.dev')
+      )
+      puts_workspace_user workspace_user
+
+      workspace.clients.find_each do |client|
+        cc = client.client_contacts.first
+
+        workspace_user = create(
+          :workspace_user,
+          member: cc,
+          role: workspace.roles.find_by(permission_level: :client),
+          workspace: workspace,
+          user: create(:user, :confirmed_user, first_name: cc.first_name, last_name: cc.first_name, email: cc.email)
+        )
+        puts_workspace_user workspace_user
+      end
     end
   end
 

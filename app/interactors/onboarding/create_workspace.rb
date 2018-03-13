@@ -5,6 +5,7 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
     transaction do
       create_workspace
       create_workspace_roles
+      create_languages
       create_team_member
       create_workspace_user
     end
@@ -12,6 +13,10 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
   end
 
   private
+
+  def create_languages
+    Language.create_for(workspace)
+  end
 
   def create_team_member
     unless team_member.save

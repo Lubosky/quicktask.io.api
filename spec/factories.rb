@@ -38,6 +38,13 @@ FactoryBot.define do
     association :workspace, factory: :workspace
   end
 
+  factory :language do
+    uuid
+    code :en
+    name
+    association :workspace, factory: :workspace
+  end
+
   factory :membership, aliases: [:active_membership] do
     uuid
     quantity 1

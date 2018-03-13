@@ -19,6 +19,7 @@ namespace :dev do
     create_workspaces
     create_memberships
     create_roles
+    create_languages
     create_workspace_currencies
     create_clients
     create_client_contacts
@@ -142,6 +143,16 @@ namespace :dev do
       Role::Base.create_for(workspace)
 
       puts_role workspace
+    end
+  end
+
+  def create_languages
+    header 'Languages'
+
+    Workspace.find_each do |workspace|
+      Language.create_for(workspace)
+
+      puts_language workspace
     end
   end
 
@@ -345,6 +356,10 @@ namespace :dev do
 
   def puts_client_contact(client_contact)
     puts "Contact #{client_contact.first_name} #{client_contact.last_name} / #{client_contact.email} for client #{client_contact.client.name} in workspace: #{client_contact.workspace.name}"
+  end
+
+  def puts_language(workspace)
+    puts "Languages for workspace: #{workspace.name}"
   end
 
   def puts_membership(membership)

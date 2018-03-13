@@ -41,6 +41,7 @@ class Workspace < ApplicationRecord
            class_name: 'WorkspaceUser',
            foreign_key: :workspace_id
 
+  has_many :languages, inverse_of: :workspace, dependent: :destroy
   has_many :charges, inverse_of: :workspace, dependent: :destroy
   has_many :project_groups, inverse_of: :workspace, dependent: :destroy
   has_many :roles, class_name: 'Role::Base', dependent: :destroy
@@ -105,6 +106,10 @@ class Workspace < ApplicationRecord
 
   def stripe_customer?
     stripe_customer_id.present?
+  end
+
+  def available_languages
+    @available_languages = Config::Language.all
   end
 
   private

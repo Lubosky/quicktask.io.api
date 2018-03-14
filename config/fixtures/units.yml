@@ -1,0 +1,9 @@
+-
+  name: 'Word'
+  deletable: false
+-
+  name: 'Page'
+-
+  name: 'Hour'
+  unit_type: 'time'
+  deletable: false

@@ -160,6 +160,12 @@ FactoryBot.define do
     expiry_date Time.current + 12.hours
   end
 
+  factory :unit do
+    uuid
+    name
+    association :workspace, factory: :workspace
+  end
+
   factory :user do
     uuid
     email

@@ -44,15 +44,17 @@ class Workspace < ApplicationRecord
   has_many :languages, inverse_of: :workspace, dependent: :destroy
   has_many :charges, inverse_of: :workspace, dependent: :destroy
   has_many :project_groups, inverse_of: :workspace, dependent: :destroy
-  has_many :roles, class_name: 'Role::Base', dependent: :destroy
 
   has_many :projects, inverse_of: :workspace, dependent: :destroy
 
+  has_many :roles, class_name: 'Role::Base', dependent: :destroy
   has_many :supported_currencies,
            inverse_of: :workspace,
            class_name: 'WorkspaceCurrency',
            foreign_key: :workspace_id,
            dependent: :destroy
+
+  has_many :units, inverse_of: :workspace, dependent: :destroy
 
   has_one :membership, inverse_of: :workspace, dependent: :destroy
 

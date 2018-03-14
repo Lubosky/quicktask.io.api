@@ -6,6 +6,7 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
       create_workspace
       create_workspace_roles
       create_languages
+      create_units
       create_team_member
       create_workspace_user
     end
@@ -23,6 +24,10 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
       errors.merge!(team_member.errors)
       rollback
     end
+  end
+
+  def create_units
+    Unit.create_for(workspace)
   end
 
   def create_workspace

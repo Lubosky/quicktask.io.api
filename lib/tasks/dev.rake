@@ -20,6 +20,7 @@ namespace :dev do
     create_memberships
     create_roles
     create_languages
+    create_units
     create_workspace_currencies
     create_clients
     create_client_contacts
@@ -153,6 +154,16 @@ namespace :dev do
       Language.create_for(workspace)
 
       puts_language workspace
+    end
+  end
+
+  def create_units
+    header 'Units'
+
+    Workspace.find_each do |workspace|
+      Unit.create_for(workspace)
+
+      puts_unit workspace
     end
   end
 
@@ -376,6 +387,10 @@ namespace :dev do
 
   def puts_role(workspace)
     puts "Roles for workspace: #{workspace.name}"
+  end
+
+  def puts_unit(workspace)
+    puts "Units for workspace: #{workspace.name}"
   end
 
   def puts_user(user, description)

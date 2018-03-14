@@ -20,6 +20,7 @@ namespace :dev do
     create_memberships
     create_roles
     create_languages
+    create_services
     create_units
     create_workspace_currencies
     create_clients
@@ -164,6 +165,23 @@ namespace :dev do
       Unit.create_for(workspace)
 
       puts_unit workspace
+    end
+  end
+
+  def create_services
+    header 'Services'
+
+    Workspace.find_each do |workspace|
+      [:translation, :interpreting, :localization, :other].each do |type|
+        create(
+          :service,
+          workspace: workspace,
+          classification: type.to_sym,
+          name: type.to_s.capitalize
+        )
+      end
+
+      puts_service workspace
     end
   end
 
@@ -387,6 +405,10 @@ namespace :dev do
 
   def puts_role(workspace)
     puts "Roles for workspace: #{workspace.name}"
+  end
+
+  def puts_service(workspace)
+    puts "Services for workspace: #{workspace.name}"
   end
 
   def puts_unit(workspace)

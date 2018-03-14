@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180313172114) do
+ActiveRecord::Schema.define(version: 20180314134355) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -255,6 +255,18 @@ ActiveRecord::Schema.define(version: 20180313172114) do
     t.index ["project_type", "workspace_id"], name: "index_projects_on_project_type_and_workspace_id"
     t.index ["uuid"], name: "index_projects_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_projects_on_workspace_id"
+  end
+
+  create_table "services", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "workspace_id", null: false
+    t.integer "classification", null: false
+    t.string "name", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["uuid"], name: "index_services_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_services_on_workspace_id"
   end
 
   create_table "team_members", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|

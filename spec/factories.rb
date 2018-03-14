@@ -148,6 +148,13 @@ FactoryBot.define do
     factory :owner_role, class: Role::Owner
   end
 
+  factory :service do
+    uuid
+    classification :translation
+    name
+    association :workspace, factory: :workspace
+  end
+
   factory :team_member do
     uuid
     email

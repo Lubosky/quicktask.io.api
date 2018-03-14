@@ -48,6 +48,7 @@ class Workspace < ApplicationRecord
   has_many :projects, inverse_of: :workspace, dependent: :destroy
 
   has_many :roles, class_name: 'Role::Base', dependent: :destroy
+  has_many :services, inverse_of: :workspace, dependent: :destroy
   has_many :supported_currencies,
            inverse_of: :workspace,
            class_name: 'WorkspaceCurrency',

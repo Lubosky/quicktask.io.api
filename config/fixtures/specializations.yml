@@ -1,0 +1,31 @@
+-
+  name: 'Business General'
+  default: true
+-
+  name: 'Ad-Words / Banners'
+-
+  name: 'Automotive / Aerospace'
+-
+  name: 'CV'
+-
+  name: 'Forex / Finance'
+-
+  name: 'Gaming / Video Games'
+-
+  name: 'Legal'
+-
+  name: 'Marketing / Consumer / Media'
+-
+  name: 'Medical'
+-
+  name: 'Mobile Applications'
+-
+  name: 'Patents'
+-
+  name: 'Scientific / Academic'
+-
+  name: 'Software / IT'
+-
+  name: 'Technical / Engineering'
+-
+  name: 'Tourism'

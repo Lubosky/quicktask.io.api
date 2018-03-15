@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180314134355) do
+ActiveRecord::Schema.define(version: 20180318084547) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -269,6 +269,26 @@ ActiveRecord::Schema.define(version: 20180314134355) do
     t.index ["workspace_id"], name: "index_services_on_workspace_id"
   end
 
+  create_table "specialization_relations", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "specializable_type", null: false
+    t.bigint "specializable_id", null: false
+    t.bigint "specialization_id", null: false
+    t.index ["specializable_type", "specializable_id"], name: "index_specialization_relations_on_specializable"
+    t.index ["specialization_id"], name: "index_specialization_relations_on_specialization_id"
+  end
+
+  create_table "specializations", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "workspace_id", null: false
+    t.string "name", null: false
+    t.boolean "default", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["uuid"], name: "index_specializations_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_specializations_on_workspace_id"
+  end
+
   create_table "team_members", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
     t.string "uuid", limit: 24, null: false
     t.bigint "workspace_id", null: false
@@ -328,4 +348,5 @@ ActiveRecord::Schema.define(version: 20180314134355) do
     t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
 
+  add_foreign_key "specialization_relations", "specializations"
 end

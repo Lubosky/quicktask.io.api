@@ -21,6 +21,7 @@ namespace :dev do
     create_roles
     create_languages
     create_services
+    create_specializations
     create_units
     create_workspace_currencies
     create_clients
@@ -182,6 +183,16 @@ namespace :dev do
       end
 
       puts_service workspace
+    end
+  end
+
+  def create_specializations
+    header 'Specializations'
+
+    Workspace.find_each do |workspace|
+      Specialization.create_for(workspace)
+
+      puts_specialization workspace
     end
   end
 
@@ -409,6 +420,10 @@ namespace :dev do
 
   def puts_service(workspace)
     puts "Services for workspace: #{workspace.name}"
+  end
+
+  def puts_specialization(workspace)
+    puts "Specializations for workspace: #{workspace.name}"
   end
 
   def puts_unit(workspace)

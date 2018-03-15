@@ -244,6 +244,16 @@ FactoryBot.define do
     association :workspace, factory: :workspace
   end
 
+  factory :specialization do
+    uuid
+    name
+    association :workspace, factory: :workspace
+
+    trait :default do
+      default true
+    end
+  end
+
   factory :workspace_user do
     uuid
     association :member, factory: :team_member

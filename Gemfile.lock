@@ -135,6 +135,7 @@ GEM
     fuubar (2.3.1)
       rspec-core (~> 3.0)
       ruby-progressbar (~> 1.4)
+    geocoder (1.4.7)
     globalid (0.4.1)
       activesupport (>= 4.2.0)
     google-id-token (1.4.2)
@@ -432,6 +433,7 @@ DEPENDENCIES
   factory_bot_rails
   faker
   fuubar
+  geocoder
   google-id-token
   google_currency
   graphiql-rails

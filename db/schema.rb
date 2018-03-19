@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180318084547) do
+ActiveRecord::Schema.define(version: 20180318084810) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -94,6 +94,30 @@ ActiveRecord::Schema.define(version: 20180318084547) do
     t.index ["code", "workspace_id"], name: "index_languages_on_code_and_workspace_id"
     t.index ["uuid"], name: "index_languages_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_languages_on_workspace_id"
+  end
+
+  create_table "locations", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.string "addressable_type", null: false
+    t.bigint "addressable_id", null: false
+    t.bigint "workspace_id", null: false
+    t.string "street_name"
+    t.string "street_number"
+    t.string "city"
+    t.string "state"
+    t.string "postal_code"
+    t.string "country"
+    t.string "address"
+    t.string "formatted_address"
+    t.point "coordinates"
+    t.float "latitude"
+    t.float "longitude"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["addressable_type", "addressable_id"], name: "index_locations_on_addressable_type_and_addressable_id"
+    t.index ["uuid"], name: "index_locations_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_locations_on_workspace_id"
   end
 
   create_table "memberships", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|

@@ -6,25 +6,16 @@ class User < ApplicationRecord
 
   has_secure_password validations: false
 
-  has_many :members, class_name: 'WorkspaceUser', foreign_key: :user_id
+  with_options dependent: :restrict_with_error, foreign_key: :owner_id, inverse_of: :owner do
+    has_many :owned_workspaces, class_name: 'Workspace'
+    has_many :owned_memberships, class_name: 'Membership'
+  end
 
+  has_many :members, class_name: 'WorkspaceUser', foreign_key: :user_id
   has_many :workspaces,
            through: :members,
            class_name: 'Workspace',
            foreign_key: :workspace_id
-
-  has_many :owned_workspaces,
-           inverse_of: :owner,
-           class_name: 'Workspace',
-           foreign_key: :owner_id,
-           dependent: :restrict_with_error
-
-  has_many :owned_memberships,
-           inverse_of: :owner,
-           class_name: 'Membership',
-           foreign_key: :owner_id,
-           dependent: :restrict_with_error
-
   has_many :tokens, foreign_key: :subject_id, dependent: :delete_all
 
   validates :email, email: true, presence: true, uniqueness: true

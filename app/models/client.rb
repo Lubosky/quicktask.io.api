@@ -3,10 +3,10 @@ class Client < ApplicationRecord
 
   belongs_to :workspace, inverse_of: :clients
 
-  with_options inverse_of: :client, dependent: :restrict_with_error do
+  with_options dependent: :restrict_with_error, inverse_of: :client do
     has_many :client_contacts
-    has_many :projects
     has_many :project_groups, through: :projects
+    has_many :projects, through: :workspace
   end
 
   validates :currency, presence: true, length: { is: 3 }

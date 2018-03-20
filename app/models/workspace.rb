@@ -8,62 +8,32 @@ class Workspace < ApplicationRecord
              class_name: 'User',
              foreign_key: :owner_id
 
-  has_many :members,
-           inverse_of: :workspace,
-           class_name: 'WorkspaceUser',
-           foreign_key: :workspace_id,
-           dependent: :destroy
+  with_options dependent: :destroy, inverse_of: :workspace do
+    has_many :client_contacts, through: :clients
+    has_many :clients
+    has_many :contractors
+    has_many :languages
+    has_many :members, class_name: 'WorkspaceUser', foreign_key: :workspace_id
+    has_many :charges
+    has_many :project_entries, class_name: 'Project::Base'
+    has_many :project_groups
+    has_many :projects
+    has_many :services
+    has_many :specializations, foreign_key: :workspace_id
+    has_many :supported_currencies, class_name: 'WorkspaceCurrency', foreign_key: :workspace_id
+    has_many :team_members
+    has_many :units
 
-  has_many :clients, inverse_of: :workspace, dependent: :destroy
-  has_many :contractors, inverse_of: :workspace, dependent: :destroy
-  has_many :team_members, inverse_of: :workspace, dependent: :destroy
+    has_one :membership
+  end
 
-  has_many :client_contacts,
-           through: :clients,
-           inverse_of: :workspace,
-           dependent: :destroy
-
-  has_many :collaborating_team_members,
-           -> { where(member_type: 'TeamMember') },
-           inverse_of: :workspace,
-           class_name: 'WorkspaceUser',
-           foreign_key: :workspace_id
-
-  has_many :collaborating_contractors,
-           -> { where(member_type: 'Contractor') },
-           inverse_of: :workspace,
-           class_name: 'WorkspaceUser',
-           foreign_key: :workspace_id
-
-  has_many :collaborating_clients,
-           -> { where(member_type: 'ClientContact') },
-           inverse_of: :workspace,
-           class_name: 'WorkspaceUser',
-           foreign_key: :workspace_id
-
-  has_many :languages, inverse_of: :workspace, dependent: :destroy
-  has_many :charges, inverse_of: :workspace, dependent: :destroy
-  has_many :project_groups, inverse_of: :workspace, dependent: :destroy
-
-  has_many :projects, inverse_of: :workspace, dependent: :destroy
+  with_options class_name: 'WorkspaceUser', foreign_key: :workspace_id, inverse_of: :workspace do
+    has_many :collaborating_team_members, -> { where(member_type: 'TeamMember') }
+    has_many :collaborating_contractors, -> { where(member_type: 'Contractor') }
+    has_many :collaborating_clients, -> { where(member_type: 'ClientContact') }
+  end
 
   has_many :roles, class_name: 'Role::Base', dependent: :destroy
-  has_many :services, inverse_of: :workspace, dependent: :destroy
-
-  has_many :specializations,
-           inverse_of: :workspace,
-           foreign_key: :workspace_id,
-           dependent: :destroy
-
-  has_many :supported_currencies,
-           inverse_of: :workspace,
-           class_name: 'WorkspaceCurrency',
-           foreign_key: :workspace_id,
-           dependent: :destroy
-
-  has_many :units, inverse_of: :workspace, dependent: :destroy
-
-  has_one :membership, inverse_of: :workspace, dependent: :destroy
 
   scope :accessible_by, ->(user) {
     joins(:members).where(organization_members: { user_id: user.id }).distinct

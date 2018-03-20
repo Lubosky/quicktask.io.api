@@ -5,7 +5,8 @@ class Client < ApplicationRecord
 
   with_options dependent: :restrict_with_error, inverse_of: :client do
     has_many :client_contacts
-    has_many :project_groups, through: :projects
+    has_many :client_requests
+    has_many :project_groups
     has_many :projects, through: :workspace
   end
 

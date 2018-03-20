@@ -10,6 +10,7 @@ class Workspace < ApplicationRecord
 
   with_options dependent: :destroy, inverse_of: :workspace do
     has_many :client_contacts, through: :clients
+    has_many :client_requests
     has_many :clients
     has_many :contractors
     has_many :languages
@@ -21,6 +22,7 @@ class Workspace < ApplicationRecord
     has_many :services
     has_many :specializations, foreign_key: :workspace_id
     has_many :supported_currencies, class_name: 'WorkspaceCurrency', foreign_key: :workspace_id
+    has_many :task_types
     has_many :team_members
     has_many :units
 

@@ -155,6 +155,35 @@ FactoryBot.define do
     association :workspace, factory: :workspace
   end
 
+  factory :specialization do
+    uuid
+    name
+    association :workspace, factory: :workspace
+
+    trait :default do
+      default true
+    end
+  end
+
+  factory :task_type do
+    uuid
+    name
+    classification :translation
+    association :workspace, factory: :workspace
+
+    trait :billable do
+      billable true
+    end
+
+    trait :internal do
+      internal true
+    end
+
+    trait :preferred do
+      preferred true
+    end
+  end
+
   factory :team_member do
     uuid
     email
@@ -242,16 +271,6 @@ FactoryBot.define do
     uuid
     code :jpy
     association :workspace, factory: :workspace
-  end
-
-  factory :specialization do
-    uuid
-    name
-    association :workspace, factory: :workspace
-
-    trait :default do
-      default true
-    end
   end
 
   factory :workspace_user do

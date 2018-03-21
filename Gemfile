@@ -7,6 +7,7 @@ git_source(:github) do |repo_name|
 end
 
 gem 'active_interaction', github: 'AaronLasseigne/active_interaction', branch: 'v4.0.0'
+gem 'acts_as_list'
 gem 'addressable'
 gem 'bcrypt'
 gem 'bootsnap'

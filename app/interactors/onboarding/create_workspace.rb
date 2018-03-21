@@ -7,6 +7,7 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
       create_workspace_roles
       create_languages
       create_specializations
+      create_task_types
       create_units
       create_team_member
       create_workspace_user
@@ -22,6 +23,10 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
 
   def create_specializations
     WorkspaceSpecialization.create_for(workspace)
+  end
+
+  def create_task_types
+    TaskType.create_for(workspace)
   end
 
   def create_team_member

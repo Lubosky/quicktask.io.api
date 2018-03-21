@@ -3,6 +3,9 @@ class Service < ApplicationRecord
 
   belongs_to :workspace, inverse_of: :services
 
+  has_many :service_tasks, -> { order(position: :asc) }, inverse_of: :service
+  has_many :task_types, through: :service_tasks
+
   enum classification: {
     translation: 0,
     interpreting: 1,

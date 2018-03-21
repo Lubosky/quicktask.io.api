@@ -22,6 +22,7 @@ namespace :dev do
     create_languages
     create_services
     create_specializations
+    create_task_types
     create_units
     create_workspace_currencies
     create_clients
@@ -312,6 +313,16 @@ namespace :dev do
     end
   end
 
+  def create_task_types
+    header 'Task Types'
+
+    Workspace.find_each do |workspace|
+      TaskType.create_for(workspace)
+
+      puts_task_type workspace
+    end
+  end
+
   def create_workspace_currencies
     header 'Workspace Currencies'
 
@@ -424,6 +435,10 @@ namespace :dev do
 
   def puts_specialization(workspace)
     puts "Specializations for workspace: #{workspace.name}"
+  end
+
+  def puts_task_type(workspace)
+    puts "Task types for workspace: #{workspace.name}"
   end
 
   def puts_unit(workspace)

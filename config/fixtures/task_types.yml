@@ -1,0 +1,25 @@
+-
+  name: 'Translation'
+  classification: 'translation'
+  billable: true
+  net_rate_scheme: true
+-
+  name: 'Editing'
+  classification: 'translation'
+  billable: true
+-
+  name: 'Interpreting'
+  classification: 'interpreting'
+  billable: true
+-
+  name: 'Proofreading'
+  classification: 'localization'
+  billable: true
+-
+  name: 'Copywriting'
+  classification: 'localization'
+  billable: true
+-
+  name: 'Transcription'
+  classification: 'localization'
+  billable: true

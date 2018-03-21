@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180319085045) do
+ActiveRecord::Schema.define(version: 20180321072817) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -311,6 +311,14 @@ ActiveRecord::Schema.define(version: 20180319085045) do
     t.index ["workspace_id"], name: "index_projects_on_workspace_id"
   end
 
+  create_table "service_tasks", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.bigint "service_id"
+    t.bigint "task_type_id"
+    t.integer "position"
+    t.index ["service_id"], name: "index_service_tasks_on_service_id"
+    t.index ["task_type_id"], name: "index_service_tasks_on_task_type_id"
+  end
+
   create_table "services", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
     t.string "uuid", limit: 24, null: false
     t.bigint "workspace_id", null: false
@@ -341,6 +349,22 @@ ActiveRecord::Schema.define(version: 20180319085045) do
     t.datetime "deleted_at"
     t.index ["uuid"], name: "index_specializations_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_specializations_on_workspace_id"
+  end
+
+  create_table "task_types", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "workspace_id", null: false
+    t.integer "classification", null: false
+    t.string "name", null: false
+    t.boolean "billable", default: false, null: false
+    t.boolean "internal", default: false, null: false
+    t.boolean "preferred", default: false, null: false
+    t.boolean "net_rate_scheme", default: false, null: false
+    t.decimal "hourly_cost", default: "0.0", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["uuid"], name: "index_task_types_on_uuid", unique: true
   end
 
   create_table "team_members", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
@@ -402,5 +426,7 @@ ActiveRecord::Schema.define(version: 20180319085045) do
     t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
 
+  add_foreign_key "service_tasks", "services"
+  add_foreign_key "service_tasks", "task_types"
   add_foreign_key "specialization_relations", "specializations"
 end

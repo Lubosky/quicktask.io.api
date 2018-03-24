@@ -7,3 +7,7 @@
   name: 'Hour'
   unit_type: 'time'
   deletable: false
+-
+  name: 'Flat fee'
+  unit_type: 'fixed'
+  deletable: false

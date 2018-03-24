@@ -28,6 +28,7 @@ namespace :dev do
     create_clients
     create_client_contacts
     create_workspace_users
+    create_rates
     create_project_groups
     create_projects
   end
@@ -313,6 +314,92 @@ namespace :dev do
     end
   end
 
+  def create_rates
+    header 'Rates'
+
+    Workspace.active.find_each do |workspace|
+      # DEFAULT CLIENT RATES
+      20.times do
+        source_language = workspace.languages.sample
+        target_language = workspace.languages.where.not(id: source_language.id).sample
+
+        rate = workspace.default_client_rates.build(
+          task_type: workspace.task_types.sample,
+          source_language: source_language,
+          target_language: target_language,
+          unit: workspace.units.sample,
+          price: rand(100),
+          workspace: workspace
+        )
+
+        rate.save!
+      end
+
+      puts_default_client_rate workspace
+
+      # DEFAULT CONTRACTOR RATES
+      20.times do
+        source_language = workspace.languages.sample
+        target_language = workspace.languages.where.not(id: source_language.id).sample
+
+        rate = workspace.default_contractor_rates.build(
+          task_type: workspace.task_types.sample,
+          source_language: source_language,
+          target_language: target_language,
+          unit: workspace.units.sample,
+          price: rand(100),
+          workspace: workspace
+        )
+
+        rate.save!
+      end
+
+      puts_default_contractor_rate workspace
+
+      # CONTRACTOR RATES
+      workspace.contractors.each do |contractor|
+        10.times do
+          source_language = workspace.languages.sample
+          target_language = workspace.languages.where.not(id: source_language.id).sample
+
+          rate = contractor.contractor_rates.build(
+            task_type: workspace.task_types.sample,
+            source_language: source_language,
+            target_language: target_language,
+            unit: workspace.units.sample,
+            price: rand(100),
+            workspace: workspace
+          )
+
+          rate.save!
+        end
+      end
+
+      puts_contractor_rate workspace
+
+      # CLIENT RATES
+      workspace.clients.each do |client|
+        10.times do
+          source_language = workspace.languages.sample
+          target_language = workspace.languages.where.not(id: source_language.id).sample
+
+          rate = client.client_rates.build(
+            task_type: workspace.task_types.sample,
+            source_language: source_language,
+            target_language: target_language,
+            unit: workspace.units.sample,
+            price: rand(100),
+            workspace: workspace
+          )
+
+          rate.save!
+        end
+      end
+
+      puts_client_rate workspace
+    end
+  end
+
   def create_task_types
     header 'Task Types'
 
@@ -407,6 +494,22 @@ namespace :dev do
 
   def puts_client_contact(client_contact)
     puts "Contact #{client_contact.first_name} #{client_contact.last_name} / #{client_contact.email} for client #{client_contact.client.name} in workspace: #{client_contact.workspace.name}"
+  end
+
+  def puts_client_rate(workspace)
+    puts "Client rates for workspace: #{workspace.name}"
+  end
+
+  def puts_contractor_rate(workspace)
+    puts "Contractor rates for workspace: #{workspace.name}"
+  end
+
+  def puts_default_client_rate(workspace)
+    puts "Default client rates for workspace: #{workspace.name}"
+  end
+
+  def puts_default_contractor_rate(workspace)
+    puts "Default contractor rates for workspace: #{workspace.name}"
   end
 
   def puts_language(workspace)

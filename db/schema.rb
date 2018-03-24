@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180321072817) do
+ActiveRecord::Schema.define(version: 20180321185224) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -309,6 +309,28 @@ ActiveRecord::Schema.define(version: 20180321072817) do
     t.index ["project_type", "workspace_id"], name: "index_projects_on_project_type_and_workspace_id"
     t.index ["uuid"], name: "index_projects_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_projects_on_workspace_id"
+  end
+
+  create_table "rates", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "task_type_id", null: false
+    t.bigint "source_language_id"
+    t.bigint "target_language_id"
+    t.bigint "unit_id", null: false
+    t.bigint "client_id"
+    t.bigint "owner_id", null: false
+    t.bigint "workspace_id", null: false
+    t.string "rate_type", null: false
+    t.integer "classification", null: false
+    t.decimal "price", precision: 19, scale: 4, default: "0.0", null: false
+    t.string "currency", limit: 3, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["owner_id"], name: "index_rates_on_owner_id"
+    t.index ["task_type_id"], name: "index_rates_on_task_type_id"
+    t.index ["uuid"], name: "index_rates_on_uuid", unique: true
+    t.index ["workspace_id", "rate_type"], name: "index_rates_on_workspace_id_and_rate_type"
   end
 
   create_table "service_tasks", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|

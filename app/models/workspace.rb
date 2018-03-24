@@ -13,12 +13,21 @@ class Workspace < ApplicationRecord
     has_many :client_requests
     has_many :clients
     has_many :contractors
+    has_many :default_client_rates,
+             -> { where(rate_type: :client_default) },
+             class_name: '::Rate::Workspace::Client',
+             foreign_key: :owner_id
+    has_many :default_contractor_rates,
+             -> { where(rate_type: :contractor_default) },
+             class_name: '::Rate::Workspace::Contractor',
+             foreign_key: :owner_id
     has_many :languages
     has_many :members, class_name: 'WorkspaceUser', foreign_key: :workspace_id
     has_many :charges
     has_many :project_entries, class_name: 'Project::Base'
     has_many :project_groups
     has_many :projects
+    has_many :rates, foreign_key: :workspace_id
     has_many :services
     has_many :specializations, foreign_key: :workspace_id
     has_many :supported_currencies, class_name: 'WorkspaceCurrency', foreign_key: :workspace_id

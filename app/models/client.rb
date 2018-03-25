@@ -17,11 +17,18 @@ class Client < ApplicationRecord
              inverse_of: :owner
   end
 
+  has_one :workspace_currency,
+          -> (c) { where(code: c.currency) }, 
+          through: :workspace, 
+          source: :supported_currencies
+
   validates :currency, presence: true, length: { is: 3 }
 
   jsonb_accessor :tax_settings,
     tax_number: :string,
     tax_rate: :float
+
+  delegate :exchange_rate, to: :workspace_currency
 
   def rates
     client_rates.

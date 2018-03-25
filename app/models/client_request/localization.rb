@@ -9,4 +9,11 @@ class ClientRequest::Localization < ClientRequest
     collection_ids = self.workspace.languages.where(id: value).ids
     write_attribute(:target_language_ids, collection_ids)
   end
+
+  private
+
+  def calculate_estimated_cost
+    estimated_price = Estimator::Localization.estimate_price(self)
+    self.estimated_cost = estimated_price
+  end
 end

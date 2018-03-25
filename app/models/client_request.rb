@@ -19,8 +19,9 @@ class ClientRequest < ApplicationRecord
     workspace_currency: :string
 
   after_initialize :set_default_attributes, on: :create
+  before_save :calculate_estimated_cost
 
-  delegate :classification, to: :service
+  delegate :classification, :task_types, to: :service
 
   validates :client,
             :currency,
@@ -29,6 +30,7 @@ class ClientRequest < ApplicationRecord
             :request_type,
             :service,
             :unit,
+            :unit_count,
             :workspace,
             :workspace_currency,
             presence: true
@@ -62,6 +64,10 @@ class ClientRequest < ApplicationRecord
   end
 
   private
+
+  def calculate_estimated_cost
+    raise NotImplementedError.new
+  end
 
   def set_default_attributes
     self.status ||= :draft

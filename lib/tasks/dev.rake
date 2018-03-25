@@ -206,7 +206,8 @@ namespace :dev do
         :client,
         workspace: workspace,
         name: Faker::Name.name,
-        email: Faker::Internet.email
+        email: Faker::Internet.email,
+        currency: :usd
       )
       puts_client client
 
@@ -214,7 +215,8 @@ namespace :dev do
         :client,
         workspace: workspace,
         name: Faker::Name.name,
-        email: Faker::Internet.email
+        email: Faker::Internet.email,
+        currency: :gbp
       )
       puts_client client
 
@@ -222,7 +224,8 @@ namespace :dev do
         :client,
         workspace: workspace,
         name: Faker::Name.name,
-        email: Faker::Internet.email
+        email: Faker::Internet.email,
+        currency: :eur
       )
       puts_client client
     end

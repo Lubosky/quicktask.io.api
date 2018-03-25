@@ -144,8 +144,6 @@ GEM
       activesupport (>= 4.2.0)
     google-id-token (1.4.2)
       jwt (>= 1)
-    google_currency (3.4.0)
-      money (~> 6.7)
     graphiql-rails (1.4.10)
       railties
       sprockets-rails
@@ -218,6 +216,8 @@ GEM
       money (~> 6.9)
     money (6.10.1)
       i18n (>= 0.6.4, < 1.0)
+    money-oxr (0.3.0)
+      money (~> 6.6)
     money-rails (1.10.0)
       activesupport (>= 3.0)
       monetize (~> 1.7.0)
@@ -441,7 +441,6 @@ DEPENDENCIES
   fuubar
   geocoder
   google-id-token
-  google_currency
   graphiql-rails
   graphql
   graphql-batch
@@ -458,6 +457,7 @@ DEPENDENCIES
   lograge
   marginalia
   mocha
+  money-oxr
   money-rails
   oj
   pg (~> 1.0)

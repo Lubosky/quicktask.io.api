@@ -1,9 +1,12 @@
-require 'money/bank/google_currency'
+require 'money_oxr/bank'
 
 Money.infinite_precision = true
-Money::Bank::GoogleCurrency.ttl_in_seconds = 86400
 
 MoneyRails.configure do |config|
-  config.default_bank = Money::Bank::GoogleCurrency.new
+  config.default_bank = MoneyOXR::Bank.new(
+    app_id: ENV.fetch('OXR_API_KEY', 'oxr_api_key'),
+    cache_path: 'config/xr.json',
+    max_age: 86400
+  )
   config.no_cents_if_whole = false
 end

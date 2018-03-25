@@ -2,6 +2,7 @@
 .bundle
 .env.*
 !.env.sample
+/config/xr.json
 /coverage/
 /log/
 /public/assets/*

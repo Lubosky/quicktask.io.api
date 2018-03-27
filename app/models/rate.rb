@@ -1,8 +1,11 @@
 class Rate < ApplicationRecord
   include EnsureUUID
 
-  belongs_to :source_language, class_name: 'Language', optional: true
-  belongs_to :target_language, class_name: 'Language', optional: true
+  with_options class_name: 'Language', optional: true do
+    belongs_to :source_language, foreign_key: :source_language_id
+    belongs_to :target_language, foreign_key: :target_language_id
+  end
+
   belongs_to :task_type
   belongs_to :unit
   belongs_to :client, optional: true
@@ -43,10 +46,12 @@ class Rate < ApplicationRecord
   end
 
   def language_combination_rate?
-    classification.to_sym.in?([:translation, :interpeting])
+    return false unless classification
+    classification.to_sym.in?([:translation, :interpreting])
   end
 
   def other_rate?
+    return false unless classification
     classification.to_sym == :other
   end
 

@@ -1,5 +1,7 @@
 en:
   errors:
+    messages:
+      greater_than_start_date: "must be later than the start date"
     email_already_registered:
       code: "Conflict"
       detail: "Email is already registered"

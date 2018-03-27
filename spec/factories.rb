@@ -19,7 +19,7 @@ FactoryBot.define do
     uuid
     name
     currency :usd
-    association :workspace, factory: :workspace
+    workspace
   end
 
   factory :client_contact do
@@ -29,6 +29,24 @@ FactoryBot.define do
     email
     association :client, factory: :client
     association :workspace, factory: :workspace
+  end
+
+  factory :client_request, class: ClientRequest::Other do
+    uuid
+    subject Faker::Name.title
+    start_date DateTime.current
+    due_date DateTime.current + 5.hours
+    unit_count 10
+
+    workspace
+    client
+    association :owner, factory: [:workspace_user, :with_client]
+    service
+    unit
+
+    factory :interpreting_request, class: ClientRequest::Interpreting
+    factory :localization_request, class: ClientRequest::Localization
+    factory :translation_request, class: ClientRequest::Translation
   end
 
   factory :contractor do
@@ -152,7 +170,7 @@ FactoryBot.define do
     uuid
     classification :translation
     name
-    association :workspace, factory: :workspace
+    workspace
   end
 
   factory :specialization do
@@ -265,6 +283,12 @@ FactoryBot.define do
         Role::Base.create_for(instance)
       end
     end
+
+    trait :with_currencies do
+      after :create do |instance|
+        WorkspaceCurrency.create_for(instance)
+      end
+    end
   end
 
   factory :workspace_currency do
@@ -281,7 +305,7 @@ FactoryBot.define do
     association :user, factory: :user
 
     trait :with_client do
-      association :member, factory: :client
+      association :member, factory: :client_contact
     end
 
     trait :with_collaborator do

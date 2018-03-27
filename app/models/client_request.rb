@@ -29,6 +29,8 @@ class ClientRequest < ApplicationRecord
             :owner,
             :request_type,
             :service,
+            :start_date,
+            :due_date,
             :unit,
             :unit_count,
             :workspace,
@@ -36,6 +38,7 @@ class ClientRequest < ApplicationRecord
             presence: true
 
   validate :validate_request_type
+  validate :validate_start_date_before_due_date
 
   enum status: { draft: 0, pending: 1, estimated: 2, cancelled: 3, withdrawn: 4 } do
     event :submit do
@@ -78,5 +81,11 @@ class ClientRequest < ApplicationRecord
 
   def validate_request_type
     errors.add(:request_type, :invalid) unless request_type == classification
+  end
+
+  def validate_start_date_before_due_date
+    if due_date && start_date && due_date < start_date
+      errors.add(:due_date, :greater_than_start_date)
+    end
   end
 end

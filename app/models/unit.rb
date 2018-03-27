@@ -5,6 +5,8 @@ class Unit < ApplicationRecord
 
   enum unit_type: { volume: 0, time: 1, percentage: 2, fixed: 3 }
 
+  scope :with_type, ->(type) { where(unit_type: type) }
+
   validates_presence_of :name
   validates_uniqueness_of :name, case_sensitive: false, scope: :workspace_id
 

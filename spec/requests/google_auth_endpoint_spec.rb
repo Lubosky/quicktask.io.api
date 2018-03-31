@@ -31,7 +31,7 @@ RSpec.describe 'POST /api/oauth/google', type: :request do
     it 'returns a 201 upon successful verification' do
       subject
 
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(201)
       expect(response.code).to eq('201')
     end
 
@@ -60,7 +60,7 @@ RSpec.describe 'POST /api/oauth/google', type: :request do
     it 'returns a 201 upon successful verification' do
       subject
 
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(201)
       expect(response.code).to eq('201')
     end
 

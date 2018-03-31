@@ -36,14 +36,14 @@ RSpec.describe Api::V1::WorkspacesController, type: :controller do
       valid_token_authentication
       get :show, params: { identifier: @workspace.id }
 
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
     end
 
     it 'returns current_workspace upon successful authentication' do
       valid_token_authentication
       get :show, params: { identifier: @workspace.id }
 
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
       expect(@controller.current_workspace.id).to eq @workspace.id
     end
   end

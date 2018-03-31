@@ -90,7 +90,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
 
       post :create, params: params
 
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(201)
     end
   end
 
@@ -119,14 +119,14 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       valid_token_authentication
       get :me
 
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
     end
 
     it 'returns current_user upon successful authentication' do
       valid_token_authentication
       get :me
 
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
       expect(@controller.current_user.id).to eq @user.id
     end
   end
@@ -139,7 +139,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
 
     get :me
 
-    expect(response).to have_http_status(:success)
+    expect(response).to have_http_status(200)
   end
 
   it 'accepts authorization header without prefix' do
@@ -150,7 +150,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
 
     get :me
 
-    expect(response).to have_http_status(:success)
+    expect(response).to have_http_status(200)
   end
 
   describe do
@@ -165,7 +165,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       get :me
 
       expect(@controller.current_user.id).to eq @user.id
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
     end
 
     it 'responds with 200 #2' do
@@ -173,7 +173,7 @@ RSpec.describe Api::V1::UsersController, type: :controller do
       get :me
 
       expect(@controller.current_user.id).to eq @user.id
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(200)
     end
 
     def authenticate(token: @token)

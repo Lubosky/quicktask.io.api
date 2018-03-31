@@ -7,7 +7,7 @@ RSpec.describe 'POST /api/auth/login', type: :request do
     it 'returns a 201 upon successful verification' do
       post url_for([:api, :auth, :login]), params: { email: user.email, password: user.password }
 
-      expect(response).to have_http_status(:success)
+      expect(response).to have_http_status(201)
       expect(response.code).to eq('201')
     end
 

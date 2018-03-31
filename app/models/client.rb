@@ -7,6 +7,7 @@ class Client < ApplicationRecord
     has_many :client_requests
     has_many :project_groups
     has_many :projects, through: :workspace
+    has_many :quotes
   end
 
   with_options dependent: :delete_all do
@@ -18,8 +19,8 @@ class Client < ApplicationRecord
   end
 
   has_one :workspace_currency,
-          -> (c) { where(code: c.currency) }, 
-          through: :workspace, 
+          -> (c) { where(code: c.currency) },
+          through: :workspace,
           source: :supported_currencies
 
   validates :currency, presence: true, length: { is: 3 }

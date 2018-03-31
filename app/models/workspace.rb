@@ -27,6 +27,7 @@ class Workspace < ApplicationRecord
     has_many :project_entries, class_name: 'Project::Base'
     has_many :project_groups
     has_many :projects
+    has_many :quotes
     has_many :rates, foreign_key: :workspace_id
     has_many :services
     has_many :specializations, foreign_key: :workspace_id
@@ -51,7 +52,7 @@ class Workspace < ApplicationRecord
   }
 
   after_initialize :set_default_attributes, on: :create
-  after_update :update_exchange_rates
+  after_update :update_exchange_rates, if: :saved_change_to_currency?
 
   validates :currency, presence: true, length: { is: 3 }
   validates :name, :owner_id, presence: true
@@ -110,7 +111,6 @@ class Workspace < ApplicationRecord
   end
 
   def update_exchange_rates
-    return unless saved_change_to_currency?
     ExchangeRateUpdaterJob.perform_async(id, currency)
   end
 

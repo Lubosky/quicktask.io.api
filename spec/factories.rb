@@ -41,7 +41,7 @@ FactoryBot.define do
     workspace
     client
     association :owner, factory: [:workspace_user, :with_client]
-    service
+    association :service, factory: [:service]
     unit
 
     factory :interpreting_request, class: ClientRequest::Interpreting
@@ -62,6 +62,20 @@ FactoryBot.define do
     name
     association :workspace, factory: :workspace
   end
+
+  factory :line_item do
+    uuid
+    quantity 10
+    unit_price 10
+
+    workspace
+    association :bookkeepable, factory: :quote
+    association :source_language, factory: [:language, code: :en]
+    association :target_language, factory: [:language, code: :de]
+    task_type
+    unit
+  end
+
 
   factory :membership, aliases: [:active_membership] do
     uuid
@@ -155,6 +169,28 @@ FactoryBot.define do
     association :workspace
   end
 
+  factory :quote do
+    uuid
+    subject Faker::Name.title
+    status :draft
+    issue_date DateTime.current
+    expiry_date DateTime.current + 7.days
+    start_date DateTime.current
+    due_date DateTime.current + 1.days
+
+    workspace
+    client
+    association :owner, factory: :workspace_user
+
+    trait :with_discount do
+      discount 10
+    end
+
+    trait :with_surcharge do
+      surcharge 10
+    end
+  end
+
   factory :role, class: Role::Base do
     uuid
     name
@@ -187,7 +223,7 @@ FactoryBot.define do
     uuid
     name
     classification :translation
-    association :workspace, factory: :workspace
+    workspace
 
     trait :billable do
       billable true
@@ -199,6 +235,18 @@ FactoryBot.define do
 
     trait :preferred do
       preferred true
+    end
+
+    trait :interpreting do
+      classification :interpreting
+    end
+
+    trait :localization do
+      classification :localization
+    end
+
+    trait :other do
+      classification :other
     end
   end
 

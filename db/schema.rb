@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180321185224) do
+ActiveRecord::Schema.define(version: 2018_03_28_174739) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -124,6 +124,31 @@ ActiveRecord::Schema.define(version: 20180321185224) do
     t.index ["code", "workspace_id"], name: "index_languages_on_code_and_workspace_id"
     t.index ["uuid"], name: "index_languages_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_languages_on_workspace_id"
+  end
+
+  create_table "line_items", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.string "bookkeepable_type", null: false
+    t.bigint "bookkeepable_id", null: false
+    t.bigint "workspace_id", null: false
+    t.bigint "source_language_id"
+    t.bigint "target_language_id"
+    t.bigint "task_type_id", null: false
+    t.bigint "unit_id", null: false
+    t.string "description"
+    t.float "quantity", null: false
+    t.decimal "unit_price", precision: 19, scale: 4, null: false
+    t.decimal "discount", precision: 6, scale: 5, default: "0.0", null: false
+    t.decimal "surcharge", precision: 6, scale: 5, default: "0.0", null: false
+    t.decimal "subtotal", precision: 19, scale: 4, default: "0.0", null: false
+    t.decimal "total", precision: 19, scale: 4, default: "0.0", null: false
+    t.jsonb "line_item_data", default: {}
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["bookkeepable_type", "bookkeepable_id"], name: "index_line_items_on_bookkeepable_type_and_bookkeepable_id"
+    t.index ["workspace_id"], name: "index_line_items_on_workspace_id"
   end
 
   create_table "locations", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
@@ -309,6 +334,41 @@ ActiveRecord::Schema.define(version: 20180321185224) do
     t.index ["project_type", "workspace_id"], name: "index_projects_on_project_type_and_workspace_id"
     t.index ["uuid"], name: "index_projects_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_projects_on_workspace_id"
+  end
+
+  create_table "quotes", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "client_id"
+    t.bigint "owner_id"
+    t.bigint "workspace_id", null: false
+    t.string "quote_type", null: false
+    t.string "subject", null: false
+    t.string "identifier"
+    t.string "purchase_order_number"
+    t.jsonb "purchase_order_data"
+    t.integer "status"
+    t.datetime "issue_date"
+    t.datetime "expiry_date"
+    t.datetime "start_date"
+    t.datetime "due_date"
+    t.boolean "billed", default: false, null: false
+    t.jsonb "quote_data", default: {}
+    t.jsonb "currency_data", default: {}
+    t.jsonb "settings", default: {}
+    t.jsonb "metadata", default: {}
+    t.decimal "discount", precision: 19, scale: 4, default: "0.0", null: false
+    t.decimal "surcharge", precision: 19, scale: 4, default: "0.0", null: false
+    t.decimal "subtotal", precision: 19, scale: 4, default: "0.0", null: false
+    t.decimal "total", precision: 19, scale: 4, default: "0.0", null: false
+    t.text "notes"
+    t.text "terms"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["client_id"], name: "index_quotes_on_client_id"
+    t.index ["quote_type", "workspace_id"], name: "index_quotes_on_quote_type_and_workspace_id"
+    t.index ["uuid"], name: "index_quotes_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_quotes_on_workspace_id"
   end
 
   create_table "rates", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|

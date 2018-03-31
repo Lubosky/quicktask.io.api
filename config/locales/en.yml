@@ -40,3 +40,12 @@ en:
   time:
     formats:
       for_today: "%l:%M %P"
+
+  quotes:
+    subject: "#QUOTE-%{date}-%{number}"
+    interpreting:
+      address: "Event location: %{address}"
+      equipment_needed:
+        "true": "Equipment needed: YES"
+        "false": "Equipment needed: NO"
+      interpreter_count: "No. of interpreters: %{interpreter_count}"

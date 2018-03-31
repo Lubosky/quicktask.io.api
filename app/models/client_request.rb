@@ -62,6 +62,26 @@ class ClientRequest < ApplicationRecord
     after_initialize { self.request_type = type }
   end
 
+  def translation_request?
+    request_type == 'translation'
+  end
+
+  def interpreting_request?
+    request_type == 'interpreting'
+  end
+
+  def localization_request?
+    request_type == 'localization'
+  end
+
+  def other_request?
+    request_type == 'other'
+  end
+
+  def convert(user)
+    Converter::ClientRequest.convert(self, user)
+  end
+
   def target_languages
     workspace.languages.where(id: target_language_ids)
   end

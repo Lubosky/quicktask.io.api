@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_03_28_174739) do
+ActiveRecord::Schema.define(version: 2018_04_01_121106) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -449,6 +449,56 @@ ActiveRecord::Schema.define(version: 2018_03_28_174739) do
     t.index ["uuid"], name: "index_task_types_on_uuid", unique: true
   end
 
+  create_table "tasklists", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "project_id", null: false
+    t.bigint "owner_id"
+    t.bigint "workspace_id", null: false
+    t.string "title", null: false
+    t.integer "task_count", default: 0, null: false
+    t.integer "completed_task_count", default: 0, null: false
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["project_id"], name: "index_tasklists_on_project_id"
+    t.index ["workspace_id"], name: "index_tasklists_on_workspace_id"
+  end
+
+  create_table "tasks", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "tasklist_id", null: false
+    t.bigint "project_id", null: false
+    t.bigint "owner_id"
+    t.bigint "workspace_id", null: false
+    t.bigint "source_language_id"
+    t.bigint "target_language_id"
+    t.bigint "task_type_id"
+    t.bigint "unit_id"
+    t.string "title", null: false
+    t.string "description"
+    t.integer "color"
+    t.integer "status"
+    t.datetime "start_date"
+    t.datetime "due_date"
+    t.datetime "completed_date"
+    t.integer "recurring_type", null: false
+    t.datetime "recurring_due_date"
+    t.jsonb "task_data", default: {}
+    t.jsonb "metadata", default: {}
+    t.float "unit_count", default: 0.0, null: false
+    t.float "completed_unit_count", default: 0.0, null: false
+    t.integer "attachment_count", default: 0, null: false
+    t.integer "comment_count", default: 0, null: false
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["project_id"], name: "index_tasks_on_project_id"
+    t.index ["tasklist_id"], name: "index_tasks_on_tasklist_id"
+    t.index ["workspace_id"], name: "index_tasks_on_workspace_id"
+  end
+
   create_table "team_members", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
     t.string "uuid", limit: 24, null: false
     t.bigint "workspace_id", null: false
@@ -461,6 +511,25 @@ ActiveRecord::Schema.define(version: 2018_03_28_174739) do
     t.datetime "deleted_at"
     t.index ["uuid"], name: "index_team_members_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_team_members_on_workspace_id"
+  end
+
+  create_table "todos", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "task_id", null: false
+    t.bigint "workspace_id", null: false
+    t.bigint "assignee_id"
+    t.string "title", null: false
+    t.datetime "due_date"
+    t.datetime "completed_date"
+    t.boolean "completed", default: false, null: false
+    t.jsonb "todo_data", default: {}
+    t.integer "position"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["assignee_id"], name: "index_todos_on_assignee_id"
+    t.index ["task_id"], name: "index_todos_on_task_id"
+    t.index ["workspace_id"], name: "index_todos_on_workspace_id"
   end
 
   create_table "tokens", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|

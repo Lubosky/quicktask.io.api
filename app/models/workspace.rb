@@ -24,7 +24,6 @@ class Workspace < ApplicationRecord
     has_many :languages
     has_many :members, class_name: 'WorkspaceUser', foreign_key: :workspace_id
     has_many :charges
-    has_many :project_entries, class_name: 'Project::Base'
     has_many :project_groups
     has_many :projects
     has_many :quotes
@@ -33,7 +32,10 @@ class Workspace < ApplicationRecord
     has_many :specializations, foreign_key: :workspace_id
     has_many :supported_currencies, class_name: 'WorkspaceCurrency', foreign_key: :workspace_id
     has_many :task_types
+    has_many :tasklists
+    has_many :tasks
     has_many :team_members
+    has_many :todos, through: :tasks
     has_many :units
 
     has_one :membership

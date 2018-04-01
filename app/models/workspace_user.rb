@@ -8,10 +8,16 @@ class WorkspaceUser < ApplicationRecord
   belongs_to :user
   belongs_to :workspace
 
-  has_many :owned_projects,
-           inverse_of: :project,
-           class_name: 'Project',
-           dependent: :destroy
+  with_options inverse_of: :owner do
+    has_many :owned_projects, class_name: 'Project', foreign_key: :owner_id
+    has_many :owned_tasklists, class_name: 'Tasklist', foreign_key: :owner_id
+    has_many :owned_tasks, class_name: 'Task', foreign_key: :owner_id
+  end
+
+  has_many :assigned_todos,
+           class_name: 'Todo',
+           foreign_key: :assignee_id,
+           inverse_of: :assignee
 
   validates_presence_of :member, :role, :user, :workspace
   validates_uniqueness_of :user_id, scope: [:member_type, :member_id]

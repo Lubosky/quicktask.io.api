@@ -65,6 +65,9 @@ GEM
       activerecord (>= 3.0)
     addressable (2.5.2)
       public_suffix (>= 2.0.2, < 4.0)
+    after_commit_action (1.1.0)
+      activerecord (>= 3.0.0)
+      activesupport (>= 3.0.0)
     arel (9.0.0)
     ast (2.4.0)
     bcrypt (3.1.11)
@@ -82,6 +85,10 @@ GEM
       deep_merge (~> 1.2.1)
       dry-validation (>= 0.10.4)
     connection_pool (2.2.1)
+    counter_culture (1.9.1)
+      activerecord (>= 3.0.0)
+      activesupport (>= 3.0.0)
+      after_commit_action (~> 1.0)
     crack (0.4.3)
       safe_yaml (~> 1.0.0)
     crass (1.0.3)
@@ -440,6 +447,7 @@ DEPENDENCIES
   bson
   commonmarker
   config
+  counter_culture
   database_rewinder
   discriminator
   dotenv-rails

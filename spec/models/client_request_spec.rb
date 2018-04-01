@@ -43,7 +43,6 @@ RSpec.describe ClientRequest, type: :model do
     it { is_expected.to validate_presence_of(:exchange_rate) }
     it { is_expected.to validate_presence_of(:owner) }
     it { is_expected.to validate_presence_of(:request_type) }
-    it { is_expected.to validate_presence_of(:service) }
     it { is_expected.to validate_presence_of(:start_date) }
     it { is_expected.to validate_presence_of(:due_date) }
     it { is_expected.to validate_presence_of(:unit) }

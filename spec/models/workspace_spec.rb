@@ -11,7 +11,26 @@ RSpec.describe Workspace, type: :model do
     it { is_expected.to belong_to(:owner).class_name('User').with_foreign_key(:owner_id) }
 
     it { is_expected.to have_many(:charges) }
+    it { is_expected.to have_many(:client_contacts) }
+    it { is_expected.to have_many(:client_requests) }
+    it { is_expected.to have_many(:contractors) }
+    it { is_expected.to have_many(:default_client_rates) }
+    it { is_expected.to have_many(:default_contractor_rates) }
+    it { is_expected.to have_many(:languages) }
+    it { is_expected.to have_many(:members).class_name('WorkspaceUser').with_foreign_key(:workspace_id) }
+    it { is_expected.to have_many(:project_groups) }
+    it { is_expected.to have_many(:projects) }
+    it { is_expected.to have_many(:quotes) }
+    it { is_expected.to have_many(:rates) }
+    it { is_expected.to have_many(:services) }
+    it { is_expected.to have_many(:specializations) }
     it { is_expected.to have_many(:supported_currencies).class_name('WorkspaceCurrency').with_foreign_key(:workspace_id) }
+    it { is_expected.to have_many(:task_types) }
+    it { is_expected.to have_many(:tasklists) }
+    it { is_expected.to have_many(:tasks) }
+    it { is_expected.to have_many(:team_members) }
+    it { is_expected.to have_many(:todos) }
+    it { is_expected.to have_many(:units) }
 
     it { is_expected.to have_one(:membership) }
 

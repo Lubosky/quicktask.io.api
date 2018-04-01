@@ -11,6 +11,10 @@ FactoryBot.define do
     "name_#{n}"
   end
 
+  sequence :title do |n|
+    "title_#{n}"
+  end
+
   sequence :uuid do |n|
     "uuid_#{n}"
   end
@@ -56,7 +60,7 @@ FactoryBot.define do
     association :workspace, factory: :workspace
   end
 
-  factory :language do
+  factory :language, aliases: [:source_language, :target_language] do
     uuid
     code :en
     name
@@ -178,8 +182,8 @@ FactoryBot.define do
     start_date DateTime.current
     due_date DateTime.current + 1.days
 
-    workspace
-    client
+    association :workspace, factory: :workspace
+    association :client, factory: :client
     association :owner, factory: :workspace_user
 
     trait :with_discount do
@@ -195,7 +199,7 @@ FactoryBot.define do
     uuid
     name
     permission_level :member
-    association :workspace
+    association :workspace, factory: :workspace
 
     factory :client_role, class: Role::Client
     factory :collaborator_role, class: Role::Collaborator
@@ -206,7 +210,7 @@ FactoryBot.define do
     uuid
     classification :translation
     name
-    workspace
+    association :workspace, factory: :workspace
   end
 
   factory :specialization do
@@ -217,6 +221,35 @@ FactoryBot.define do
     trait :default do
       default true
     end
+  end
+
+  factory :tasklist do
+    uuid
+    title
+
+    association :owner, factory: :workspace_user
+    association :project, factory: :project
+    association :workspace, factory: :workspace
+  end
+
+  factory :task do
+    uuid
+    title
+
+    color :no_color
+    status :no_status
+
+    start_date DateTime.current
+    due_date DateTime.current + 1.day
+
+    association :owner, factory: :workspace_user
+    association :tasklist, factory: :tasklist
+    association :project, factory: :project
+    association :workspace, factory: :workspace
+    association :source_language, code: :en
+    association :target_language, code: :de
+    association :task_type, factory: :task_type
+    association :unit, factory: :unit
   end
 
   factory :task_type do
@@ -254,6 +287,24 @@ FactoryBot.define do
     uuid
     email
     association :workspace, factory: :workspace
+  end
+
+  factory :todo do
+    uuid
+    title
+
+    due_date DateTime.current + 1.day
+
+    association :task, factory: :task
+    association :workspace, factory: :workspace
+
+    trait :completed do
+      completed true
+    end
+
+    trait :with_assignee do
+      association :assignee, factory: :workspace_user
+    end
   end
 
   factory :token do

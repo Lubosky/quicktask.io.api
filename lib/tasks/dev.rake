@@ -5,8 +5,21 @@ namespace :dev do
       raise 'This task can only be run in the development environment'
     end
 
+    ActionMailer::Base.delivery_method = :test
+
     require 'factory_bot_rails'
+    require 'sidekiq/api'
+
     include FactoryBot::Syntax::Methods
+
+    Sidekiq::Queue.all do |queue|
+      queue.clear
+    end
+
+    Sidekiq::RetrySet.new.clear
+    Sidekiq::ScheduledSet.new.clear
+    Sidekiq::DeadSet.new.clear
+    Sidekiq::Stats.new.reset
 
     Rake::Task['db:drop'].invoke
     Rake::Task['db:create'].invoke
@@ -31,6 +44,9 @@ namespace :dev do
     create_rates
     create_project_groups
     create_projects
+    create_tasklists
+    create_tasks
+    create_todos
   end
 
   def create_users
@@ -403,6 +419,54 @@ namespace :dev do
     end
   end
 
+  def create_tasklists
+    header 'Tasklists'
+
+    Workspace.active.find_each do |workspace|
+      workspace.projects.find_each do |project|
+        3.times do
+          create(
+            :tasklist,
+            owner: workspace.collaborating_team_members.sample,
+            project: project,
+            workspace: workspace
+          )
+        end
+      end
+
+      puts_tasklist workspace
+    end
+  end
+
+  def create_tasks
+    header 'Tasks'
+
+    Tasklist.includes(:project, :workspace).find_each do |tasklist|
+      workspace = tasklist.workspace
+
+      5.times do
+        source_language = workspace.languages.sample
+        target_language = workspace.languages.where.not(id: source_language.id).sample
+
+        create(
+          :task,
+          tasklist: tasklist,
+          owner: workspace.collaborating_team_members.sample,
+          project: tasklist.project,
+          workspace: workspace,
+          color: Task.colors.keys.sample,
+          status: Task.statuses.keys.sample,
+          source_language: source_language,
+          target_language: target_language,
+          task_type: workspace.task_types.sample,
+          unit: workspace.units.sample
+        )
+      end
+
+      puts_task tasklist
+    end
+  end
+
   def create_task_types
     header 'Task Types'
 
@@ -411,6 +475,27 @@ namespace :dev do
 
       puts_task_type workspace
     end
+  end
+
+  def create_todos
+    header 'To-dos'
+
+    Task.find_each do |task|
+      n = rand(0..3)
+      workspace = task.workspace
+
+      n.times do
+        create(
+          :todo,
+          completed: [true, false].sample,
+          assignee: workspace.collaborating_team_members.sample,
+          task: task,
+          workspace: workspace
+        )
+      end
+    end
+
+    puts_todo
   end
 
   def create_workspace_currencies
@@ -543,8 +628,20 @@ namespace :dev do
     puts "Specializations for workspace: #{workspace.name}"
   end
 
+  def puts_task(tasklist)
+    puts "Tasks for tasklist: #{tasklist.title} / #{tasklist.workspace.name}"
+  end
+
+  def puts_tasklist(workspace)
+    puts "Tasklists for workspace: #{workspace.name}"
+  end
+
   def puts_task_type(workspace)
     puts "Task types for workspace: #{workspace.name}"
+  end
+
+  def puts_todo
+    puts "To-dos created"
   end
 
   def puts_unit(workspace)

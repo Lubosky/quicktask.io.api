@@ -35,7 +35,7 @@ class Task < ApplicationRecord
                   touch: true
 
   scope :with_status, ->(status) { where(status: status) }
-  scope :expect_status, ->(status) { where.not(status: status) }
+  scope :except_status, ->(status) { where.not(status: status) }
 
   validates :owner, :project, :tasklist, :title, :workspace, presence: true
   validates :task_type, :unit, presence: true, if: :active?

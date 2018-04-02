@@ -59,7 +59,7 @@ class Project < ApplicationRecord
         tasks.with_status([:draft, :no_status, :on_hold, :planned]).
           find_each(&:cancel!)
 
-        tasks.expect_status([:archived, :cancelled, :completed]).
+        tasks.except_status([:archived, :cancelled, :completed]).
           find_each(&:complete!)
       end
 
@@ -68,7 +68,7 @@ class Project < ApplicationRecord
 
     event :cancel do
       before do
-        tasks.expect_status([:archived, :cancelled]).find_each(&:cancel!)
+        tasks.except_status([:archived, :cancelled]).find_each(&:cancel!)
       end
 
       transition all - [:archived] => :cancelled

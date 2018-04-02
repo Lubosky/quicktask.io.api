@@ -41,6 +41,9 @@ en:
     formats:
       for_today: "%l:%M %P"
 
+  projects:
+    name: "#PROJECT-%{date}-%{number}"
+
   quotes:
     subject: "#QUOTE-%{date}-%{number}"
     interpreting:
@@ -49,3 +52,9 @@ en:
         "true": "Equipment needed: YES"
         "false": "Equipment needed: NO"
       interpreter_count: "No. of interpreters: %{interpreter_count}"
+
+  tasklists:
+    title:
+      language_combination: "%{source} - %{target} [%{source_upcase}-%{target_upcase}]"
+      target_language: "%{target} [%{target_upcase}]"
+      other: "Other"

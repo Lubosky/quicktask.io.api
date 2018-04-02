@@ -111,6 +111,10 @@ class Quote < ApplicationRecord
     @calculator ||= Calculator::Quote.calculate(self)
   end
 
+  def convert(user)
+    Converter::Quote.convert(self, user)
+  end
+
   private
 
   def set_default_attributes

@@ -86,4 +86,8 @@ class Project < ApplicationRecord
   def is_internal?
     internal?
   end
+
+  def generate_quote(user)
+    Converter::Project.generate_quote(self, user)
+  end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_04_01_121106) do
+ActiveRecord::Schema.define(version: 2018_04_02_161251) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -290,6 +290,15 @@ ActiveRecord::Schema.define(version: 2018_04_01_121106) do
     t.index ["uuid"], name: "index_plans_on_uuid", unique: true
   end
 
+  create_table "project_estimates", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.bigint "project_id", null: false
+    t.bigint "quote_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_project_estimates_on_project_id"
+    t.index ["quote_id"], name: "index_project_estimates_on_quote_id"
+  end
+
   create_table "project_groups", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
     t.string "uuid", limit: 24, null: false
     t.bigint "client_id", null: false
@@ -334,6 +343,15 @@ ActiveRecord::Schema.define(version: 2018_04_01_121106) do
     t.index ["project_type", "workspace_id"], name: "index_projects_on_project_type_and_workspace_id"
     t.index ["uuid"], name: "index_projects_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_projects_on_workspace_id"
+  end
+
+  create_table "proposals", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.bigint "client_request_id", null: false
+    t.bigint "quote_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["client_request_id"], name: "index_proposals_on_client_request_id"
+    t.index ["quote_id"], name: "index_proposals_on_quote_id"
   end
 
   create_table "quotes", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
@@ -577,6 +595,10 @@ ActiveRecord::Schema.define(version: 2018_04_01_121106) do
     t.index ["uuid"], name: "index_users_on_uuid", unique: true
   end
 
+  add_foreign_key "project_estimates", "projects"
+  add_foreign_key "project_estimates", "quotes"
+  add_foreign_key "proposals", "client_requests"
+  add_foreign_key "proposals", "quotes"
   add_foreign_key "service_tasks", "services"
   add_foreign_key "service_tasks", "task_types"
   add_foreign_key "specialization_relations", "specializations"

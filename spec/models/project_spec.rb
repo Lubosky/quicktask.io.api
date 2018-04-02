@@ -17,6 +17,9 @@ RSpec.describe Project, type: :model do
     it { is_expected.to have_many(:tasklists) }
     it { is_expected.to have_many(:tasks) }
 
+    it { is_expected.to have_one(:project_estimate) }
+    it { is_expected.to have_one(:quote).through(:project_estimate) }
+
     it { is_expected.to validate_presence_of(:name) }
     it { is_expected.to validate_presence_of(:uuid) }
     it { is_expected.to validate_uniqueness_of(:uuid) }

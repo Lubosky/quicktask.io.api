@@ -36,6 +36,8 @@ RSpec.describe ClientRequest, type: :model do
     it { is_expected.to belong_to(:unit) }
     it { is_expected.to belong_to(:workspace) }
 
+    it { is_expected.to have_one(:proposal) }
+    it { is_expected.to have_one(:quote).through(:proposal) }
     it { is_expected.to have_one(:specialization_relation) }
     it { is_expected.to have_one(:specialization).through(:specialization_relation) }
 

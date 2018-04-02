@@ -9,6 +9,7 @@ class Converter::Quote
   end
 
   def convert
+    return quote.project if quote.project
     fulfill_conversion
   end
 
@@ -35,6 +36,7 @@ class Converter::Quote
     ::Project.transaction do
       project = build_project
       project.tap(&:save!)
+      project.quote = quote
     end
   end
 

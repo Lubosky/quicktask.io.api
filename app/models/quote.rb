@@ -7,6 +7,12 @@ class Quote < ApplicationRecord
 
   has_many :line_items, as: :bookkeepable, autosave: true, dependent: :destroy
 
+  has_one :proposal
+  has_one :client_request, through: :proposal
+
+  has_one :project_estimate
+  has_one :project, through: :project_estimate
+
   jsonb_accessor :currency_data,
     currency: :string,
     exchange_rate: :decimal,

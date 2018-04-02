@@ -9,6 +9,7 @@ class Converter::Project
   end
 
   def generate_quote
+    return project.quote if project.quote
     fulfill_conversion
   end
 
@@ -39,6 +40,7 @@ class Converter::Project
       quote = build_quote
       quote.tap do |resource|
         resource.save!
+        resource.project = project
         resource.update_totals
       end
     end

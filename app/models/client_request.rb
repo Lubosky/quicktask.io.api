@@ -8,6 +8,9 @@ class ClientRequest < ApplicationRecord
   belongs_to :unit
   belongs_to :workspace, inverse_of: :client_requests
 
+  has_one :proposal
+  has_one :quote, through: :proposal
+
   has_one :specialization_relation, as: :specializable, dependent: :destroy
   has_one :specialization, through: :specialization_relation
 

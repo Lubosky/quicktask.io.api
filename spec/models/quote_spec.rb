@@ -14,6 +14,11 @@ RSpec.describe Quote, type: :model do
 
     it { is_expected.to have_many(:line_items) }
 
+    it { is_expected.to have_one(:proposal) }
+    it { is_expected.to have_one(:client_request).through(:proposal) }
+    it { is_expected.to have_one(:project_estimate) }
+    it { is_expected.to have_one(:project).through(:project_estimate) }
+
     it { is_expected.to validate_presence_of(:currency) }
     it { is_expected.to validate_presence_of(:exchange_rate) }
     it { is_expected.to validate_presence_of(:owner) }

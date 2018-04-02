@@ -22,6 +22,9 @@ class Project < ApplicationRecord
     has_many :tasks, through: :tasklists
   end
 
+  has_one :project_estimate
+  has_one :quote, through: :project_estimate
+
   jsonb_accessor :settings,
     automated_workflow: [:boolean, default: true],
     internal: [:boolean, default: false]

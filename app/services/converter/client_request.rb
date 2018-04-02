@@ -1,4 +1,22 @@
 class Converter::ClientRequest
+  def self.convert(request, user)
+    new(request, user).convert
+  end
+
+  def initialize(request, user)
+    @request = request
+    @user = user
+  end
+
+  def convert
+    return request.quote if request.quote
+    fulfill_conversion
+  end
+
+  private
+
+  attr_reader :request, :user
+
   COPYABLE_ATTRIBUTES = %i(
     client_id
     workspace_id
@@ -12,29 +30,13 @@ class Converter::ClientRequest
   DEFAULT_COUNT = 1.0
   DEFAULT_EXCHANGE_RATE = 1.0
 
-  def self.convert(request, user)
-    new(request, user).convert
-  end
-
-  def initialize(request, user)
-    @request = request
-    @user = user
-  end
-
-  def convert
-    fulfill_conversion
-  end
-
-  private
-
-  attr_reader :request, :user
 
   def fulfill_conversion
     ::Quote.transaction do
       entry = build_quote
       entry.tap do |quote|
-        quote.owner = user
         quote.save!
+        quote.client_request = request
         quote.update_totals
       end
     end
@@ -42,6 +44,7 @@ class Converter::ClientRequest
 
   def build_quote
     permitted_attributes = request.slice(COPYABLE_ATTRIBUTES).tap do |hash|
+      hash[:owner] = user
       hash[:subject] = compose_subject
       hash[:notes] = compose_notes
       hash[:line_items_attributes] = build_line_items

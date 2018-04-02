@@ -1,5 +1,5 @@
 class Task < ApplicationRecord
-  include BelongsDirectly, EnsureUUID
+  include BelongsDirectly, EnsureUUID, HasLocation
 
   with_options inverse_of: :tasks do
     belongs_to :project
@@ -34,14 +34,17 @@ class Task < ApplicationRecord
                   column_name: proc { |r| r.completed? ? 'completed_task_count' : nil },
                   touch: true
 
+  default_scope { includes(:task_type) }
   scope :with_status, ->(status) { where(status: status) }
   scope :except_status, ->(status) { where.not(status: status) }
 
   validates :owner, :project, :tasklist, :title, :workspace, presence: true
+  validates :location, absence: true, unless: :interpreting_task?
   validates :task_type, :unit, presence: true, if: :active?
   validate :validate_start_date_before_due_date
 
   delegate :project, :workspace, to: :tasklist
+  delegate :classification, to: :task_type
 
   enum color: {
     no_color: 0,
@@ -106,7 +109,24 @@ class Task < ApplicationRecord
   after_initialize { self.status ||= :draft }
   before_validation { self.title&.strip! }
   before_validation { self.project = self.tasklist.project }
+  before_validation :ensure_location_is_nullified, unless: :interpreting_task?
   after_commit :update_project_completion_ratio, on: :update
+
+  def translation_task?
+    classification == 'translation'
+  end
+
+  def interpreting_task?
+    classification == 'interpreting'
+  end
+
+  def localization_task?
+    classification == 'localization'
+  end
+
+  def other_task?
+    classification == 'other'
+  end
 
   def update_project_completion_ratio
     return unless saved_change_to_completed_unit_count? || saved_change_to_unit_count?
@@ -123,6 +143,10 @@ class Task < ApplicationRecord
   end
 
   private
+
+  def ensure_location_is_nullified
+    self.location = nil
+  end
 
   def validate_start_date_before_due_date
     if due_date && start_date && due_date < start_date

@@ -35,8 +35,8 @@ class Converter::Quote
   def fulfill_conversion
     ::Project.transaction do
       project = build_project
-      project.tap(&:save!)
       project.quote = quote
+      project.tap(&:save!)
     end
   end
 
@@ -114,19 +114,44 @@ class Converter::Quote
   def build_tasks(collection)
     tasks = []
 
-    collection.dup.each do |entry|
-      task = build_task(entry)
+    collection.dup.each do |resource|
+      task = build_task(resource)
       tasks.push(task) if task
     end
 
     return tasks
   end
 
-  def build_task(entry)
-    entry.slice(TASK_ATTRIBUTES).tap do |hash|
+  def build_task(resource)
+    resource.slice(TASK_ATTRIBUTES).tap do |hash|
       hash[:owner] = user
-      hash[:title] = entry.task_type.name
-      hash[:unit_count] = entry.quantity
+      hash[:title] = resource.task_type.name
+      hash[:unit_count] = resource.quantity
+      if interpreting_task?(resource) && has_location?
+        hash[:location_attributes] = build_interpreting_location
+      end
     end
+  end
+
+  def build_interpreting_location
+    {
+      address: client_request&.location&.address
+    }
+  end
+
+  def interpreting_request?
+    client_request && client_request.classification == 'interpreting'
+  end
+
+  def interpreting_task?(task)
+    task.task_type.classification == 'interpreting'
+  end
+
+  def has_location?
+    interpreting_request? && client_request.location.present?
+  end
+
+  def client_request
+    @client_request ||= quote.client_request
   end
 end

@@ -6,6 +6,7 @@ class Converter::ClientRequest
   def initialize(request, user)
     @request = request
     @user = user
+    @line_items = []
   end
 
   def convert
@@ -47,29 +48,25 @@ class Converter::ClientRequest
       hash[:owner] = user
       hash[:subject] = compose_subject
       hash[:notes] = compose_notes
-      hash[:line_items_attributes] = build_line_items
+      hash[:line_items_attributes] = build_line_item_collection
     end
 
     ::Quote.new(permitted_attributes)
   end
 
-  def build_line_items
-    line_items = []
-
+  def build_line_item_collection
     if language_service_request?
       request.target_language_ids.each do |target_language_id|
-        line_item = build_line_item(target_language_id: target_language_id)
-        line_items.push(line_item) if line_item
+        build_line_items(target_language_id: target_language_id)
       end
     else
-      line_item = build_line_item
-      line_items.push(line_item) if line_item
+      build_line_items(target_language_id: target_language_id)
     end
 
-    return line_items
+    return @line_items
   end
 
-  def build_line_item(target_language_id: nil)
+  def build_line_items(target_language_id: nil)
     service_tasks.each do |service_task|
       rate_params = rate_params(
         target_language_id: target_language_id,
@@ -84,7 +81,7 @@ class Converter::ClientRequest
         unit_price: price
       )
 
-      return line_item_params
+      @line_items.push(line_item_params)
     end
   end
 

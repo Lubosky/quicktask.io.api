@@ -69,6 +69,10 @@ class Task < ApplicationRecord
     cancelled: 6,
     archived: 7
   } do
+    event :nullify do
+      transition all - [:archived] => :no_status
+    end
+
     event :prepare do
       before do
         self.completed_unit_count = 0
@@ -85,7 +89,7 @@ class Task < ApplicationRecord
       transition all - [:archived] => :active, if: -> { !!task_type && !!unit }
     end
 
-    event :defer do
+    event :suspend do
       transition all - [:archived] => :on_hold
     end
 

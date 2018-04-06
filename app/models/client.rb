@@ -6,7 +6,7 @@ class Client < ApplicationRecord
   with_options dependent: :restrict_with_error, inverse_of: :client do
     has_many :client_requests
     has_many :project_groups
-    has_many :projects, through: :workspace
+    has_many :projects
     has_many :quotes
   end
 
@@ -23,6 +23,9 @@ class Client < ApplicationRecord
           through: :workspace,
           source: :supported_currencies
 
+  default_scope { where(internal: false) }
+
+  validates :name, presence: true
   validates :currency, presence: true, length: { is: 3 }
 
   jsonb_accessor :tax_settings,

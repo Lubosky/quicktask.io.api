@@ -64,7 +64,7 @@ module ZanpakutoController
     self.resource = resource_class.new(resource_params)
   end
 
-  def instantiate_collection(apply_timeframe: true, apply_filtering: true, apply_sorting: true, apply_pagination: true, preload_includes: true)
+  def instantiate_collection(apply_timeframe: false, apply_filtering: true, apply_sorting: true, apply_pagination: true, preload_includes: true)
     collection = accessible_records
     collection = yield collection             if block_given?
     collection = apply_timeframe collection   if apply_timeframe

@@ -28,7 +28,25 @@ Rails.application.routes.draw do
         namespace :client, module: :client, as: :client do
         end
 
-        namespace :member, module: :member, as: :member do
+        namespace :team, module: :team, as: :team do
+          resources :clients
+          resources :contractors
+          resources :projects do
+            [:prepare, :plan, :activate, :suspend, :complete, :cancel, :archive].each do |action|
+              post action, on: :member
+            end
+            resources :tasklists, except: [:show] do
+              resources :tasks, except: [:index] do
+                [:prepare, :plan, :activate, :suspend, :complete, :cancel, :archive].each do |action|
+                  post action, on: :member
+                end
+                resources :todo, except: [:show] do
+                  post :assign, on: :member
+                  post :complete, on: :member
+                end
+              end
+            end
+          end
         end
 
         namespace :vendor, module: :vendor, as: :vendor do

@@ -1,4 +1,4 @@
-class Project < ApplicationRecord
+ class Project < ApplicationRecord
   include EnsureUUID
 
   with_options inverse_of: :projects do
@@ -17,12 +17,12 @@ class Project < ApplicationRecord
            through: :workspace,
            source: :members
 
-  with_options inverse_of: :project do
+  with_options dependent: :destroy, inverse_of: :project do
     has_many :tasklists
     has_many :tasks, through: :tasklists
   end
 
-  has_one :project_estimate
+  has_one :project_estimate, dependent: :destroy
   has_one :quote, through: :project_estimate
 
   jsonb_accessor :settings,
@@ -32,6 +32,8 @@ class Project < ApplicationRecord
   accepts_nested_attributes_for :tasklists,
                                 allow_destroy: true,
                                 reject_if: ->(o) { o['title'].blank? }
+
+  after_initialize { self.status ||= :draft }
 
   validates :client, :name, :owner, :workspace, presence: true
 
@@ -45,15 +47,23 @@ class Project < ApplicationRecord
     cancelled: 6,
     archived: 7
   } do
+    event :nullify do
+      transition all - [:archived] => :no_status
+    end
+
     event :prepare do
       transition all - [:archived] => :draft
+    end
+
+    event :plan do
+      transition all - [:archived] => :planned
     end
 
     event :activate do
       transition all - [:archived] => :active
     end
 
-    event :defer do
+    event :suspend do
       transition all - [:archived] => :on_hold
     end
 

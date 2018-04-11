@@ -2,13 +2,8 @@ Mutations::AuthenticateUserMutation = GraphQL::Field.define do
   type Types::AuthenticationTokenType
   description 'Signs in a user with an email address and password.'
 
-  argument :email, !types.String do
-    description 'The user’s email address.'
-  end
-
-  argument :password, !types.String do
-    description 'The user’s password.'
-  end
+  argument :email, !types.String, 'The user’s email address.'
+  argument :password, !types.String, 'The user’s password.'
 
   resolve AuthenticationResolver.new
 end

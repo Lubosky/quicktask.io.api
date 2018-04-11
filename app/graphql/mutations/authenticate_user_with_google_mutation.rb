@@ -2,9 +2,7 @@ Mutations::AuthenticateUserWithGoogleMutation = GraphQL::Field.define do
   type Types::AuthenticationTokenType
   description 'Signs in a user via Google OAuth.'
 
-  argument :code, !types.String do
-    description 'An authorization code to exchange for an access token.'
-  end
+  argument :code, !types.String, 'An authorization code to exchange for an access token.'
 
   resolve GoogleAuthenticationResolver.new
 end

@@ -2,13 +2,8 @@ Types::MembershipType = GraphQL::ObjectType.define do
   name 'Membership'
   description ''
 
-  field :id, !types.ID do
-    description 'Globally unique ID of the membership.'
-  end
-
-  field :uuid, !types.String do
-    description 'A unique substitute for a Membership ID.'
-  end
+  field :id, !types.ID, 'Globally unique ID of the membership.'
+  field :uuid, !types.String, 'A unique substitute for a membership ID.'
 
   field :plan, !Types::PlanType do
     description ''
@@ -16,76 +11,20 @@ Types::MembershipType = GraphQL::ObjectType.define do
     resolve ->(obj, _args, _ctx) { obj.plan }
   end
 
-  field :stripeSubscriptionId, !types.String do
-    description ''
-    property :stripe_subscription_id
-  end
+  field :stripe_subscription_id, !types.String, ''
+  field :status, types.String, 'Membership’s status. Enum: Trialing, Active, Unpaid, Deactivated.'
+  field :quantity, !types.Int, ''
+  field :free_license, !types.Boolean, ''
+  field :trial_period_end_date, Types::DateTimeType, ''
+  field :trial_period_extension_days, !types.Int, ''
+  field :scheduled_for_deactivation_on, Types::DateType, ''
+  field :deactivated_on, Types::DateType, ''
+  field :scheduled_for_reactivation_on, Types::DateType, ''
+  field :reactivated_on, Types::DateType, ''
+  field :next_payment_amount, Types::BigDecimalType, ''
+  field :next_payment_on, Types::DateType, ''
 
-  field :status, types.String do
-    description 'Membership’s status. Enum: Trialing, Active, Unpaid, Deactivated.'
-  end
-
-  field :quantity, !types.Int do
-    description ''
-  end
-
-  field :freeLicense, !types.Boolean do
-    description ''
-    property :free_license
-  end
-
-  field :trialPeriodEndDate, Types::DateTimeType do
-    description ''
-    property :trial_period_end_date
-  end
-
-  field :trialPeriodExtensionDays, !types.Int do
-    description ''
-    property :trial_period_extension_days
-  end
-
-  field :scheduledForDeactivationOn, Types::DateType do
-    description ''
-    property :scheduled_for_deactivation_on
-  end
-
-  field :deactivatedOn, Types::DateType do
-    description ''
-    property :deactivated_on
-  end
-
-  field :scheduledForReactivationOn, Types::DateType do
-    description ''
-    property :scheduled_for_reactivation_on
-  end
-
-  field :reactivatedOn, Types::DateType do
-    description ''
-    property :reactivated_on
-  end
-
-  field :nextPaymentAmount, Types::BigDecimalType do
-    description ''
-    property :next_payment_amount
-  end
-
-  field :nextPaymentOn, Types::DateType do
-    description ''
-    property :next_payment_on
-  end
-
-  field :createdAt, Types::DateTimeType do
-    description 'The time at which this membership was created.'
-    property :created_at
-  end
-
-  field :updatedAt, Types::DateTimeType do
-    description 'The time at which this membership was last modified.'
-    property :updated_at
-  end
-
-  field :deletedAt, Types::DateTimeType do
-    description 'The time at which this membership was deleted.'
-    property :deleted_at
-  end
+  field :created_at, Types::DateTimeType, 'The time at which this record was created.'
+  field :updated_at, Types::DateTimeType, 'The time at which this record was last modified.'
+  field :deleted_at, Types::DateTimeType, 'The time at which this record was deleted.'
 end

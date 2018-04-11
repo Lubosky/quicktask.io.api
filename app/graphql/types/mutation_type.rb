@@ -4,4 +4,9 @@ Types::MutationType = GraphQL::ObjectType.define do
 
   field :authenticateUser, Mutations::AuthenticateUserMutation
   field :authenticateUserWithGoogle, Mutations::AuthenticateUserWithGoogleMutation
+
+  field :createProject, Mutations::Team::Project::CreateProjectMutation
+  field :updateProject, Mutations::Team::Project::UpdateProjectMutation
+  field :deleteProject, Mutations::Team::Project::DeleteProjectMutation
+  field :updateProjectStatus, Mutations::Team::Project::UpdateProjectStatusMutation
 end

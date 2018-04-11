@@ -19,12 +19,26 @@ class WorkspaceUser < ApplicationRecord
            foreign_key: :assignee_id,
            inverse_of: :assignee
 
-  validates_presence_of :member, :role, :user, :workspace
+  jsonb_accessor :workspace_settings,
+    project_view_type: [:integer, default: 0],
+    task_view_type: [:integer, default: 0]
+
+  validates :member,
+            :project_view_type,
+            :role,
+            :task_view_type,
+            :user,
+            :workspace,
+            presence: true
+
   validates_uniqueness_of :user_id, scope: [:member_type, :member_id]
   validate :member_allowed_for_role?, if: :role_id_changed?
 
   delegate :first_name, :last_name, :locale, :time_zone, :settings, to: :user
   delegate :permission_level, :permissions, to: :role
+
+  enum project_view_type: { grid: 0, list: 1 }, _prefix: true
+  enum task_view_type: { column: 0, list: 1 }, _prefix: true
 
   enum status: { pending: 0, active: 1, deactivated: 2 } do
     event :activate do

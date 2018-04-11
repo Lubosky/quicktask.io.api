@@ -18,9 +18,11 @@ RSpec.describe WorkspaceUser, type: :model do
     it { is_expected.to have_many(:owned_tasklists).class_name('Tasklist').with_foreign_key(:owner_id) }
     it { is_expected.to have_many(:owned_tasks).class_name('Task').with_foreign_key(:owner_id) }
 
+    it { is_expected.to validate_presence_of(:project_view_type) }
     it { is_expected.to validate_presence_of(:role) }
-    it { is_expected.to validate_presence_of(:workspace) }
+    it { is_expected.to validate_presence_of(:task_view_type) }
     it { is_expected.to validate_presence_of(:user) }
+    it { is_expected.to validate_presence_of(:workspace) }
     it { is_expected.to validate_uniqueness_of(:user_id).scoped_to([:member_type, :member_id]) }
 
     it { is_expected.to validate_presence_of(:uuid) }

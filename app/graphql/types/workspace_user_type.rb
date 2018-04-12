@@ -20,6 +20,9 @@ Types::WorkspaceUserType = GraphQL::ObjectType.define do
   field :permission_level, !types.String, ''
   field :permissions, !types[!types.String], ''
 
+  field :project_view_type, !types.String, ''
+  field :task_view_type, !types.String, ''
+
   field :created_at, Types::DateTimeType, 'The time at which this workspace member’s account was created.'
   field :updated_at, Types::DateTimeType, 'The time at which this workspace member’s account was last modified.'
   field :deleted_at, Types::DateTimeType, 'The time at which this workspace member’s account was deleted.'

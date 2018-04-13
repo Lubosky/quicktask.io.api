@@ -2,8 +2,11 @@ module Mutations
   module Team
     module Project
       UpdateProjectStatusMutation = GraphQL::Field.define do
-        type Types::Team::ProjectType
+        type Types::ProjectType
         description 'Updates a project’s status.'
+
+        argument :workspaceId, !types.ID, as: :workspace_id
+        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
 
         argument :id, !types.ID, 'Globally unique ID of the project.'
         argument :input, Inputs::Team::Project::StatusInput

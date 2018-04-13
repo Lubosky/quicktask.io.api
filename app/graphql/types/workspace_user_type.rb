@@ -13,15 +13,15 @@ Types::WorkspaceUserType = GraphQL::ObjectType.define do
   field :workspace_id, !types.ID, 'Globally unique ID of the workspace.'
   field :user_id, !types.ID, 'Globally unique ID of the user.'
 
-  field :first_name, !types.String, 'The first name of the workspace user.'
-  field :last_name, !types.String, 'The last name of the workspace user.'
+  field :first_name, types.String, 'The first name of the workspace user.'
+  field :last_name, types.String, 'The last name of the workspace user.'
   field :status, types.String, 'Workspace member’s status. Enum: Pending, Active, Deactivated.'
-  field :currency, !types.String, ''
-  field :permission_level, !types.String, ''
-  field :permissions, !types[!types.String], ''
+  field :currency, types.String, ''
+  field :permission_level, types.String, ''
+  field :permissions, types[!types.String], ''
 
-  field :project_view_type, !types.String, ''
-  field :task_view_type, !types.String, ''
+  field :project_view_type, types.String, ''
+  field :task_view_type, types.String, ''
 
   field :created_at, Types::DateTimeType, 'The time at which this workspace member’s account was created.'
   field :updated_at, Types::DateTimeType, 'The time at which this workspace member’s account was last modified.'

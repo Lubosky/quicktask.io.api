@@ -7,43 +7,15 @@ Types::QueryType = GraphQL::ObjectType.define do
     resolve ->(_obj, _args, ctx) { ctx[:current_user] }
   end
 
-  field :currentWorkspace, Types::WorkspaceType do
-    description 'Returns the workspace record for the currently used workspace.'
-    resolve ->(_obj, _args, ctx) { ctx[:current_workspace] }
-  end
+  field :workspace, Types::WorkspaceType do
+    argument :workspaceId, !types.ID, as: :workspace_id
+    argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
 
-  field :contractorWorkspace, Types::Contractor::WorkspaceType do
-    description ''
-
-    authorize ->(_obj, _args, ctx) {
-      ctx[:current_workspace_user] && ctx[:current_workspace_user].contractor?
+    authorize ->(_obj, args, ctx) {
+      ctx[:current_workspace_user] &&
+        ctx[:current_workspace_user].workspace_id == args[:workspace_id].to_i
     }
 
     resolve ->(_obj, _args, ctx) { ctx[:current_workspace] }
-  end
-
-  field :clientWorkspace, Types::Client::WorkspaceType do
-    description ''
-
-    authorize ->(_obj, _args, ctx) {
-      ctx[:current_workspace_user] && ctx[:current_workspace_user].client?
-    }
-
-    resolve ->(_obj, _args, ctx) { ctx[:current_workspace] }
-  end
-
-  field :teamWorkspace, Types::Team::WorkspaceType do
-    description ''
-
-    authorize ->(_obj, _args, ctx) {
-      ctx[:current_workspace_user] && ctx[:current_workspace_user].team_member?
-    }
-
-    resolve ->(_obj, _args, ctx) { ctx[:current_workspace] }
-  end
-
-  field :currentWorkspaceUser, Types::WorkspaceUserType do
-    description 'Returns the workspace user record for the currently authorized workspace user.'
-    resolve ->(_obj, _args, ctx) { ctx[:current_workspace_user] }
   end
 end

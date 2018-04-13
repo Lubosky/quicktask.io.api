@@ -1,5 +1,5 @@
-Types::Team::ClientType = GraphQL::ObjectType.define do
-  name 'TeamClient'
+Types::ClientType = GraphQL::ObjectType.define do
+  name 'Client'
   description ''
 
   field :id, !types.ID, 'Globally unique ID of the client.'
@@ -10,7 +10,7 @@ Types::Team::ClientType = GraphQL::ObjectType.define do
   field :name, !types.String, 'The name of the client.'
   field :email, types.String, 'The email of the client.'
   field :phone, types.String, 'The phone of the client.'
-  field :currency, !types.String, 'The currency of the client.'
+  field :currency, types.String, 'The currency of the client.'
 
   field :created_at, Types::DateTimeType, 'The time at which this record was created.'
   field :updated_at, Types::DateTimeType, 'The time at which this record was last modified.'

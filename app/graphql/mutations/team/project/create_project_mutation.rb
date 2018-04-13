@@ -2,8 +2,11 @@ module Mutations
   module Team
     module Project
       CreateProjectMutation = GraphQL::Field.define do
-        type Types::Team::ProjectType
+        type Types::ProjectType
         description 'Creates a new project in a workspace.'
+
+        argument :workspaceId, !types.ID, as: :workspace_id
+        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
 
         argument :input, Inputs::Team::Project::BaseInput
 

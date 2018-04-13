@@ -1,5 +1,5 @@
-Types::Team::ContractorType = GraphQL::ObjectType.define do
-  name 'TeamContractor'
+Types::ContractorType = GraphQL::ObjectType.define do
+  name 'Contractor'
   description ''
 
   field :id, !types.ID, 'Globally unique ID of the contractor.'
@@ -7,9 +7,9 @@ Types::Team::ContractorType = GraphQL::ObjectType.define do
 
   field :workspace_id, !types.ID, 'Globally unique ID of the workspace.'
 
-  field :first_name, !types.String, 'The first name of the contractor.'
-  field :last_name, !types.String, 'The first name of the contractor.'
-  field :email, !types.String, 'The email of the contractor.'
+  field :first_name, types.String, 'The first name of the contractor.'
+  field :last_name, types.String, 'The first name of the contractor.'
+  field :email, types.String, 'The email of the contractor.'
   field :phone, types.String, 'The phone of the contractor.'
   field :currency, !types.String, 'The currency of the contractor.'
 

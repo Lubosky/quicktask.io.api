@@ -2,8 +2,11 @@ module Mutations
   module Team
     module Project
       UpdateProjectMutation = GraphQL::Field.define do
-        type Types::Team::ProjectType
+        type Types::ProjectType
         description 'Updates the project.'
+
+        argument :workspaceId, !types.ID, as: :workspace_id
+        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
 
         argument :id, !types.ID, 'Globally unique ID of the project.'
         argument :input, Inputs::Team::Project::BaseInput
@@ -31,9 +34,10 @@ module Mutations
           inputs = {}.tap do |hash|
             hash.merge!(args[:input].to_h)
             hash[:context] = context
+            hash[:project] = project
           end
 
-          action = ::Team::Project::Update.run(inputs.merge(project: project))
+          action = ::Team::Project::Update.run(inputs)
           if action.valid?
             action.result
           else

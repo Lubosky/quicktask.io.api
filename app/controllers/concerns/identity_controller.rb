@@ -35,7 +35,7 @@ module IdentityController
   def workspace_identifier
     params[:identifier] ||
     params[:workspace_identifier] ||
-    graphql_variables[:workspaceIdentifier]
+    graphql_variables[:workspaceId]
   end
 
   def workspace_identifier?
@@ -168,8 +168,8 @@ module IdentityController
   end
 
   def set_current_workspace_user
-    if workspace_user_identifier = graphql_variables[:workspaceUserIdentifier]
-      set_current_workspace_user_for(workspace_user_identifier)
+    if impersonation_type = graphql_variables[:impersonationType]
+      set_current_workspace_user_for(impersonation_type)
     else
       current_workspace.members.find_by(user: current_user)
     end

@@ -4,6 +4,9 @@ module Mutations
       type Types::WorkspaceUserType
       description 'Updates the workspace settings of currently authenticated user.'
 
+      argument :workspaceId, !types.ID, as: :workspace_id
+      argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+
       argument :input, Inputs::WorkspaceUser::SettingsInput
 
       resource! ->(_obj, _args, ctx) { ctx[:current_workspace_user] }

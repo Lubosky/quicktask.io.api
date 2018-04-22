@@ -20,6 +20,7 @@ Types::WorkspaceUserType = GraphQL::ObjectType.define do
   field :permission_level, types.String, ''
   field :permissions, types[!types.String], ''
 
+  field :project_sort_option, types.String, ''
   field :project_view_type, types.String, ''
   field :task_view_type, types.String, ''
 

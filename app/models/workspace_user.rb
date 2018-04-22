@@ -20,10 +20,12 @@ class WorkspaceUser < ApplicationRecord
            inverse_of: :assignee
 
   jsonb_accessor :workspace_settings,
+    project_sort_option: [:integer, default: 0],
     project_view_type: [:integer, default: 0],
     task_view_type: [:integer, default: 0]
 
   validates :member,
+            :project_sort_option,
             :project_view_type,
             :role,
             :task_view_type,
@@ -37,6 +39,7 @@ class WorkspaceUser < ApplicationRecord
   delegate :first_name, :last_name, :locale, :time_zone, :settings, to: :user
   delegate :permission_level, :permissions, to: :role
 
+  enum project_sort_option: { due_date: 0, identifier: 1, title: 2, updated_at: 3 }, _prefix: true
   enum project_view_type: { grid: 0, list: 1 }, _prefix: true
   enum task_view_type: { column: 0, list: 1 }, _prefix: true
 

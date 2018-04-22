@@ -11,6 +11,7 @@ Types::ClientType = GraphQL::ObjectType.define do
   field :email, types.String, 'The email of the client.'
   field :phone, types.String, 'The phone of the client.'
   field :currency, types.String, 'The currency of the client.'
+  field :tax_number, types.String, 'The tax number of the client.'
 
   field :created_at, Types::DateTimeType, 'The time at which this record was created.'
   field :updated_at, Types::DateTimeType, 'The time at which this record was last modified.'

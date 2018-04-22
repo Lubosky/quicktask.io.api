@@ -14,6 +14,7 @@ module Inputs
         argument :startDate, Types::DateTimeType, as: :start_date
         argument :dueDate, Types::DateTimeType, as: :due_date
         argument :completedDate, Types::DateTimeType, as: :completed_date
+        argument :internal, types.Boolean
         argument :automatedWorkflow, types.Boolean, as: :automated_workflow
       end
     end

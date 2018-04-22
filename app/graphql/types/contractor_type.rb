@@ -9,6 +9,7 @@ Types::ContractorType = GraphQL::ObjectType.define do
 
   field :first_name, types.String, 'The first name of the contractor.'
   field :last_name, types.String, 'The first name of the contractor.'
+  field :business_name, types.String, 'Contractor’s business name.'
   field :email, types.String, 'The email of the contractor.'
   field :phone, types.String, 'The phone of the contractor.'
   field :currency, !types.String, 'The currency of the contractor.'

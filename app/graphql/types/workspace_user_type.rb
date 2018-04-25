@@ -16,7 +16,7 @@ Types::WorkspaceUserType = GraphQL::ObjectType.define do
   field :first_name, types.String, 'The first name of the workspace user.'
   field :last_name, types.String, 'The last name of the workspace user.'
   field :status, types.String, 'Workspace member’s status. Enum: Pending, Active, Deactivated.'
-  field :currency, types.String, ''
+  field :currency, Types::CurrencyType, ''
   field :permission_level, types.String, ''
   field :permissions, types[!types.String], ''
 

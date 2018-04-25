@@ -12,7 +12,7 @@ Types::ContractorType = GraphQL::ObjectType.define do
   field :business_name, types.String, 'Contractor’s business name.'
   field :email, types.String, 'The email of the contractor.'
   field :phone, types.String, 'The phone of the contractor.'
-  field :currency, !types.String, 'The currency of the contractor.'
+  field :currency, Types::CurrencyType, 'The currency of the contractor.'
 
   field :created_at, Types::DateTimeType, 'The time at which this record was created.'
   field :updated_at, Types::DateTimeType, 'The time at which this record was last modified.'

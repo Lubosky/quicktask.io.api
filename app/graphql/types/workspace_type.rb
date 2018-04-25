@@ -84,4 +84,18 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
       collection.page(args[:page]).per(args[:limit])
     }
   end
+
+  field :supported_currencies do
+    type types[!Types::WorkspaceCurrencyType]
+    description ''
+
+    authorize ->(_obj, _args, ctx) {
+      ::Team::WorkspaceCurrencyPolicy.new(ctx[:current_workspace_user], WorkspaceCurrency).index?
+    }
+
+    before_scope ->(_obj, _args, ctx) { ctx[:current_workspace].supported_currencies }
+    resolve ->(collection, _args, _ctx) {
+      collection
+    }
+  end
 end

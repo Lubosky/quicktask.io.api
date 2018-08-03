@@ -12,9 +12,11 @@ class Tasklist < ApplicationRecord
 
   belongs_directly_to :workspace
 
-  acts_as_list scope: :project
+  acts_as_list scope: :project, top_of_list: 0
 
   accepts_nested_attributes_for :tasks, allow_destroy: true
+
+  default_scope { order(:position) }
 
   validates :project, :title, :workspace, presence: true
 

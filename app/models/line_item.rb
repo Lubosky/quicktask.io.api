@@ -32,7 +32,7 @@ class LineItem < ApplicationRecord
 
   after_validation :calculate_totals
 
-  acts_as_list scope: :bookkeepable
+  acts_as_list scope: :bookkeepable, top_of_list: 0
 
   def discount=(value)
     discount = Percentage.fractionify(value)

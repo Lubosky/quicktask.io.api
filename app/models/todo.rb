@@ -9,9 +9,14 @@ class Todo < ApplicationRecord
   belongs_to :assignee,
              class_name: 'WorkspaceUser',
              foreign_key: :assignee_id,
-             inverse_of: :assigned_todos
+             inverse_of: :assigned_todos,
+             optional: true
 
-  acts_as_list scope: :task
+  belongs_directly_to :workspace
+
+  acts_as_list scope: :task, top_of_list: 0
+
+  default_scope { order(:position) }
 
   scope :assigned_to, ->(assignee) { where(assignee: assignee) }
   scope :completed, -> { where(completed: true) }

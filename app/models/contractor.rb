@@ -1,6 +1,7 @@
 class Contractor < ApplicationRecord
   include EnsureUUID
   include HasMember
+  include HasName
 
   belongs_to :workspace, inverse_of: :contractors, class_name: 'Workspace'
 

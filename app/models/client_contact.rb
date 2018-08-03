@@ -1,6 +1,7 @@
 class ClientContact < ApplicationRecord
   include EnsureUUID
   include HasMember
+  include HasName
 
   with_options inverse_of: :client_contacts do
     belongs_to :client

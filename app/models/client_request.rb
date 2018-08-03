@@ -103,12 +103,16 @@ class ClientRequest < ApplicationRecord
   end
 
   def validate_request_type
-    errors.add(:request_type, :invalid) unless request_type == classification
+    unless request_type == classification
+      errors.add(:request_type, :invalid)
+      throw(:abort)
+    end
   end
 
   def validate_start_date_before_due_date
     if due_date && start_date && due_date < start_date
       errors.add(:due_date, :greater_than_start_date)
+      throw(:abort)
     end
   end
 end

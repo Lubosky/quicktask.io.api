@@ -12,6 +12,7 @@ member:
   - manage_projects
   - manage_tasklists
   - manage_tasks
+  - manage_todos
 
 owner:
   - manage_clients
@@ -20,5 +21,6 @@ owner:
   - manage_projects
   - manage_tasklists
   - manage_tasks
+  - manage_todos
   - manage_team_members
   - manage_workspace

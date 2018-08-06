@@ -29,6 +29,14 @@ class Todo < ApplicationRecord
   after_validation :set_completion_date, if: :completed?
   after_validation :reset_completion_date, unless: :completed?
 
+  def complete!
+    self.update!(completed: true)
+  end
+
+  def uncomplete!
+    self.update!(completed: false)
+  end
+
   private
 
   def set_completion_date

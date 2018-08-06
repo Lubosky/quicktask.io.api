@@ -5,5 +5,6 @@ class TeamMember < ApplicationRecord
 
   belongs_to :workspace, inverse_of: :team_members, class_name: 'Workspace'
 
-  validates :email, email: true, presence: true, uniqueness: true
+  validates :email, email: true, presence: true
+  validates_uniqueness_of :email, case_sensitive: false, scope: :workspace_id
 end

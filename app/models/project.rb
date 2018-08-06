@@ -35,6 +35,8 @@
 
   after_initialize { self.status ||= :draft }
 
+  scope :with_task_map, -> { select("projects.*, #{TaskMapQuery.query}") }
+
   validates :client, :name, :owner, :workspace, presence: true
 
   enum status: {
@@ -102,5 +104,27 @@
 
   def generate_quote(user)
     Converter::Project.generate_quote(self, user)
+  end
+
+  def ordered_tasklist_ids
+    ordered_task_map.keys
+  end
+
+  def ordered_task_ids
+    ordered_task_map
+  end
+
+  private
+
+  def ordered_task_map
+    if respond_to?(:collection_map)
+      collection = collection_map
+    else
+      collection = Project.where(id: id).
+        pluck(TaskMapQuery.query).
+        first
+    end
+
+    collection ? collection.reduce(Hash.new, :merge) : Hash.new
   end
 end

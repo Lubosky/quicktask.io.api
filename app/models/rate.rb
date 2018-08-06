@@ -23,6 +23,16 @@ class Rate < ApplicationRecord
 
   discriminate Rate, on: :rate_type
 
+  scope :for_task, ->(task) {
+    where(
+      classification: task.classification,
+      source_language: task.source_language,
+      target_language: task.target_language,
+      task_type: task.task_type,
+      unit: task.unit
+    ).limit(1)
+  }
+
   scope :with_classification, ->(type) { where(classification: type) }
   scope :without_duplicates, -> {
     select('DISTINCT ON (source_language_id, target_language_id, unit_id, task_type_id) *').

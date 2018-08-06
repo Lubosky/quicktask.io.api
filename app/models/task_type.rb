@@ -5,6 +5,7 @@ class TaskType < ApplicationRecord
 
   has_many :service_tasks, inverse_of: :task_type
   has_many :services, through: :service_tasks
+  has_many :tasks, inverse_of: :task_type
 
   enum classification: {
     translation: 0,

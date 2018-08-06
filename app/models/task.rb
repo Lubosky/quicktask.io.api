@@ -1,8 +1,20 @@
 class Task < ApplicationRecord
   include BelongsDirectly, EnsureUUID, HasLocation
 
+  TRANSLATION_FIELDS = %w(source_language_id target_language_id task_type_id unit_id)
+  INTERPRETING_FIELDS = %w(location source_language_id target_language_id task_type_id unit_id)
+  LOCALIZATION_FIELDS = %w(source_language_id task_type_id unit_id)
+  OTHER_FIELDS = %w(task_type_id)
+  TASK_FIELDS = {
+    translation: TRANSLATION_FIELDS,
+    interpreting: INTERPRETING_FIELDS,
+    localization: LOCALIZATION_FIELDS,
+    other: OTHER_FIELDS
+  }
+
   with_options inverse_of: :tasks do
     belongs_to :project
+    belongs_to :task_type
     belongs_to :tasklist
     belongs_to :workspace
   end
@@ -12,35 +24,53 @@ class Task < ApplicationRecord
   with_options optional: true do
     belongs_to :source_language, class_name: 'Language'
     belongs_to :target_language, class_name: 'Language'
-    belongs_to :task_type
     belongs_to :unit
   end
 
+  has_many :potential_assignees,
+           ->(task) { where(id: PotentialAssigneesQuery.build_query(task)) },
+           through: :workspace,
+           source: :contractors
   has_many :todos, inverse_of: :task
 
   belongs_directly_to :workspace
 
-  acts_as_list scope: :tasklist
+  jsonb_accessor :task_data,
+    source_language_name: [:string, default: nil],
+    source_language_code: [:string, default: nil],
+    target_language_name: [:string, default: nil],
+    target_language_code: [:string, default: nil],
+    task_type_name: [:string, default: nil],
+    task_type_classification: [:string, default: nil],
+    unit_name: [:string, default: nil]
+
+  acts_as_list scope: :tasklist, top_of_list: 0
+
+  alias :following_task :lower_item
+  alias :following_tasks :lower_items
+  alias :precedent_task :higher_item
+  alias :precedent_tasks :higher_items
+
   counter_culture :project,
-                  column_name: proc { |r| !r.cancelled? ? 'task_count' : nil },
+                  column_name: :task_count,
                   touch: true
   counter_culture :project,
                   column_name: proc { |r| r.completed? ? 'completed_task_count' : nil },
                   touch: true
   counter_culture :tasklist,
-                  column_name: proc { |r| !r.cancelled? ? 'task_count' : nil },
+                  column_name: :task_count,
                   touch: true
   counter_culture :tasklist,
                   column_name: proc { |r| r.completed? ? 'completed_task_count' : nil },
                   touch: true
 
-  default_scope { includes(:task_type) }
+  default_scope { joins(:task_type).order(:tasklist_id, :position) }
+
   scope :with_status, ->(status) { where(status: status) }
   scope :except_status, ->(status) { where.not(status: status) }
 
-  validates :owner, :project, :tasklist, :title, :workspace, presence: true
+  validates :owner, :project, :tasklist, :task_type, :title, :workspace, presence: true
   validates :location, absence: true, unless: :interpreting_task?
-  validates :task_type, :unit, presence: true, if: :active?
   validate :validate_start_date_before_due_date
 
   delegate :project, :workspace, to: :tasklist
@@ -60,60 +90,31 @@ class Task < ApplicationRecord
   }
 
   enum status: {
-    no_status: 0,
-    draft: 1,
-    planned: 2,
-    active: 3,
-    on_hold: 4,
-    completed: 5,
-    cancelled: 6,
-    archived: 7
+    uncompleted: 0,
+    completed: 1
   } do
-    event :nullify do
-      transition all - [:archived] => :no_status
-    end
-
-    event :prepare do
-      before do
-        self.completed_unit_count = 0
-      end
-
-      transition all - [:archived] => :draft
-    end
-
-    event :activate do
-      after do
-        self.project.activate
-      end
-
-      transition all - [:archived] => :active, if: -> { !!task_type && !!unit }
-    end
-
-    event :suspend do
-      transition all - [:archived] => :on_hold
-    end
-
     event :complete do
-      transition all - [:no_status, :draft, :archived] => :completed
+      transition :uncompleted => :completed
     end
 
-    event :cancel do
+    event :uncomplete do
+      transition :completed => :uncompleted
+    end
+
+    event :reset do
       before do
         self.completed_unit_count = 0
       end
 
-      transition all - [:archived] => :cancelled
-    end
-
-    event :archive do
-      transition [:active, :completed] => :archived
+      transition :completed => :uncompleted
     end
   end
 
-  after_initialize { self.status ||= :draft }
+  after_initialize { self.status ||= :uncompleted }
   before_validation { self.title&.strip! }
   before_validation { self.project = self.tasklist.project }
   before_validation :ensure_location_is_nullified, unless: :interpreting_task?
+  before_save :update_task_data, if: :association_fields_changed?
   after_commit :update_project_completion_ratio, on: :update
 
   def translation_task?
@@ -136,7 +137,7 @@ class Task < ApplicationRecord
     return unless saved_change_to_completed_unit_count? || saved_change_to_unit_count?
 
     query = Arel.sql('(coalesce(sum(coalesce(completed_unit_count, 0))/nullif(sum(coalesce(unit_count, 0)),0), 0))')
-    completion_ratio = Task.where(project_id: project_id).
+    completion_ratio = Task.unscope(:order).where(project_id: project_id).
       pluck(query).
       first
 
@@ -146,7 +147,37 @@ class Task < ApplicationRecord
     )
   end
 
+  def update_task_data
+    self.source_language_name = self&.source_language&.name
+    self.source_language_code = self&.source_language&.code
+    self.target_language_name = self&.target_language&.name
+    self.target_language_code = self&.target_language&.code
+    self.task_type_name = self&.task_type&.name
+    self.task_type_classification = self&.task_type&.classification
+    self.unit_name = self&.unit&.name
+  end
+
+  def move_task(position:, tasklist_id: self.tasklist_id)
+    self.update(position: position, tasklist_id: tasklist_id)
+  end
+
+  def assignable?
+    association_fields(precise: true).none? { |f| send(f).blank? }
+  end
+
   private
+
+  def association_fields_changed?
+    association_fields.any? { |f| send("#{f}_changed?") }
+  end
+
+  def association_fields(precise: false)
+    if precise
+      attributes.keys & TASK_FIELDS.with_indifferent_access[self.classification]
+    else
+      attributes.keys & %w(source_language_id target_language_id task_type_id unit_id)
+    end
+  end
 
   def ensure_location_is_nullified
     self.location = nil

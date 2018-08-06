@@ -82,7 +82,6 @@ namespace :dev do
     user = create(
       :user,
       :with_google,
-      :with_optional_password,
       email: 'google@example.dev'
     )
     puts_user user, 'with google auth'
@@ -338,7 +337,7 @@ namespace :dev do
 
     Workspace.active.find_each do |workspace|
       # DEFAULT CLIENT RATES
-      20.times do
+      100.times do
         source_language = workspace.languages.sample
         target_language = workspace.languages.where.not(id: source_language.id).sample
 
@@ -357,7 +356,7 @@ namespace :dev do
       puts_default_client_rate workspace
 
       # DEFAULT CONTRACTOR RATES
-      20.times do
+      100.times do
         source_language = workspace.languages.sample
         target_language = workspace.languages.where.not(id: source_language.id).sample
 
@@ -377,7 +376,7 @@ namespace :dev do
 
       # CONTRACTOR RATES
       workspace.contractors.each do |contractor|
-        10.times do
+        100.times do
           source_language = workspace.languages.sample
           target_language = workspace.languages.where.not(id: source_language.id).sample
 
@@ -398,7 +397,7 @@ namespace :dev do
 
       # CLIENT RATES
       workspace.clients.each do |client|
-        10.times do
+        100.times do
           source_language = workspace.languages.sample
           target_language = workspace.languages.where.not(id: source_language.id).sample
 
@@ -424,7 +423,7 @@ namespace :dev do
 
     Workspace.active.find_each do |workspace|
       workspace.projects.find_each do |project|
-        3.times do
+        9.times do
           create(
             :tasklist,
             owner: workspace.collaborating_team_members.sample,
@@ -444,7 +443,7 @@ namespace :dev do
     Tasklist.includes(:project, :workspace).find_each do |tasklist|
       workspace = tasklist.workspace
 
-      5.times do
+      15.times do
         source_language = workspace.languages.sample
         target_language = workspace.languages.where.not(id: source_language.id).sample
 

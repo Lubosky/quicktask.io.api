@@ -36,7 +36,7 @@ class WorkspaceUser < ApplicationRecord
   validates_uniqueness_of :user_id, scope: [:member_type, :member_id]
   validate :member_allowed_for_role?, if: :role_id_changed?
 
-  delegate :first_name, :last_name, :locale, :time_zone, :settings, to: :user
+  delegate :first_name, :last_name, :email, :locale, :time_zone, :settings, to: :user
   delegate :permission_level, :permissions, to: :role
 
   enum project_sort_option: { due_date: 0, identifier: 1, title: 2, updated_at: 3 }, _prefix: true
@@ -77,6 +77,15 @@ class WorkspaceUser < ApplicationRecord
       member&.currency
     when :client_contact
       member&.client&.currency
+    end
+  end
+
+  def synchronize_common_attributes
+    self.member.tap do |entity|
+      entity.first_name = self.first_name
+      entity.last_name = self.last_name
+      entity.email = self.email
+      entity.save
     end
   end
 

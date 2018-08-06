@@ -92,10 +92,16 @@ class GoogleIdentity
     User.where(google_uid: user_identifier).or(User.where(email: email_address)).first
   end
 
+  def generate_password
+    ::PasswordGenerator.generate_password
+  end
+
   def create_user_from_payload
     user_attributes = {
       email: email_address,
       google_uid: user_identifier,
+      password_digest: generate_password,
+      password_automatically_set: true,
       email_confirmed: email_verified,
       first_name: first_name,
       last_name: last_name

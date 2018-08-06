@@ -1,10 +1,9 @@
 class User < ApplicationRecord
-  include EmailNormalizer
-  include EnsureUUID
+  include EmailNormalizer, EnsureUUID
 
   attr_reader :password
 
-  has_secure_password validations: false
+  has_secure_password
 
   with_options dependent: :restrict_with_error, foreign_key: :owner_id, inverse_of: :owner do
     has_many :owned_workspaces, class_name: 'Workspace'
@@ -19,6 +18,7 @@ class User < ApplicationRecord
   has_many :tokens, foreign_key: :subject_id, dependent: :delete_all
 
   validates :email, email: true, presence: true, uniqueness: true
+  validates :locale, :time_zone, presence: true
   validates :google_uid,
             presence: true,
             uniqueness: true,
@@ -30,6 +30,11 @@ class User < ApplicationRecord
             unless: :skip_password_validation?
 
   validate :password_or_google_uid_present
+
+  after_save :synchronize_common_attributes, if: :common_attributes_changed?
+
+  jsonb_accessor :settings,
+    time_twelve_hour: [:boolean, default: false]
 
   def password=(value)
     password_digest_will_change!
@@ -53,9 +58,22 @@ class User < ApplicationRecord
     save(validate: false)
   end
 
+  def password_matches?(password)
+    if self.password_automatically_set?
+      ::BCrypt::Password.create(password)
+      true
+    elsif password_digest.present?
+      ::BCrypt::Password.new(self.password_digest) == password
+    else
+      ::BCrypt::Password.create(password)
+      false
+    end
+  end
+
   def reset_password(new_password, new_password_confirmation)
     self.password = new_password
     self.password_confirmation = new_password_confirmation
+    self.password_automatically_set = false
     save
   end
 
@@ -78,20 +96,27 @@ class User < ApplicationRecord
     end
   end
 
-  private
-
-  def password_optional?
-    google_uid.present?
+  def synchronize_common_attributes
+    self.members.
+      includes(:member, :user).
+      find_each(&:synchronize_common_attributes)
   end
 
-  def skip_password_validation?
-    password_optional? ||
-      (password_digest.present? && !password_digest_changed?)
+  private
+
+  def common_attributes_changed?
+    saved_change_to_first_name? ||
+      saved_change_to_last_name? ||
+      saved_change_to_email?
   end
 
   def skip_google_uid_validation?
     password_digest.present? ||
       (google_uid.present? && !google_uid_changed?)
+  end
+
+  def skip_password_validation?
+    password_digest.present? && !password_digest_changed?
   end
 
   def password_or_google_uid_present

@@ -326,14 +326,10 @@ FactoryBot.define do
     first_name Faker::Name.first_name
     last_name Faker::Name.last_name
 
-    trait :with_optional_password do
-      google_uid
-      password nil
-      password_digest ''
-    end
-
     trait :with_google do
       google_uid
+      password 'p@ssword'
+      password_automatically_set true
     end
 
     trait :confirmed_user do

@@ -1,9 +1,9 @@
-class Team::Task::Prepare < ApplicationInteractor
+class Team::Task::Uncomplete < ApplicationInteractor
   object :task
 
   def execute
     transaction do
-      task.prepare!
+      task.uncomplete!
     end
     task
   end

@@ -23,12 +23,6 @@ class Team::Todo::Create < ApplicationInteractor
   private
 
   def todo
-    @todo ||= task.todos.build(todo_attributes)
-  end
-
-  def todo_attributes
-    attributes.tap do |hash|
-      hash[:owner] = current_workspace_user
-    end
+    @todo ||= task.todos.build(attributes)
   end
 end

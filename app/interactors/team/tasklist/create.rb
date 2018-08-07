@@ -16,7 +16,7 @@ class Team::Tasklist::Create < ApplicationInteractor
   private
 
   def tasklist
-    @tasklist ||= project.tasklists.build(tasklist_attributes)
+    @tasklist ||= project.tasklists.build(tasklist_attributes.except(:project))
   end
 
   def tasklist_attributes

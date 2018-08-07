@@ -2,7 +2,6 @@ class Team::Todo::Update < ApplicationInteractor
   object :todo
 
   integer :assignee_id, default: nil
-  integer :owner_id, default: nil
 
   string :title, default: nil
 

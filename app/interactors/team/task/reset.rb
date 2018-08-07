@@ -1,9 +1,9 @@
-class Team::Task::Plan < ApplicationInteractor
+class Team::Task::Reset < ApplicationInteractor
   object :task
 
   def execute
     transaction do
-      task.plan!
+      task.reset!
     end
     task
   end

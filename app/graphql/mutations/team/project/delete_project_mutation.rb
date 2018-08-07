@@ -8,10 +8,10 @@ module Mutations
         argument :workspaceId, !types.ID, as: :workspace_id
         argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
 
-        argument :id, !types.ID, 'Globally unique ID of the project.'
+        argument :projectId, !types.ID, 'Globally unique ID of the project.', as: :project_id
 
         resource! ->(_obj, args, ctx) {
-          ctx[:current_workspace].projects.find(args[:id])
+          ctx[:current_workspace].projects.find(args[:project_id])
         }
 
         authorize! ->(project, _args, ctx) {

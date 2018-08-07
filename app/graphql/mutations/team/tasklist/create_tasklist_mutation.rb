@@ -1,29 +1,25 @@
 module Mutations
   module Team
-    module Project
-      UpdateProjectMutation = GraphQL::Field.define do
-        type Types::ProjectType
-        description 'Updates the project.'
+    module Tasklist
+      CreateTasklistMutation = GraphQL::Field.define do
+        type Types::TasklistType
+        description 'Creates a tasklist.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
         argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
 
         argument :projectId, !types.ID, 'Globally unique ID of the project.', as: :project_id
-        argument :input, Inputs::Team::Project::BaseInput
+        argument :input, Inputs::Team::Tasklist::BaseInput
 
-        resource! ->(_obj, args, ctx) {
-          ctx[:current_workspace].projects.find(args[:project_id])
+        authorize! ->(_obj, _args, ctx) {
+          ::Team::TasklistPolicy.new(ctx[:current_workspace_user], ::Tasklist).create?
         }
 
-        authorize! ->(project, _args, ctx) {
-          ::Team::ProjectPolicy.new(ctx[:current_workspace_user], project).update?
-        }
-
-        resolve UpdateProjectMutationResolver.new
+        resolve CreateTasklistMutationResolver.new
       end
 
-      class UpdateProjectMutationResolver
-        def call(project, args, ctx)
+      class CreateTasklistMutationResolver
+        def call(_obj, args, ctx)
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
@@ -31,13 +27,15 @@ module Mutations
             :request
           )
 
+          project = ctx[:current_workspace].projects.find_by(id: args[:project_id])
+
           inputs = {}.tap do |hash|
             hash.merge!(args[:input].to_h)
             hash[:context] = context
             hash[:project] = project
           end
 
-          action = ::Team::Project::Update.run(inputs)
+          action = ::Team::Tasklist::Create.run(inputs)
           if action.valid?
             action.result
           else

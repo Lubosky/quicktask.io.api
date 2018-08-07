@@ -16,11 +16,17 @@ Types::UserType = GraphQL::ObjectType.define do
   field :email_confirmed, !types.Boolean, 'True if the user’s email is currently marked confirmed, false if not.'
   field :status, !types.String, 'User’s status. Enum: Inactive, Pending, Active.'
   field :last_login_at, Types::DateTimeType, 'The time at which this user logged in for the last time.'
-  field :language, !types.String, 'Locale selected by the user.'
+  field :language, types.String do
+    description 'Locale selected by the user.'
+    property :locale
+  end
+
   field :timezone, types.String do
     description 'Time zone assigned by the system or selected by the user.'
     property :time_zone
   end
+
+  field :time_twelve_hour, !types.Boolean, ''
 
   field :created_at, Types::DateTimeType, 'The time at which this user’s account was created.'
   field :updated_at, Types::DateTimeType, 'The time at which this user’s account was last modified.'
@@ -33,9 +39,9 @@ Types::UserType = GraphQL::ObjectType.define do
     resolve ->(collection, args, _ctx) { collection }
   end
 
-  field :workspaceUsers, !types[!Types::WorkspaceUserType] do
+  field :workspace_users, !types[!Types::WorkspaceUserType] do
     description ''
-    before_scope ->(obj, _args, _ctx) { obj.members }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(User, :members).load(obj) }
     resolve ->(collection, args, _ctx) { collection }
   end
 end

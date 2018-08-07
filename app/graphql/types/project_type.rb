@@ -24,6 +24,9 @@ Types::ProjectType = GraphQL::ObjectType.define do
   field :automated_workflow, types.Boolean, ''
   field :internal, types.Boolean, 'Indicates whether this project is internal or for external client.'
 
+  field :ordered_tasklist_ids, types[types.String], ''
+  field :ordered_task_ids, Types::JSONType, ''
+
   field :created_at, Types::DateTimeType, 'The time at which this project was created.'
   field :updated_at, Types::DateTimeType, 'The time at which this project was last modified.'
   field :deleted_at, Types::DateTimeType, 'The time at which this project was deleted.'
@@ -31,17 +34,34 @@ Types::ProjectType = GraphQL::ObjectType.define do
   field :owner, Types::WorkspaceUserType do
     description ''
 
-    resolve ->(obj, _args, _ctx) {
-      AssociationLoader.for(Project, :owner).load(obj)
-    }
+    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project, :owner).load(obj) }
+    resolve ->(resource, _args, _ctx) { resource }
   end
 
   field :tasklists do
     type types[Types::TasklistType]
     description ''
 
-    resolve ->(obj, _args, _ctx) {
-      AssociationLoader.for(Project, :tasklists).load(obj)
-    }
+    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project, :tasklists).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
+  field :tasks do
+    type types[Types::TaskType]
+    description ''
+
+    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project, :tasks).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
+
+  field :task, Types::TaskType do
+    description ''
+
+    argument :task_id, types.ID, 'Globally unique ID of the task.'
+
+    resource ->(obj, args, _ctx) { obj.tasks.find(args[:task_id]) }, pass_through: true
+    authorize! ->(task, _args, ctx) { ::Team::TaskPolicy.new(ctx[:current_workspace_user], task).show? }
+    resolve ->(task, _args, _ctx) { task }
   end
 end

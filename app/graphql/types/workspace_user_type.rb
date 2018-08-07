@@ -5,13 +5,16 @@ Types::WorkspaceUserType = GraphQL::ObjectType.define do
   field :id, !types.ID, 'Globally unique ID of the workspace user.'
   field :uuid, !types.String, 'A unique substitute for a workspace user ID.'
 
-  field :type, !types.String do
-    description 'Type of the workspace user.'
-    property :member_type
-  end
-
   field :workspace_id, !types.ID, 'Globally unique ID of the workspace.'
   field :user_id, !types.ID, 'Globally unique ID of the user.'
+
+  field :member_type, !types.String, 'Type of the workspace user.'
+  field :member, Types::MemberType do
+    description ''
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(WorkspaceUser, :member).load(obj) }
+    resolve ->(resource, _args, _ctx) { resource }
+  end
 
   field :first_name, types.String, 'The first name of the workspace user.'
   field :last_name, types.String, 'The last name of the workspace user.'

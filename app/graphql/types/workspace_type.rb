@@ -5,6 +5,8 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
   field :id, !types.ID, 'Globally unique ID of the workspace.'
   field :uuid, !types.String, 'A unique substitute for a workspace ID.'
 
+  field :owner_id, !types.ID, 'Globally unique ID of the owner.'
+
   field :name, !types.String, 'The name of the workspace.'
   field :business_name, types.String, 'The business name of the workspace.'
   field :status, !types.String, 'Workspace’s status. Enum: Pending, Active, Deactivated.'
@@ -18,20 +20,26 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
 
   field :owner, Types::UserType do
     description ''
-    resolve ->(obj, _args, _ctx) { obj.owner }
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :owner).load(obj) }
+    resolve ->(resource, _args, _ctx) { resource }
   end
 
   field :membership, Types::MembershipType do
     description ''
-    resolve ->(obj, _args, _ctx) { obj.membership }
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :membership).load(obj) }
+    resolve ->(resource, _args, _ctx) { resource }
   end
 
   field :impersonations do
     type !types[!Types::WorkspaceUserType]
     description ''
 
-    before_scope ->(obj, _args, ctx) { obj.members.where(user_id: ctx[:current_user].id) }
-    resolve ->(collection, _args, _ctx) { collection }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :members).load(obj) }
+    resolve ->(promise, _args, ctx) {
+      promise.then(proc { |collection| collection.where(user: ctx[:current_user]) })
+    }
   end
 
   field :clients do
@@ -45,9 +53,9 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
     argument :page, types.Int, 'Indicates the number of the page. All paginated queries start at page 1.'
 
-    before_scope ->(obj, _args, ctx) { ctx[:current_workspace].clients }
-    resolve ->(collection, args, _ctx) {
-      collection.page(args[:page]).per(args[:limit])
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :clients).load(obj) }
+    resolve ->(promise, args, _ctx) {
+      promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
     }
   end
 
@@ -62,10 +70,22 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
     argument :page, types.Int, 'Indicates the number of the page. All paginated queries start at page 1.'
 
-    before_scope ->(obj, _args, ctx) { ctx[:current_workspace].contractors }
-    resolve ->(collection, args, _ctx) {
-      collection.page(args[:page]).per(args[:limit])
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :contractors).load(obj) }
+    resolve ->(promise, args, _ctx) {
+      promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
     }
+  end
+
+  field :languages do
+    type types[!Types::LanguageType]
+    description ''
+
+    authorize ->(_obj, _args, ctx) {
+      ::LanguagePolicy.new(ctx[:current_workspace_user], Language).index?
+    }
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :languages).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
   end
 
   field :projects do
@@ -79,10 +99,26 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
     argument :page, types.Int, 'Indicates the number of the page. All paginated queries start at page 1.'
 
-    before_scope ->(obj, _args, ctx) { ctx[:current_workspace].projects }
-    resolve ->(collection, args, _ctx) {
-      collection.page(args[:page]).per(args[:limit])
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :projects).load(obj) }
+    resolve ->(promise, args, _ctx) {
+      promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
     }
+  end
+
+  field :project, Types::ProjectType do
+    description ''
+
+    argument :project_id, types.ID, 'Globally unique ID of the project.'
+
+    resource ->(obj, args, _ctx) {
+      obj.projects.with_task_map.find(args[:project_id])
+    }, pass_through: true
+
+    authorize! ->(project, _args, ctx) {
+      ::Team::ProjectPolicy.new(ctx[:current_workspace_user], project).show?
+    }
+
+    resolve ->(project, _args, _ctx) { project }
   end
 
   field :supported_currencies do
@@ -93,9 +129,32 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
       ::Team::WorkspaceCurrencyPolicy.new(ctx[:current_workspace_user], WorkspaceCurrency).index?
     }
 
-    before_scope ->(_obj, _args, ctx) { ctx[:current_workspace].supported_currencies }
-    resolve ->(collection, _args, _ctx) {
-      collection
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :supported_currencies).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
+
+  field :task_types do
+    type types[!Types::TaskTypeType]
+    description ''
+
+    authorize ->(_obj, _args, ctx) {
+      ::Team::TaskTypePolicy.new(ctx[:current_workspace_user], TaskType).index?
     }
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :task_types).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
+  field :units do
+    type types[!Types::UnitType]
+    description ''
+
+    authorize ->(_obj, _args, ctx) {
+      ::UnitPolicy.new(ctx[:current_workspace_user], Unit).index?
+    }
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :units).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
   end
 end

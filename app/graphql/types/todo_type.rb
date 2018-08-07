@@ -6,7 +6,6 @@ Types::TodoType = GraphQL::ObjectType.define do
   field :uuid, !types.String, 'A unique substitute for a todo ID.'
 
   field :assignee_id, types.ID, 'Globally unique ID of the assignee.'
-  field :owner_id, types.ID, 'Globally unique ID of the owner.'
   field :task_id, !types.ID, 'Globally unique ID of the task.'
   field :workspace_id, !types.ID, 'Globally unique ID of the workspace.'
 

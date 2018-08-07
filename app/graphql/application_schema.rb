@@ -1,4 +1,6 @@
 ApplicationSchema = GraphQL::Schema.define do
+  max_depth 6
+
   resolve_type ->(_type, root, _context) {
     "Types::#{root.model_name}Type".safe_constantize
   }

@@ -37,7 +37,7 @@ FactoryBot.define do
 
   factory :client_request, class: ClientRequest::Other do
     uuid
-    subject Faker::Name.title
+    subject Faker::Job.title
     start_date DateTime.current
     due_date DateTime.current + 5.hours
     unit_count 10
@@ -175,7 +175,7 @@ FactoryBot.define do
 
   factory :quote do
     uuid
-    subject Faker::Name.title
+    subject Faker::Job.title
     status :draft
     issue_date DateTime.current
     expiry_date DateTime.current + 7.days
@@ -237,7 +237,6 @@ FactoryBot.define do
     title
 
     color :no_color
-    status :no_status
 
     start_date DateTime.current
     due_date DateTime.current + 1.day

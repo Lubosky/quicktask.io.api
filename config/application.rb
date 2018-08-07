@@ -38,6 +38,8 @@ module GliderPathApi
     config.middleware.use Rack::Deflater
     config.middleware.use Rack::CanonicalHost, ENV['CANONICAL_HOST'] if ENV['CANONICAL_HOST']
 
+    config.middleware.insert_before Rack::Runtime, Rack::Timeout, service_timeout: 10
+
     config.active_job.queue_adapter = :sidekiq
 
     config.action_mailer.default(charset: 'utf-8')

@@ -17,6 +17,11 @@ module Config
       new(*language.values) if language
     end
 
+    def self.exists?(id:)
+      language = self.find_by(id: id)
+      return language.present?
+    end
+
     def <=>(other)
       name <=> other.name
     end

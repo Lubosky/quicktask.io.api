@@ -16,7 +16,6 @@ RSpec.describe User, type: :model do
     it { is_expected.to validate_uniqueness_of(:email).ignoring_case_sensitivity }
     it { is_expected.to validate_length_of(:password).is_at_least(8) }
 
-    it { is_expected.to allow_value(nil).for(:password) }
     it { is_expected.to allow_value('').for(:password) }
 
     it { is_expected.to allow_value('foo@example.co.uk').for(:email) }
@@ -62,10 +61,12 @@ RSpec.describe User, type: :model do
     expect(user_3).to be_valid
   end
 
-  it 'skips validation of :password_digest presence if :google_uid is present' do
-    user = build(:user, google_uid: '123456789', password_digest: nil)
+  it 'validates presence of :password_digest if :google_uid is present' do
+    user_1 = build(:user, google_uid: '123456789', password_digest: nil)
+    user_2 = build(:user, google_uid: '987654321', password_digest: '1234abcd')
 
-    expect(user).to be_valid
+    expect(user_1).not_to be_valid
+    expect(user_2).to be_valid
   end
 
   it 'skips validation of :google_uid presence if :password_digest is present' do

@@ -3,6 +3,7 @@ $: << File.expand_path('../..', __FILE__)
 require 'action_mailer'
 require 'email_spec'
 require 'email_spec/rspec'
+require 'pundit/rspec'
 require 'rspec/collection_matchers'
 require 'simplecov'
 require 'webmock/rspec'

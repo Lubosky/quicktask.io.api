@@ -100,7 +100,7 @@ class GoogleIdentity
     user_attributes = {
       email: email_address,
       google_uid: user_identifier,
-      password_digest: generate_password,
+      password: generate_password,
       password_automatically_set: true,
       email_confirmed: email_verified,
       first_name: first_name,

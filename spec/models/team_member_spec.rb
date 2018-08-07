@@ -11,7 +11,7 @@ RSpec.describe TeamMember, type: :model do
     it { is_expected.to belong_to(:workspace) }
 
     it { is_expected.to validate_presence_of(:email) }
-    it { is_expected.to validate_uniqueness_of(:email).ignoring_case_sensitivity }
+    it { is_expected.to validate_uniqueness_of(:email).ignoring_case_sensitivity.scoped_to(:workspace_id) }
     it { is_expected.to validate_presence_of(:uuid) }
     it { is_expected.to validate_uniqueness_of(:uuid) }
   end

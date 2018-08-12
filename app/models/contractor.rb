@@ -18,6 +18,13 @@ class Contractor < ApplicationRecord
            foreign_key: :owner_id,
            inverse_of: :owner
 
+  has_one :workspace_currency,
+          -> (c) { where(code: c.currency) },
+          through: :workspace,
+          source: :supported_currencies
+
+  delegate :exchange_rate, to: :workspace_currency
+
   validates :currency, presence: true, length: { is: 3 }
   validates :email, email: true, allow_blank: true
 

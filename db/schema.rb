@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_07_093811) do
+ActiveRecord::Schema.define(version: 2018_08_12_083558) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -379,6 +379,37 @@ ActiveRecord::Schema.define(version: 2018_08_07_093811) do
     t.datetime "updated_at", null: false
     t.index ["client_request_id"], name: "index_proposals_on_client_request_id"
     t.index ["quote_id"], name: "index_proposals_on_quote_id"
+  end
+
+  create_table "purchase_orders", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.string "owner_type", null: false
+    t.bigint "owner_id", null: false
+    t.bigint "issuer_id", null: false
+    t.bigint "updater_id"
+    t.bigint "hand_off_id", null: false
+    t.bigint "workspace_id", null: false
+    t.string "subject", null: false
+    t.string "identifier"
+    t.string "purchase_order_number"
+    t.jsonb "purchase_order_data"
+    t.datetime "issue_date"
+    t.boolean "billed", default: false, null: false
+    t.jsonb "currency_data", default: {}
+    t.jsonb "metadata", default: {}
+    t.decimal "discount", precision: 19, scale: 4, default: "0.0", null: false
+    t.decimal "surcharge", precision: 19, scale: 4, default: "0.0", null: false
+    t.decimal "subtotal", precision: 19, scale: 4, default: "0.0", null: false
+    t.decimal "total", precision: 19, scale: 4, default: "0.0", null: false
+    t.text "notes"
+    t.text "terms"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["hand_off_id"], name: "index_purchase_orders_on_hand_off_id"
+    t.index ["owner_type", "owner_id"], name: "index_purchase_orders_on_owner_type_and_owner_id"
+    t.index ["uuid"], name: "index_purchase_orders_on_uuid", unique: true
+    t.index ["workspace_id"], name: "index_purchase_orders_on_workspace_id"
   end
 
   create_table "quotes", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|

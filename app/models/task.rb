@@ -30,9 +30,11 @@ class Task < ApplicationRecord
   with_options inverse_of: :task do
     has_many :hand_offs
     has_many :pending_hand_offs, -> { pending }, class_name: 'HandOff'
+    has_many :purchase_orders, through: :hand_offs
     has_many :todos
 
     has_one :assignment, -> { accepted }, class_name: 'HandOff'
+    has_one :accepted_purchase_order, class_name: 'PurchaseOrder', through: :assignment, source: :purchase_order
   end
 
   has_many :potential_assignees,
@@ -55,6 +57,9 @@ class Task < ApplicationRecord
   belongs_directly_to :workspace
 
   jsonb_accessor :task_data,
+    equipment_needed: [:boolean, default: false]
+
+  jsonb_accessor :metadata,
     source_language_name: [:string, default: nil],
     source_language_code: [:string, default: nil],
     target_language_name: [:string, default: nil],
@@ -131,7 +136,7 @@ class Task < ApplicationRecord
 
   after_initialize { self.status ||= :uncompleted }
   before_validation { self.title&.strip! }
-  before_validation { self.project = self.tasklist.project }
+  before_validation :set_default_attributes
   before_validation :ensure_location_is_nullified, unless: :interpreting_task?
   before_save :update_task_data, if: :association_fields_changed?
   after_commit :update_project_completion_ratio, on: :update
@@ -199,6 +204,15 @@ class Task < ApplicationRecord
       attributes.keys & TASK_FIELDS.with_indifferent_access[self.classification]
     else
       attributes.keys & %w(source_language_id target_language_id task_type_id unit_id)
+    end
+  end
+
+  def set_default_attributes
+    self.project = self&.tasklist&.project
+    if self.interpreting_task?
+      self.equipment_needed ||= false
+    else
+      self.equipment_needed = nil
     end
   end
 

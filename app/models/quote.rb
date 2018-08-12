@@ -114,7 +114,7 @@ class Quote < ApplicationRecord
   end
 
   def update_totals
-    @calculator ||= Calculator::Quote.calculate(self)
+    @calculator ||= Calculator::Bill.calculate(self)
   end
 
   def convert(user)

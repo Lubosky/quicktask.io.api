@@ -31,7 +31,6 @@ class Converter::ClientRequest
   DEFAULT_COUNT = 1.0
   DEFAULT_EXCHANGE_RATE = 1.0
 
-
   def fulfill_conversion
     ::Quote.transaction do
       entry = build_quote

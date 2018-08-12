@@ -13,6 +13,8 @@ class HandOff < ApplicationRecord
     belongs_to :workspace
   end
 
+  has_one :purchase_order, inverse_of: :hand_off
+
   belongs_directly_to :workspace
 
   scope :accepted, -> { where.not(accepted_at: nil, assignee_id: nil) }
@@ -46,6 +48,7 @@ class HandOff < ApplicationRecord
   delegate :hand_off_valid_period, to: :workspace
 
   before_create :set_valid_through
+  after_create :generate_purchase_order
 
   def user_from_assignee!
     WorkspaceUser.find_or_initialize_by(member_id: self.assignee_id, member_type: self.assignee_type)
@@ -131,6 +134,8 @@ class HandOff < ApplicationRecord
       errors.add(:assignee, :must_have_valid_rate)
     end
   end
+
+  def generate_purchase_order
+    ::PurchaseOrderGenerator.generate(self)
+  end
 end
-
-

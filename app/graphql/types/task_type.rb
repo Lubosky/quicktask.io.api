@@ -71,9 +71,11 @@ Types::TaskType = GraphQL::ObjectType.define do
     property :assignable?
   end
 
+  field :equipment_needed, types.Boolean, ''
+
   field :task_meta, Types::JSONType do
     description ''
-    property :task_data
+    property :metadata
   end
 
   field :created_at, Types::DateTimeType, 'The time at which this task was created.'

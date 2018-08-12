@@ -51,6 +51,14 @@ en:
   projects:
     name: "#PROJECT-%{date}-%{number}"
 
+  purchase_orders:
+    subject: "#PO-%{date}-%{number}"
+    interpreting:
+      address: "Event location: %{address}"
+      equipment_needed:
+        "true": "Equipment needed: YES"
+        "false": "Equipment needed: NO"
+
   quotes:
     subject: "#QUOTE-%{date}-%{number}"
     interpreting:

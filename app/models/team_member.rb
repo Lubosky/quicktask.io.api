@@ -17,6 +17,16 @@ class TeamMember < ApplicationRecord
            foreign_key: :assigner_id,
            inverse_of: :assigner
 
+  has_one :workspace_currency,
+          -> (c) { where(code: c.currency) },
+          through: :workspace,
+          source: :supported_currencies
+
+  delegate :currency, :default_contractor_rates, to: :workspace
+  delegate :exchange_rate, to: :workspace_currency
+
   validates :email, email: true, presence: true
   validates_uniqueness_of :email, case_sensitive: false, scope: :workspace_id
+
+  alias :rates :default_contractor_rates
 end

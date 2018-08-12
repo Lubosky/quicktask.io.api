@@ -20,6 +20,11 @@
   with_options dependent: :destroy, inverse_of: :project do
     has_many :tasklists
     has_many :tasks, through: :tasklists
+
+    with_options class_name: 'PurchaseOrder', through: :tasks do
+      has_many :purchase_orders, source: :purchase_orders
+      has_many :accepted_purchase_orders, source: :accepted_purchase_order
+    end
   end
 
   has_one :project_estimate, dependent: :destroy

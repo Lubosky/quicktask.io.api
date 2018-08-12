@@ -520,6 +520,12 @@ namespace :dev do
     Workspace.find_each do |workspace|
       TaskType.create_for(workspace)
 
+      create(
+        :task_type,
+        :other,
+        workspace: workspace
+      )
+
       puts_task_type workspace
     end
   end

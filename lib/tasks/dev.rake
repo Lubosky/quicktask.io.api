@@ -47,6 +47,7 @@ namespace :dev do
     create_tasklists
     create_tasks
     create_todos
+    create_hand_offs
   end
 
   def create_users
@@ -113,7 +114,8 @@ namespace :dev do
     workspace = create(
       :workspace,
       name: 'Pending Space',
-      owner: User.find_by(email: 'basic@example.dev')
+      owner: User.find_by(email: 'basic@example.dev'),
+      hand_off_valid_period: rand(1..96)
     )
     puts_workspace workspace, 'pending workspace'
   end
@@ -124,7 +126,8 @@ namespace :dev do
     workspace = create(
       :workspace,
       name: 'Subscribed Space',
-      owner: User.find_by(email: 'google@example.dev')
+      owner: User.find_by(email: 'google@example.dev'),
+      hand_off_valid_period: rand(1..96)
     )
 
     membership = build(
@@ -439,11 +442,15 @@ namespace :dev do
 
   def create_tasks
     header 'Tasks'
+    puts "Creating tasks\u2026\n"
+    print "\n"
 
     Tasklist.includes(:project, :workspace).find_each do |tasklist|
       workspace = tasklist.workspace
 
       15.times do
+        print "\e[32m.\e[0m"
+
         source_language = workspace.languages.sample
         target_language = workspace.languages.where.not(id: source_language.id).sample
 
@@ -461,9 +468,50 @@ namespace :dev do
           unit: workspace.units.sample
         )
       end
-
-      puts_task tasklist
     end
+
+    print "\n"
+    puts_task
+  end
+
+  def create_hand_offs
+    header 'Hand-offs'
+    puts "Creating hand-offs\u2026\n"
+    print "\n"
+
+    Task.includes(:workspace).find_each do |task|
+      truthy = [true, false].sample
+      workspace = task.workspace
+      assignee_scope = task.other_task? ?
+        workspace.team_members.sample :
+        workspace.contractors.sample
+
+      count = task.other_task? ? 1 : rand(3..6)
+
+      count.times do
+        print "\e[32m.\e[0m"
+
+        create(
+          :hand_off,
+          assignee: assignee_scope,
+          assigner: workspace.team_members.sample,
+          task: task,
+          workspace: workspace
+        )
+
+      rescue ActiveRecord::RecordInvalid => e
+        nil
+      end
+
+      task.reload
+
+      if truthy
+        task&.hand_offs&.sample&.accept!
+      end
+    end
+
+    print "\n"
+    puts_hand_off
   end
 
   def create_task_types
@@ -478,12 +526,16 @@ namespace :dev do
 
   def create_todos
     header 'To-dos'
+    puts "Creating to-dos\u2026\n"
+    print "\n"
 
     Task.find_each do |task|
       n = rand(0..3)
       workspace = task.workspace
 
       n.times do
+        print "\e[32m.\e[0m"
+
         create(
           :todo,
           completed: [true, false].sample,
@@ -494,6 +546,7 @@ namespace :dev do
       end
     end
 
+    print "\n"
     puts_todo
   end
 
@@ -599,6 +652,10 @@ namespace :dev do
     puts "Default contractor rates for workspace: #{workspace.name}"
   end
 
+  def puts_hand_off
+    puts "\e[32mHand-offs created! ^_^\e[0m"
+  end
+
   def puts_language(workspace)
     puts "Languages for workspace: #{workspace.name}"
   end
@@ -627,8 +684,8 @@ namespace :dev do
     puts "Specializations for workspace: #{workspace.name}"
   end
 
-  def puts_task(tasklist)
-    puts "Tasks for tasklist: #{tasklist.title} / #{tasklist.workspace.name}"
+  def puts_task
+    puts "\e[32mTasks created! ^_^\e[0m"
   end
 
   def puts_tasklist(workspace)
@@ -640,7 +697,7 @@ namespace :dev do
   end
 
   def puts_todo
-    puts "To-dos created"
+    puts "\e[32mTo-dos created! ^_^\e[0m"
   end
 
   def puts_unit(workspace)

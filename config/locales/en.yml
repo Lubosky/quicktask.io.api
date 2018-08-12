@@ -1,4 +1,11 @@
 en:
+  activerecord:
+    errors:
+      models:
+        hand_off:
+          attributes:
+            assignee:
+              must_have_valid_rate: "must have valid rate"
   errors:
     messages:
       greater_than_start_date: "must be later than the start date"

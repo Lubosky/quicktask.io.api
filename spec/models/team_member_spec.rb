@@ -10,6 +10,9 @@ RSpec.describe TeamMember, type: :model do
 
     it { is_expected.to belong_to(:workspace) }
 
+    it { is_expected.to have_many(:assignments).class_name('HandOff').with_foreign_key(:assignee_id) }
+    it { is_expected.to have_many(:delegated_hand_offs).class_name('HandOff').with_foreign_key(:assigner_id) }
+
     it { is_expected.to validate_presence_of(:email) }
     it { is_expected.to validate_uniqueness_of(:email).ignoring_case_sensitivity.scoped_to(:workspace_id) }
     it { is_expected.to validate_presence_of(:uuid) }

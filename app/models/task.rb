@@ -27,11 +27,30 @@ class Task < ApplicationRecord
     belongs_to :unit
   end
 
+  with_options inverse_of: :task do
+    has_many :hand_offs
+    has_many :pending_hand_offs, -> { pending }, class_name: 'HandOff'
+    has_many :todos
+
+    has_one :assignment, -> { accepted }, class_name: 'HandOff'
+  end
+
   has_many :potential_assignees,
            ->(task) { where(id: PotentialAssigneesQuery.build_query(task)) },
            through: :workspace,
            source: :contractors
-  has_many :todos, inverse_of: :task
+
+  has_many :invitees,
+           as: :assignee,
+           foreign_key: :assignee_id,
+           source: :assignee,
+           source_type: 'Contractor',
+           through: :hand_offs
+
+  with_options foreign_key: :assignee_id, source: :assignee, through: :assignment do
+    has_one :team_member_assignee, source_type: 'TeamMember'
+    has_one :contractor_assignee, source_type: 'Contractor'
+  end
 
   belongs_directly_to :workspace
 
@@ -64,7 +83,7 @@ class Task < ApplicationRecord
                   column_name: proc { |r| r.completed? ? 'completed_task_count' : nil },
                   touch: true
 
-  default_scope { joins(:task_type).order(:tasklist_id, :position) }
+  default_scope { joins(:task_type).preload(:task_type).order(:tasklist_id, :position) }
 
   scope :with_status, ->(status) { where(status: status) }
   scope :except_status, ->(status) { where.not(status: status) }
@@ -131,6 +150,10 @@ class Task < ApplicationRecord
 
   def other_task?
     classification == 'other'
+  end
+
+  def assignee
+    assignment&.assignee
   end
 
   def update_project_completion_ratio

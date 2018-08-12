@@ -5,6 +5,13 @@ class Contractor < ApplicationRecord
 
   belongs_to :workspace, inverse_of: :contractors, class_name: 'Workspace'
 
+  with_options as: :assignee, class_name: 'HandOff', foreign_key: :assignee_id, inverse_of: :assignee do
+    has_many :assignments, -> { accepted }
+    has_many :invitations
+  end
+
+  has_many :tasks, through: :assignments, source: :task
+
   has_many :contractor_rates,
            class_name: 'Rate::Contractor',
            dependent: :delete_all,

@@ -60,6 +60,32 @@ FactoryBot.define do
     association :workspace, factory: :workspace
   end
 
+  factory :hand_off do
+    uuid
+
+    association :assignee, factory: :contractor
+    association :assigner, factory: :team_member
+    association :task, factory: :task
+    association :workspace, factory: :workspace
+
+    trait :accepted do
+      accepted_at DateTime.current
+    end
+
+    trait :rejected do
+      rejected_at DateTime.current
+    end
+
+    trait :expired do
+      expired_at DateTime.current
+    end
+
+    trait :cancelled do
+      cancelled_at DateTime.current
+      association :canceller, factory: :team_member
+    end
+  end
+
   factory :language, aliases: [:source_language, :target_language] do
     uuid
     code :en

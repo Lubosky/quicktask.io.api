@@ -23,6 +23,8 @@ class Rate < ApplicationRecord
 
   discriminate Rate, on: :rate_type
 
+  scope :default_for_client, ->(type) { where(rate_type: :client_default) }
+  scope :default_for_contractor, ->(type) { where(rate_type: :contractor_default) }
   scope :for_task, ->(task) {
     where(
       classification: task.classification,

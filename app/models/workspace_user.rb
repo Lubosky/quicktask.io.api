@@ -14,8 +14,7 @@ class WorkspaceUser < ApplicationRecord
     has_many :owned_tasks, class_name: 'Task', foreign_key: :owner_id
   end
 
-  has_many :assigned_todos,
-           class_name: 'Todo',
+  has_many :assigned_todos, class_name: 'Todo',
            foreign_key: :assignee_id,
            inverse_of: :assignee
 

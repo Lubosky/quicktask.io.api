@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_04_02_161251) do
+ActiveRecord::Schema.define(version: 2018_08_07_093811) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -110,6 +110,33 @@ ActiveRecord::Schema.define(version: 2018_04_02_161251) do
     t.datetime "deleted_at"
     t.index ["uuid"], name: "index_contractors_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_contractors_on_workspace_id"
+  end
+
+  create_table "hand_offs", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.string "assignee_type", null: false
+    t.bigint "assignee_id", null: false
+    t.bigint "assigner_id", null: false
+    t.bigint "task_id", null: false
+    t.bigint "workspace_id", null: false
+    t.datetime "valid_through"
+    t.decimal "rate_applied", precision: 19, scale: 4, default: "0.0", null: false
+    t.datetime "accepted_at"
+    t.datetime "rejected_at"
+    t.datetime "expired_at"
+    t.datetime "cancelled_at"
+    t.bigint "canceller_id"
+    t.integer "view_count", default: 0, null: false
+    t.datetime "last_viewed_at"
+    t.integer "email_count", default: 0, null: false
+    t.datetime "last_emailed_at"
+    t.boolean "assignment", default: false, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["assignee_type", "assignee_id"], name: "index_hand_offs_on_assignee_type_and_assignee_id"
+    t.index ["task_id"], name: "index_hand_offs_on_task_id"
+    t.index ["workspace_id"], name: "index_hand_offs_on_workspace_id"
   end
 
   create_table "languages", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|

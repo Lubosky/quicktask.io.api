@@ -9,21 +9,22 @@ class Workspace < ApplicationRecord
              foreign_key: :owner_id
 
   with_options dependent: :destroy, inverse_of: :workspace do
+    has_many :charges
     has_many :client_contacts, through: :clients
     has_many :client_requests
     has_many :clients
     has_many :contractors
-    has_many :default_client_rates,
-             -> { where(rate_type: :client_default) },
-             class_name: '::Rate::Workspace::Client',
-             foreign_key: :owner_id
-    has_many :default_contractor_rates,
-             -> { where(rate_type: :contractor_default) },
-             class_name: '::Rate::Workspace::Contractor',
-             foreign_key: :owner_id
+    with_options foreign_key: :owner_id do
+      has_many :default_client_rates,
+               -> { default_for_client(:client_default) },
+               class_name: '::Rate::Workspace::Client'
+      has_many :default_contractor_rates,
+               -> { default_for_contractor(:contractor_default) },
+               class_name: '::Rate::Workspace::Contractor'
+    end
+    has_many :hand_offs
     has_many :languages
     has_many :members, class_name: 'WorkspaceUser', foreign_key: :workspace_id
-    has_many :charges
     has_many :project_groups
     has_many :projects
     has_many :quotes
@@ -49,15 +50,24 @@ class Workspace < ApplicationRecord
 
   has_many :roles, class_name: 'Role::Base', dependent: :destroy
 
+  MAX_HAND_OFF_VALID_PERIOD = 744
+
+  jsonb_accessor :workspace_settings,
+    hand_off_valid_period: [:integer, default: nil]
+
   scope :accessible_by, ->(user) {
     joins(:members).where(organization_members: { user_id: user.id }).distinct
   }
 
+  before_create { self.hand_off_valid_period ||= 24 }
   after_initialize :set_default_attributes, on: :create
   after_update :update_exchange_rates, if: :saved_change_to_currency?
 
   validates :currency, presence: true, length: { is: 3 }
   validates :name, :owner_id, presence: true
+  validates_numericality_of :hand_off_valid_period,
+                            less_than_or_equal_to: MAX_HAND_OFF_VALID_PERIOD,
+                            allow_nil: true
 
   enum status: { pending: 0, active: 1, deactivated: 2 } do
     event :activate do

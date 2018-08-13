@@ -5,6 +5,12 @@ class TeamMember < ApplicationRecord
 
   belongs_to :workspace, inverse_of: :team_members, class_name: 'Workspace'
 
+  with_options inverse_of: :owner, foreign_key: :owner_id do
+    has_many :projects
+    has_many :tasklists
+    has_many :tasks
+  end
+
   has_many :assignments,
            -> { accepted },
            as: :assignee,
@@ -27,6 +33,4 @@ class TeamMember < ApplicationRecord
 
   validates :email, email: true, presence: true
   validates_uniqueness_of :email, case_sensitive: false, scope: :workspace_id
-
-  alias :rates :default_contractor_rates
 end

@@ -2,11 +2,10 @@ class Tasklist < ApplicationRecord
   include BelongsDirectly, EnsureUUID
 
   with_options inverse_of: :tasklists do
+    belongs_to :owner, class_name: 'TeamMember', foreign_key: :owner_id
     belongs_to :project
     belongs_to :workspace
   end
-
-  belongs_to :owner, class_name: 'WorkspaceUser', inverse_of: :owned_tasklists
 
   has_many :tasks, dependent: :destroy, inverse_of: :tasklist
 

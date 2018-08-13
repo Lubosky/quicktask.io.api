@@ -8,7 +8,7 @@ RSpec.describe Tasklist, type: :model do
       Tasklist.any_instance.stubs(:ensure_uuid).returns(true)
     end
 
-    it { is_expected.to belong_to(:owner) }
+    it { is_expected.to belong_to(:owner).class_name('TeamMember').with_foreign_key(:owner_id) }
     it { is_expected.to belong_to(:project) }
     it { is_expected.to belong_to(:workspace) }
 

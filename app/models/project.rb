@@ -2,15 +2,11 @@
   include EnsureUUID
 
   with_options inverse_of: :projects do
+    belongs_to :owner, class_name: 'TeamMember', foreign_key: :owner_id
     belongs_to :client
     belongs_to :project_group, optional: true
     belongs_to :workspace
   end
-
-  belongs_to :owner,
-             inverse_of: :owned_projects,
-             class_name: 'WorkspaceUser',
-             foreign_key: :owner_id
 
   has_many :possible_collaborators,
            -> { where(status: :active) },
@@ -21,9 +17,13 @@
     has_many :tasklists
     has_many :tasks, through: :tasklists
 
-    with_options class_name: 'PurchaseOrder', through: :tasks do
-      has_many :purchase_orders, source: :purchase_orders
-      has_many :accepted_purchase_orders, source: :accepted_purchase_order
+    with_options through: :tasks do
+      has_many :hand_offs, class_name: 'HandOff'
+
+      with_options class_name: 'PurchaseOrder' do
+        has_many :purchase_orders, source: :purchase_orders
+        has_many :accepted_purchase_orders, source: :accepted_purchase_order
+      end
     end
   end
 
@@ -63,24 +63,34 @@
     end
 
     event :plan do
+      before do
+        self.generate_quote
+      end
+
       transition all - [:archived] => :planned
     end
 
     event :activate do
+      before do
+        self.generate_quote
+      end
+
       transition all - [:archived] => :active
     end
 
     event :suspend do
+      before do
+        self.generate_quote
+      end
+
       transition all - [:archived] => :on_hold
     end
 
     event :complete do
       before do
-        tasks.with_status([:draft, :no_status, :on_hold, :planned]).
-          find_each(&:cancel!)
-
-        tasks.except_status([:archived, :cancelled, :completed]).
-          find_each(&:complete!)
+        self.generate_quote
+        tasks.find_each(&:complete!)
+        hand_offs.pending.find_each(&:cancel!)
       end
 
       transition all - [:no_status, :draft, :archived] => :completed
@@ -88,7 +98,8 @@
 
     event :cancel do
       before do
-        tasks.except_status([:archived, :cancelled]).find_each(&:cancel!)
+        tasks.find_each(&:reset!)
+        hand_offs.pending.find_each(&:cancel!)
       end
 
       transition all - [:archived] => :cancelled
@@ -107,8 +118,8 @@
     internal?
   end
 
-  def generate_quote(user)
-    Converter::Project.generate_quote(self, user)
+  def generate_quote
+    Converter::Project.generate_quote(self, owner) unless self.quote
   end
 
   def ordered_tasklist_ids

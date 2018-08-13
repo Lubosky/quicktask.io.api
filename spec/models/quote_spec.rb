@@ -9,7 +9,7 @@ RSpec.describe Quote, type: :model do
     end
 
     it { is_expected.to belong_to(:client) }
-    it { is_expected.to belong_to(:owner).class_name('WorkspaceUser') }
+    it { is_expected.to belong_to(:owner).class_name('TeamMember') }
     it { is_expected.to belong_to(:workspace) }
 
     it { is_expected.to have_many(:line_items) }

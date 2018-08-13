@@ -4,7 +4,7 @@ class CreateTasks < ActiveRecord::Migration[5.2]
       t.string      :uuid, null: false, limit: 24
       t.belongs_to  :tasklist, null: false
       t.belongs_to  :project, null: false
-      t.belongs_to  :owner, references: :workspace_user, index: false
+      t.belongs_to  :owner, references: :team_member, index: false
       t.belongs_to  :workspace, null: false
 
       t.belongs_to  :source_language, references: :language, index: false

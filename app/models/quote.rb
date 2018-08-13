@@ -2,7 +2,7 @@ class Quote < ApplicationRecord
   include EnsureUUID
 
   belongs_to :client, inverse_of: :quotes
-  belongs_to :owner, class_name: 'WorkspaceUser'
+  belongs_to :owner, class_name: 'TeamMember'
   belongs_to :workspace, inverse_of: :quotes
 
   has_many :line_items, as: :bookkeepable, autosave: true, dependent: :destroy

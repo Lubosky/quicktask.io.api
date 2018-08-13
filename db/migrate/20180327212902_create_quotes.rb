@@ -3,7 +3,7 @@ class CreateQuotes < ActiveRecord::Migration[5.1]
     create_table :quotes, id: :bigint, default: -> { 'generate_id()' } do |t|
       t.string      :uuid, null: false, limit: 24
       t.belongs_to  :client
-      t.belongs_to  :owner, references: :workspace_user, index: false
+      t.belongs_to  :owner, references: :team_member, index: false
       t.belongs_to  :workspace, null: false
 
       t.string      :quote_type, null: false

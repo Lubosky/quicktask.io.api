@@ -3,7 +3,7 @@ require 'rails_helper'
 RSpec.describe LineItem, type: :model do
   let!(:workspace) { create(:workspace, :with_currencies) }
   let!(:client) { create(:client, workspace: workspace) }
-  let!(:owner) { create(:workspace_user, workspace: workspace) }
+  let!(:owner) { create(:team_member, workspace: workspace) }
   let!(:source_language) { create(:language, code: :en, workspace: workspace) }
   let!(:target_language) { create(:language, code: :de, workspace: workspace) }
   let!(:task_type) { create(:task_type, workspace: workspace) }

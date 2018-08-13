@@ -195,7 +195,7 @@ FactoryBot.define do
     uuid
     name
     association :client
-    association :owner, factory: :workspace_user
+    association :owner, factory: :team_member
     association :workspace
   end
 
@@ -210,7 +210,7 @@ FactoryBot.define do
 
     association :workspace, factory: :workspace
     association :client, factory: :client
-    association :owner, factory: :workspace_user
+    association :owner, factory: :team_member
 
     trait :with_discount do
       discount 10
@@ -253,7 +253,7 @@ FactoryBot.define do
     uuid
     title
 
-    association :owner, factory: :workspace_user
+    association :owner, factory: :team_member
     association :project, factory: :project
     association :workspace, factory: :workspace
   end
@@ -267,7 +267,7 @@ FactoryBot.define do
     start_date DateTime.current
     due_date DateTime.current + 1.day
 
-    association :owner, factory: :workspace_user
+    association :owner, factory: :team_member
     association :tasklist, factory: :tasklist
     association :project, factory: :project
     association :workspace, factory: :workspace

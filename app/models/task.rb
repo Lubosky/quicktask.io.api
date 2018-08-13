@@ -13,13 +13,12 @@ class Task < ApplicationRecord
   }
 
   with_options inverse_of: :tasks do
+    belongs_to :owner, class_name: 'TeamMember', foreign_key: :owner_id
     belongs_to :project
     belongs_to :task_type
     belongs_to :tasklist
     belongs_to :workspace
   end
-
-  belongs_to :owner, class_name: 'WorkspaceUser', inverse_of: :owned_tasks
 
   with_options optional: true do
     belongs_to :source_language, class_name: 'Language'

@@ -86,15 +86,15 @@ class PurchaseOrderGenerator
   end
 
   def owner_currency
-    owner&.currency
+    owner.currency
   end
 
   def owner
-    hand_off&.assignee
+    hand_off.assignee
   end
 
   def task
-    hand_off&.task
+    hand_off.task
   end
 
   def fetch_exchange_rate(currency)

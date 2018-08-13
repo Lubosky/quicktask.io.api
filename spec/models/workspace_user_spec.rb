@@ -14,9 +14,6 @@ RSpec.describe WorkspaceUser, type: :model do
     it { is_expected.to belong_to(:workspace) }
 
     it { is_expected.to have_many(:assigned_todos).class_name('Todo').with_foreign_key(:assignee_id) }
-    it { is_expected.to have_many(:owned_projects).class_name('Project').with_foreign_key(:owner_id) }
-    it { is_expected.to have_many(:owned_tasklists).class_name('Tasklist').with_foreign_key(:owner_id) }
-    it { is_expected.to have_many(:owned_tasks).class_name('Task').with_foreign_key(:owner_id) }
 
     it { is_expected.to validate_presence_of(:project_view_type) }
     it { is_expected.to validate_presence_of(:role) }

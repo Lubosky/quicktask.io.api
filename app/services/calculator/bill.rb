@@ -22,15 +22,15 @@ class Calculator::Bill
   delegate :line_items, to: :bill
 
   def calculate_subtotal
-    bill.subtotal = totals.first
+    bill.subtotal = totals.first || 0
   end
 
   def calculate_discount
-    bill.discount = totals.second
+    bill.discount = totals.second || 0
   end
 
   def calculate_surcharge
-    bill.surcharge = totals.third
+    bill.surcharge = totals.third || 0
   end
 
   def calculate_total

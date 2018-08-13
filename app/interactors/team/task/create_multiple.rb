@@ -37,7 +37,7 @@ class Team::Task::CreateMultiple < ApplicationInteractor
   def tasks_attributes
     attributes[:tasks].each do |task_attributes|
       task_attributes.tap do |hash|
-        hash[:owner] = current_workspace_user
+        hash[:owner] = current_workspace_user.member
       end
     end
   end

@@ -9,7 +9,7 @@ RSpec.describe Project, type: :model do
     end
 
     it { is_expected.to belong_to(:client) }
-    it { is_expected.to belong_to(:owner).class_name('WorkspaceUser').with_foreign_key(:owner_id) }
+    it { is_expected.to belong_to(:owner).class_name('TeamMember').with_foreign_key(:owner_id) }
     it { is_expected.to belong_to(:workspace) }
     it { is_expected.to belong_to(:project_group) }
 

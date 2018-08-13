@@ -31,7 +31,7 @@ class Team::Project::Create < ApplicationInteractor
 
   def project_attributes
     attributes.tap do |hash|
-      hash[:owner] = current_workspace_user
+      hash[:owner] = current_workspace_user.member
     end
   end
 end

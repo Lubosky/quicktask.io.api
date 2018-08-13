@@ -46,6 +46,7 @@ namespace :dev do
     create_projects
     create_tasklists
     create_tasks
+    activate_projects
     create_todos
     create_hand_offs
   end
@@ -306,32 +307,40 @@ namespace :dev do
     header 'Projects'
 
     workspace = Workspace.active.first
-    owner = WorkspaceUser.where(member_type: 'TeamMember', workspace: workspace).first
+    owner = workspace.team_members
 
     workspace.clients.find_each do |client|
-      project = create(
+      project_one = create(
         :project,
         client: client,
-        owner: owner,
+        owner: owner.sample,
         workspace: workspace
       )
-      puts_project(project, workspace)
+      puts_project(project_one, workspace)
 
-      project = create(
+      project_two = create(
         :project,
         client: client,
-        owner: owner,
+        owner: owner.sample,
         workspace: workspace
       )
-      puts_project(project, workspace)
+      puts_project(project_two, workspace)
 
-      project = create(
+      project_three = create(
         :project,
         client: client,
-        owner: owner,
+        owner: owner.sample,
         workspace: workspace
       )
-      puts_project(project, workspace)
+      puts_project(project_three, workspace)
+    end
+  end
+
+  def activate_projects
+    actions = ['prepare', 'plan', 'activate']
+
+    Project.find_each do |project|
+      project.send("#{actions.sample}!")
     end
   end
 
@@ -429,7 +438,7 @@ namespace :dev do
         9.times do
           create(
             :tasklist,
-            owner: workspace.collaborating_team_members.sample,
+            owner: workspace&.team_members&.sample,
             project: project,
             workspace: workspace
           )
@@ -457,7 +466,7 @@ namespace :dev do
         create(
           :task,
           tasklist: tasklist,
-          owner: workspace.collaborating_team_members.sample,
+          owner: workspace.team_members.sample,
           project: tasklist.project,
           workspace: workspace,
           color: Task.colors.keys.sample,

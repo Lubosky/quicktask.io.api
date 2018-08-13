@@ -31,7 +31,7 @@ Types::ProjectType = GraphQL::ObjectType.define do
   field :updated_at, Types::DateTimeType, 'The time at which this project was last modified.'
   field :deleted_at, Types::DateTimeType, 'The time at which this project was deleted.'
 
-  field :owner, Types::WorkspaceUserType do
+  field :owner, Types::TeamMemberType do
     description ''
 
     before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project, :owner).load(obj) }

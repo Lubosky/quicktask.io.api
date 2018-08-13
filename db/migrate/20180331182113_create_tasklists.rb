@@ -3,7 +3,7 @@ class CreateTasklists < ActiveRecord::Migration[5.2]
     create_table :tasklists, id: :bigint, default: -> { 'generate_id()' } do |t|
       t.string      :uuid, null: false, limit: 24
       t.belongs_to  :project, null: false
-      t.belongs_to  :owner, references: :workspace_user, index: false
+      t.belongs_to  :owner, references: :team_member, index: false
       t.belongs_to  :workspace, null: false
 
       t.string      :title, null: false

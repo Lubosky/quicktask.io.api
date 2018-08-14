@@ -13,8 +13,10 @@ ApplicationSchema = GraphQL::Schema.define do
 
   mutation(Types::MutationType)
   query(Types::QueryType)
+  subscription(Types::SubscriptionType)
 
   use GraphQL::Batch
+  use GraphQL::Subscriptions::ActionCableSubscriptions, redis: $redis
 end
 
 GraphQL::Errors.configure(ApplicationSchema) do

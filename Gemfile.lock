@@ -491,6 +491,7 @@ DEPENDENCIES
   rails
   rbtrace
   readthis
+  redis
   rinku
   rspec-collection_matchers
   rspec-its

@@ -36,12 +36,12 @@ Types::UserType = GraphQL::ObjectType.define do
   field :workspaces, !types[!Types::WorkspaceType] do
     description 'Workspaces and organizations this user may access.'
     before_scope ->(obj, _args, _ctx) { Workspace.accessible_by(obj) }
-    resolve ->(collection, args, _ctx) { collection }
+    resolve ->(collection, _args, _ctx) { collection }
   end
 
   field :workspace_users, !types[!Types::WorkspaceUserType] do
     description ''
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(User, :members).load(obj) }
-    resolve ->(collection, args, _ctx) { collection }
+    resolve ->(collection, _args, _ctx) { collection }
   end
 end

@@ -6,6 +6,8 @@ Rails.application.routes.draw do
   end
 
   namespace :api, defaults: { format: :json }, constraints: { subdomain: 'backend' } do
+    mount ActionCable.server => '/cable'
+
     post '/graphql', to: 'graphql#execute'
 
     scope module: :v1, constraints: Constraints::API.new(version: 1, default: true) do

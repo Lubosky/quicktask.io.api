@@ -1,0 +1,9 @@
+queue_ahead: 180
+queue_name: "default"
+tz: "UTC"
+
+expiring_hand_offs_checker_job:
+  class: "ExpiringHandOffsCheckerJob"
+  every: "1.hour"
+  at: "*:05"
+  expires_after: "6.hours"

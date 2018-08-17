@@ -64,6 +64,12 @@ en:
         button: "XXX…"
         text: "XXX…"
         outro: "XXX…"
+    task:
+      expiring_hand_offs:
+        subject: "XXX…"
+        headline: "XXX…"
+        text: "XXX…"
+        outro: "XXX…"
 
   date:
     formats:

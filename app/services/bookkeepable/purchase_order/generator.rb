@@ -1,4 +1,4 @@
-class Bookkeepable::Generator::PurchaseOrder
+class Bookkeepable::PurchaseOrder::Generator
   def self.generate(hand_off)
     new(hand_off).generate
   end
@@ -67,8 +67,14 @@ class Bookkeepable::Generator::PurchaseOrder
   def unit_price(rate)
     return 0 unless rate
 
+    if hand_off.rate_applied.present?
+      rate_applied = hand_off.rate_applied
+    else
+      rate_applied = rate.price
+    end
+
     exchange_rate = conversion_rate(rate.currency)
-    price = rate.price * exchange_rate
+    price = rate_applied * exchange_rate
 
     return price
   end

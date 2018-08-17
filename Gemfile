@@ -56,6 +56,7 @@ gem 'sass-rails'
 gem 'sentry-raven'
 gem 'sidekiq'
 gem 'sidekiq-unique-jobs'
+gem 'simple_scheduler'
 gem 'stateful_enum'
 gem 'sinatra', require: false
 gem 'stripe'

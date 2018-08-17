@@ -48,6 +48,8 @@ class Task < ApplicationRecord
            source_type: 'Contractor',
            through: :hand_offs
 
+  has_one :project_owner, class_name: 'TeamMember', through: :project, source: :owner
+
   with_options foreign_key: :assignee_id, source: :assignee, through: :assignment do
     has_one :team_member_assignee, source_type: 'TeamMember'
     has_one :contractor_assignee, source_type: 'Contractor'
@@ -91,6 +93,34 @@ class Task < ApplicationRecord
 
   scope :with_status, ->(status) { where(status: status) }
   scope :except_status, ->(status) { where.not(status: status) }
+  scope :with_expiring_hand_offs, -> {
+    hand_offs = HandOff.arel_table
+    tasks = Task.arel_table
+
+    without_accepted = hand_offs.
+      project(hand_offs[:id]).
+        where(
+          tasks[:id].eq(hand_offs[:task_id]).
+          and(hand_offs[:accepted_at].not_eq(nil))
+        ).exists.not
+
+    valid_through_query = hand_offs.
+      project(hand_offs[:valid_through].maximum).
+        where(
+          tasks[:id].eq(hand_offs[:task_id]).
+          and(hand_offs[:accepted_at].eq(nil)).
+          and(hand_offs[:rejected_at].eq(nil)).
+          and(hand_offs[:cancelled_at].eq(nil)).
+          and(hand_offs[:expired_at].eq(nil))
+        )
+
+    unscoped.joins(:pending_hand_offs).
+      where(without_accepted).
+      where(
+        hand_offs[:valid_through].eq(valid_through_query).
+        and(hand_offs[:valid_through].lteq(1.hour.from_now))
+      )
+  }
 
   validates :owner, :project, :tasklist, :task_type, :title, :workspace, presence: true
   validates :location, absence: true, unless: :interpreting_task?

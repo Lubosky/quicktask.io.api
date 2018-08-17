@@ -135,6 +135,6 @@ class HandOff < ApplicationRecord
   end
 
   def generate_purchase_order
-    ::Bookkeepable::Generator::PurchaseOrder.generate(self)
+    ::Bookkeepable::PurchaseOrder::Generator.generate(self)
   end
 end

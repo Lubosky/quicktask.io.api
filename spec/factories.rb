@@ -62,6 +62,7 @@ FactoryBot.define do
 
   factory :hand_off do
     uuid
+    rate_applied Random.rand(0.99...99.99)
 
     association :assignee, factory: :contractor
     association :assigner, factory: :team_member

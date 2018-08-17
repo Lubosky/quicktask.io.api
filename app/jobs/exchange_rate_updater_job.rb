@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ExchangeRateUpdaterJob
   include Sidekiq::Worker
   sidekiq_options retry: true, unique: :until_executed

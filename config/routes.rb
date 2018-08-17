@@ -56,6 +56,9 @@ Rails.application.routes.draw do
       end
     end
 
+    get 'request/assignment/:token', to: 'hand_off_tokens#verify'
+    get 'request/review/:token', to: 'hand_off_tokens#verify'
+
     namespace :auth do
       post 'login', to: 'token#create'
       delete 'logout', to: 'token#destroy'

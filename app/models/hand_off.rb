@@ -1,4 +1,7 @@
 class HandOff < ApplicationRecord
+  class HandOffCancelled < StandardError; end
+  class HandOffExpired < StandardError; end
+
   include BelongsDirectly, EnsureUUID
 
   belongs_to :assignee, polymorphic: true
@@ -13,6 +16,7 @@ class HandOff < ApplicationRecord
     belongs_to :workspace
   end
 
+  has_one :project, inverse_of: :hand_offs, through: :task
   has_one :purchase_order, inverse_of: :hand_off
 
   belongs_directly_to :workspace
@@ -50,12 +54,6 @@ class HandOff < ApplicationRecord
   before_create :set_valid_through
   after_create :generate_purchase_order
 
-  def user_from_assignee!
-    WorkspaceUser.find_or_initialize_by(member_id: self.assignee_id, member_type: self.assignee_type)
-      .tap { |user| user.assign_attributes(name: self.recipient_name) }
-      .tap(&:save)
-  end
-
   def assign!
     return unless assign_directly?
     accept!
@@ -65,6 +63,7 @@ class HandOff < ApplicationRecord
     return unless pending?
     update!(accepted_at: Time.current, rejected_at: nil, cancelled_at: nil, expired_at: nil)
     HandOff.with_task(self.task).pristine.find_each(&:expire!)
+    return self
   end
 
   def reject!
@@ -136,6 +135,6 @@ class HandOff < ApplicationRecord
   end
 
   def generate_purchase_order
-    ::PurchaseOrderGenerator.generate(self)
+    ::Bookkeepable::Generator::PurchaseOrder.generate(self)
   end
 end

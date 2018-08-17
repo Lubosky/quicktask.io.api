@@ -1,4 +1,4 @@
-class PurchaseOrderGenerator
+class Bookkeepable::Generator::PurchaseOrder
   def self.generate(hand_off)
     new(hand_off).generate
   end

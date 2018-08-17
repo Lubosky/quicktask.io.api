@@ -18,6 +18,12 @@ en:
     invalid_token:
       code: "Unauthorized"
       detail: "Invalid token"
+    token_expired:
+      code: "Unauthorized"
+      detail: "Token expired"
+    hand_off_expired:
+      code: "Unauthorized"
+      detail: "Hand-off expired"
   email:
     footer:
       made_by_html: "Made with ❤️ by <a href='%{href}' target='_blank'>%{name}</a>"
@@ -39,6 +45,25 @@ en:
       button: "Create a new password"
       text: "To recover your account and reset your password, please click at the following URL: %{url}."
       outro: "If you didn't mean to reset your password, just ignore this email. Your password will not be changed."
+    hand_off:
+      acceptance:
+        subject: "XXX…"
+        headline: "XXX…"
+        button: "XXX…"
+        text: "XXX…"
+        outro: "XXX…"
+      assignment:
+        subject: "XXX…"
+        headline: "XXX…"
+        button: "XXX…"
+        text: "XXX…"
+        outro: "XXX…"
+      invitation:
+        subject: "XXX…"
+        headline: "XXX…"
+        button: "XXX…"
+        text: "XXX…"
+        outro: "XXX…"
 
   date:
     formats:

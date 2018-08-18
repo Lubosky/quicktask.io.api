@@ -83,6 +83,14 @@ class HandOff < ApplicationRecord
     update!(accepted_at: nil, rejected_at: nil, cancelled_at: nil, expired_at: Time.current)
   end
 
+  def status
+    return :accepted if self.accepted?
+    return :rejected if self.rejected?
+    return :cancelled if self.cancelled?
+    return :expired if self.expired?
+    return :pending
+  end
+
   def accepted?
     accepted_at.present?
   end

@@ -119,4 +119,68 @@ Types::TaskType = GraphQL::ObjectType.define do
 
     resolve ->(collection, _args, _ctx) { collection }
   end
+
+  field :invitees do
+    type types[!Types::ContractorType]
+    description ''
+
+    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Task, :invitees).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
+  field :assignee, Types::MemberType do
+    description ''
+
+    before_scope ->(obj, _args, _ctx) {
+      AssociationLoader.for(Task, :assignment).load(obj).then do |assignment|
+        if assignment
+          if assignment.assignee_type == 'Contractor'
+            AssociationLoader.for(Task, :contractor_assignee).load(obj)
+          elsif assignment.assignee_type == 'TeamMember'
+            AssociationLoader.for(Task, :team_member_assignee).load(obj)
+          end
+        end
+      end
+    }
+
+    resolve ->(resource, _args, _ctx) { resource }
+  end
+
+  field :hand_offs do
+    type types[!Types::HandOffType]
+    description ''
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :hand_offs).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
+  field :pending_hand_offs do
+    type types[!Types::HandOffType]
+    description ''
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :pending_hand_offs).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
+  field :assignment, Types::HandOffType do
+    description ''
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :assignment).load(obj) }
+    resolve ->(resource, _args, _ctx) { resource }
+  end
+
+  field :purchase_orders do
+    type types[!Types::PurchaseOrderType]
+    description ''
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :purchase_orders).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
+  field :accepted_purchase_order, Types::PurchaseOrderType do
+    description ''
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :accepted_purchase_order).load(obj) }
+    resolve ->(resource, _args, _ctx) { resource }
+  end
 end

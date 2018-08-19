@@ -41,6 +41,10 @@
   after_initialize { self.status ||= :draft }
 
   scope :with_task_map, -> { select("projects.*, #{TaskMapQuery.query}") }
+  scope :with_preloaded, -> {
+    joins(tasklists: { tasks: [:task_type, :todos] }).
+      preload(tasklists: { tasks: [:task_type, :todos] })
+  }
 
   validates :client, :name, :owner, :workspace, presence: true
 

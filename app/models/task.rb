@@ -121,6 +121,9 @@ class Task < ApplicationRecord
         and(hand_offs[:valid_through].lteq(1.hour.from_now))
       )
   }
+  scope :with_preloaded, -> {
+    joins(:task_type, :todos).preload(:task_type, :todos)
+  }
 
   validates :owner, :project, :tasklist, :task_type, :title, :workspace, presence: true
   validates :location, absence: true, unless: :interpreting_task?

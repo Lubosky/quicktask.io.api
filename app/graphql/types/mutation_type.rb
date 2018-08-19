@@ -23,6 +23,7 @@ Types::MutationType = GraphQL::ObjectType.define do
   field :updateProject, Mutations::Team::Project::UpdateProjectMutation
   field :deleteProject, Mutations::Team::Project::DeleteProjectMutation
   field :updateProjectStatus, Mutations::Team::Project::UpdateProjectStatusMutation
+  field :duplicateProject, Mutations::Team::Project::DuplicateProjectMutation
 
   field :createTasklist, Mutations::Team::Tasklist::CreateTasklistMutation
   field :updateTasklist, Mutations::Team::Tasklist::UpdateTasklistMutation
@@ -33,6 +34,7 @@ Types::MutationType = GraphQL::ObjectType.define do
   field :updateTask, Mutations::Team::Task::UpdateTaskMutation
   field :updateTaskPosition, Mutations::Team::Task::UpdateTaskPositionMutation
   field :updateTaskStatus, Mutations::Team::Task::UpdateTaskStatusMutation
+  field :duplicateTask, Mutations::Team::Task::DuplicateTaskMutation
 
   field :createTodo, Mutations::Team::Todo::CreateTodoMutation
   field :updateTodo, Mutations::Team::Todo::UpdateTodoMutation

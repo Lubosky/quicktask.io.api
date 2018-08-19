@@ -26,6 +26,9 @@ class Todo < ApplicationRecord
   delegate :workspace, to: :task
 
   before_validation { self.title&.strip! }
+  with_options on: :create do
+    before_validation { self.completed ||= false }
+  end
   after_validation :set_completion_date, if: :completed?
   after_validation :reset_completion_date, unless: :completed?
 

@@ -41,6 +41,7 @@ namespace :dev do
     create_workspace_currencies
     create_clients
     create_client_contacts
+    create_contractors
     create_workspace_users
     create_rates
     create_project_groups
@@ -222,33 +223,21 @@ namespace :dev do
     header 'Clients'
 
     Workspace.active.find_each do |workspace|
-      client = create(
-        :client,
-        workspace: workspace,
-        name: Faker::Name.name,
-        email: Faker::Internet.email,
-        currency: :usd
-      )
-      puts_client client
-
-      client = create(
-        :client,
-        workspace: workspace,
-        name: Faker::Name.name,
-        email: Faker::Internet.email,
-        currency: :gbp
-      )
-      puts_client client
-
-      client = create(
-        :client,
-        workspace: workspace,
-        name: Faker::Name.name,
-        email: Faker::Internet.email,
-        currency: :eur
-      )
-      puts_client client
+      20.times do
+        create_client(workspace)
+      end
     end
+  end
+
+  def create_client(workspace)
+    client = create(
+      :client,
+      workspace: workspace,
+      name: Faker::Name.name,
+      email: Faker::Internet.email,
+      currency: :gbp
+    )
+    puts_client client
   end
 
   def create_client_contacts
@@ -287,6 +276,34 @@ namespace :dev do
         puts_client_contact client_contact
       end
     end
+  end
+
+  def create_contractors
+    header 'Contractors'
+
+    puts "Creating contractors\u2026\n"
+    print "\n"
+
+    Workspace.active.find_each do |workspace|
+      50.times do
+        print "\e[32m.\e[0m"
+
+        create_contractor(workspace)
+      end
+    end
+
+    print "\n"
+    puts_contractor
+  end
+
+  def create_contractor(workspace)
+    contractor = create(
+      :contractor,
+      workspace: workspace,
+      first_name: Faker::Name.first_name,
+      last_name: Faker::Name.last_name,
+      email: Faker::Internet.email
+    )
   end
 
   def create_project_groups
@@ -458,7 +475,7 @@ namespace :dev do
     Tasklist.includes(:project, :workspace).find_each do |tasklist|
       workspace = tasklist.workspace
 
-      15.times do
+      5.times do
         print "\e[32m.\e[0m"
 
         source_language = workspace.languages.sample
@@ -496,7 +513,7 @@ namespace :dev do
         workspace.team_members.sample :
         workspace.contractors.sample
 
-      count = task.other_task? ? 1 : rand(3..6)
+      count = task.other_task? ? 1 : rand(1..3)
 
       count.times do
         print "\e[32m.\e[0m"
@@ -654,6 +671,10 @@ namespace :dev do
 
   def puts_client_rate(workspace)
     puts "Client rates for workspace: #{workspace.name}"
+  end
+
+  def puts_contractor
+    puts "\e[32mContractors created! ^_^\e[0m"
   end
 
   def puts_contractor_rate(workspace)

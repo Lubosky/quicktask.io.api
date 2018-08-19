@@ -68,12 +68,6 @@ class Rate < ApplicationRecord
   end
 
   def self.rate_for(task)
-    find_by(
-      classification: task.classification,
-      source_language: task.source_language,
-      target_language: task.target_language,
-      task_type: task.task_type,
-      unit: task.unit
-    )
+    find_by(task.query_fields)
   end
 end

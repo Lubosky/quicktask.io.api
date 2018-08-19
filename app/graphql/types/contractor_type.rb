@@ -29,13 +29,7 @@ Types::ContractorType = GraphQL::ObjectType.define do
       if args[:task_id]
         RecordLoader.for(Task).load(args[:task_id]).then do |task|
           if task && task.assignable?
-            RecordLoader.for(Rate::Contractor, column: :owner_id, where: {
-              classification: task.classification,
-              source_language_id: task.source_language_id,
-              target_language_id: task.target_language_id,
-              task_type_id: task.task_type_id,
-              unit_id: task.unit_id
-            }).load(obj.id).then do |collection|
+            RecordLoader.for(Rate::Contractor, column: :owner_id, where: task.query_fields).load(obj.id).then do |collection|
               Array.wrap(collection)
             end
           else

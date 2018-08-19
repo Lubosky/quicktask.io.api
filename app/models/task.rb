@@ -222,6 +222,15 @@ class Task < ApplicationRecord
     association_fields(precise: true).none? { |f| send(f).blank? }
   end
 
+  def query_fields
+    {}.tap do |hash|
+      hash[:classification] = self.classification
+      association_fields(precise: true).
+        map(&:to_sym).
+        each { |f| hash[f] = send("#{f}") }
+    end
+  end
+
   private
 
   def association_fields_changed?

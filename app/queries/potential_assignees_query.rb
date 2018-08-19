@@ -13,13 +13,13 @@ class PotentialAssigneesQuery
   end
 
   def base_query
-    Contractor.select(contractors[:id]).joins(join_query)
+    Contractor.select(contractors[:id]).distinct.joins(join_query)
   end
 
   def join_query
     contractors
       .join(rates)
-      .on(contractors[:id].eq(rates[:owner_id]))
+      .on(contractors[:id].eq(rates[:owner_id]).and(rates[:rate_type].eq('contractor')))
       .join_sources
   end
 

@@ -1,8 +1,9 @@
-class Team::Task::Assign < ApplicationInteractor
+class Team::HandOff::Create < ApplicationInteractor
   object :task
 
   integer :assignee_id, default: nil
   boolean :assignment, default: false
+  decimal :rate_applied, default: nil
 
   def execute
     transaction do
@@ -15,7 +16,7 @@ class Team::Task::Assign < ApplicationInteractor
     token = HandOffToken.generate_for(hand_off).to_s
     deliver_email(token)
 
-    task
+    hand_off
   end
 
   private
@@ -25,8 +26,8 @@ class Team::Task::Assign < ApplicationInteractor
   end
 
   def assignee_scope
-    return TeamMember if task.other_task?
-    return Contractor
+    return ::TeamMember if task.other_task?
+    return ::Contractor
   end
 
   def assign_directly?

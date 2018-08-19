@@ -5,6 +5,7 @@ Types::LineItemType = GraphQL::ObjectType.define do
   field :id, !types.ID, 'Globally unique ID of the line item.'
   field :uuid, !types.String, 'A unique substitute for a line item ID.'
 
+  field :bookkeepable_id, !types.ID, 'Globally unique ID of the bookkeepable record.'
   field :bookkeepable_type, !types.String, 'Type of the bookkeepable record.'
   field :bookkeepable, Types::BookkeepableType do
     description ''

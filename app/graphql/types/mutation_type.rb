@@ -38,7 +38,9 @@ Types::MutationType = GraphQL::ObjectType.define do
   field :updateTodo, Mutations::Team::Todo::UpdateTodoMutation
   field :updateTodoPosition, Mutations::Team::Todo::UpdateTodoPositionMutation
   field :updateTodoStatus, Mutations::Team::Todo::UpdateTodoStatusMutation
-  field :deleteTodo, Mutations::Team::Todo::DeleteTodoMutation
+
+  field :createHandOff, Mutations::Team::HandOff::CreateHandOffMutation
+  field :updateHandOffStatus, Mutations::Team::HandOff::UpdateHandOffStatusMutation
 
   field :updateTeamMember, Mutations::Team::TeamMember::UpdateTeamMemberMutation
   field :updateTeamMemberProfile, Mutations::Team::TeamMember::UpdateTeamMemberProfileMutation

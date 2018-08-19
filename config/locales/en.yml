@@ -5,6 +5,7 @@ en:
         hand_off:
           attributes:
             assignee:
+              already_invited: "already invited"
               must_have_valid_rate: "must have valid rate"
   errors:
     messages:

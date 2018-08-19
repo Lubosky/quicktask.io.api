@@ -5,17 +5,18 @@ Types::HandOffType = GraphQL::ObjectType.define do
   field :id, !types.ID, 'Globally unique ID of the hand-off.'
   field :uuid, !types.String, 'A unique substitute for a hand-off ID.'
 
+  field :assignee_id, !types.ID, 'Globally unique ID of the assignee.'
   field :assignee_type, !types.String, 'Type of the workspace user.'
   field :assignee, Types::MemberType do
     description ''
 
     before_scope ->(obj, _args, _ctx) {
       if obj.assignee_type == 'TeamMember'
-        AssociationLoader.for(TeamMember, :assignee).load(obj)
+        AssociationLoader.for(HandOff, :assignee).load(obj)
       elsif obj.assignee_type == 'Contractor'
-        AssociationLoader.for(Contractor, :assignee).load(obj)
+        AssociationLoader.for(HandOff, :assignee).load(obj)
       elsif obj.assignee_type == 'ClientContact'
-        AssociationLoader.for(ClientContact, :assignee).load(obj)
+        AssociationLoader.for(HandOff, :assignee).load(obj)
       end
     }
 
@@ -31,7 +32,13 @@ Types::HandOffType = GraphQL::ObjectType.define do
   end
 
   field :task_id, !types.ID, 'Globally unique ID of the task.'
-  field :project_id, !types.ID, 'Globally unique ID of the project.'
+  field :task, Types::TaskType do
+    description ''
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(HandOff, :task).load(obj) }
+    resolve ->(resource, _args, _ctx) { resource }
+  end
+
   field :workspace_id, !types.ID, 'Globally unique ID of the workspace.'
 
   field :valid_through, Types::DateTimeType, 'The time at which this hand-off will expire.'
@@ -67,6 +74,10 @@ Types::HandOffType = GraphQL::ObjectType.define do
     description ''
     property :invitation?
   end
+
+  field :created_at, Types::DateTimeType, 'The time at which this hand-off was created.'
+  field :updated_at, Types::DateTimeType, 'The time at which this hand-off was last modified.'
+  field :deleted_at, Types::DateTimeType, 'The time at which this hand-off was deleted.'
 
   field :purchase_order, Types::PurchaseOrderType do
     description ''

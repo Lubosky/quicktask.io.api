@@ -46,6 +46,7 @@ class HandOff < ApplicationRecord
   scope :with_task, ->(task) { where(task: task) }
 
   validates :assignee, :assigner, :task, :workspace, presence: true
+  validate :assignee_not_invited, on: :create
   validate :contractor_with_rate, on: :create
 
   delegate :workspace, to: :task
@@ -132,6 +133,14 @@ class HandOff < ApplicationRecord
     end
 
     self.valid_through ||= expiry_date
+  end
+
+  def assignee_not_invited
+    return true if assignee.is_a?(TeamMember)
+
+    if ::HandOff.with_task(self.task).pending.exists?(assignee_id: self.assignee_id, assignee_type: self.assignee_type)
+      errors.add(:assignee, :already_invited)
+    end
   end
 
   def contractor_with_rate

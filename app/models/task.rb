@@ -132,23 +132,9 @@ class Task < ApplicationRecord
   delegate :project, :workspace, to: :tasklist
   delegate :classification, to: :task_type
 
-  enum color: {
-    no_color: 0,
-    purple: 1,
-    blue: 2,
-    green: 3,
-    amber: 4,
-    pink: 5,
-    red: 6,
-    orange: 7,
-    brown: 8,
-    rainbow: 9
-  }
-
-  enum status: {
-    uncompleted: 0,
-    completed: 1
-  } do
+  enum color: [:no_color, :purple, :blue, :green, :amber, :pink, :red, :orange, :brown, :rainbow]
+  enum recurring_type: [:none, :day, :week, :biweekly, :work_day, :month, :quarterly, :half_year, :year], _prefix: true
+  enum status: [:uncompleted, :completed] do
     event :complete do
       transition :uncompleted => :completed
     end
@@ -166,7 +152,10 @@ class Task < ApplicationRecord
     end
   end
 
-  after_initialize { self.status ||= :uncompleted }
+  after_initialize {
+    self.status ||= :uncompleted
+    self.recurring_type ||= :none
+  }
   before_validation { self.title&.strip! }
   before_validation :set_default_attributes
   before_validation :ensure_location_is_nullified, unless: :interpreting_task?

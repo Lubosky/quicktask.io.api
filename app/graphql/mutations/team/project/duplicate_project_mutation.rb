@@ -11,7 +11,7 @@ module Mutations
         argument :projectId, !types.ID, 'Globally unique ID of the project.', as: :project_id
 
         authorize! ->(_obj, _args, ctx) {
-          ::Team::ProjectPolicy.new(ctx[:current_workspace_user], ::Project).create?
+          ::Team::ProjectPolicy.new(ctx[:current_workspace_user], ::Project::Base).create?
         }
 
         resolve DuplicateProjectMutationResolver.new

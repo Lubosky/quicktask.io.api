@@ -11,7 +11,7 @@ module Mutations
         argument :input, Inputs::Team::Project::BaseInput
 
         authorize! ->(_obj, _args, ctx) {
-          ::Team::ProjectPolicy.new(ctx[:current_workspace_user], ::Project).create?
+          ::Team::ProjectPolicy.new(ctx[:current_workspace_user], ::Project::Base).create?
         }
 
         resolve CreateProjectMutationResolver.new

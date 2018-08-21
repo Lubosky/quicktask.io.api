@@ -43,6 +43,7 @@ namespace :dev do
     create_client_contacts
     create_contractors
     create_workspace_users
+    create_project_templates
     create_rates
     create_project_groups
     create_projects
@@ -219,6 +220,20 @@ namespace :dev do
     end
   end
 
+  def create_project_templates
+    header 'Project Templates'
+
+    Workspace.active.find_each do |workspace|
+      member = workspace.team_members.sample
+
+      if member.present?
+        ::ProjectTemplateBuilder.create_for(member.workspace_user, workspace)
+      end
+
+      puts_project_template workspace
+    end
+  end
+
   def create_clients
     header 'Clients'
 
@@ -357,7 +372,7 @@ namespace :dev do
   def activate_projects
     actions = ['prepare', 'plan', 'activate']
 
-    Project.find_each do |project|
+    Project::Base.find_each do |project|
       project.send("#{actions.sample}!")
     end
   end
@@ -472,7 +487,7 @@ namespace :dev do
     puts "Creating tasks\u2026\n"
     print "\n"
 
-    Tasklist.includes(:project, :workspace).find_each do |tasklist|
+    Tasklist.for_projects.includes(:project, :workspace).find_each do |tasklist|
       workspace = tasklist.workspace
 
       5.times do
@@ -703,6 +718,10 @@ namespace :dev do
 
   def puts_project_group(project_group, workspace)
     puts "Project group #{project_group.name} in workspace: #{workspace.name}"
+  end
+
+  def puts_project_template(workspace)
+    puts "Project templates for workspace: #{workspace.name}"
   end
 
   def puts_project(project, workspace)

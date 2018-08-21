@@ -9,8 +9,9 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
       create_specializations
       create_task_types
       create_units
-      create_team_member
-      create_workspace_user
+      create_units
+      member = create_workspace_user
+      create_project_templates(member)
     end
     workspace
   end
@@ -19,6 +20,10 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
 
   def create_languages
     Language.create_for(workspace)
+  end
+
+  def create_project_templates(member)
+    ::ProjectTemplateBuilder.create_for(member, workspace)
   end
 
   def create_specializations

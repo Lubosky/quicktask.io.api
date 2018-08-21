@@ -7,6 +7,8 @@ en:
             assignee:
               already_invited: "already invited"
               must_have_valid_rate: "must have valid rate"
+        project/template:
+          ? base
   errors:
     messages:
       greater_than_start_date: "must be later than the start date"
@@ -105,3 +107,24 @@ en:
       language_combination: "%{source} - %{target} [%{source_upcase}-%{target_upcase}]"
       target_language: "%{target} [%{target_upcase}]"
       other: "Other"
+
+  templates:
+    project:
+      workflow:
+        kanban:
+          name: "Kanban"
+          description: "Use Kanban to adopt the classic To-Do, Doing and Done methodology."
+          doing: "Doing"
+          done: "Done"
+          todo: "To do"
+        team:
+          name: "Single Team"
+          description: "Each team member has their own Tasklist."
+        weekday:
+          name: "Weekday"
+          description: "Works best for teams planning tasks on a weekly basis."
+          friday: "Friday"
+          monday: "Monday"
+          thursday: "Thursday"
+          tuesday: "Tuesday"
+          wednesday: "Wednesday"

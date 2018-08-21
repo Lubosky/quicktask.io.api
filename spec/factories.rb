@@ -192,11 +192,21 @@ FactoryBot.define do
     association :workspace
   end
 
-  factory :project do
+  factory :project, class: Project::Base do
     uuid
     name
+    project_type :project
+
     association :client
     association :owner, factory: :team_member
+    association :workspace
+  end
+
+  factory :project_template, class: Project::Template do
+    uuid
+    name
+    project_type :template
+
     association :workspace
   end
 
@@ -373,6 +383,10 @@ FactoryBot.define do
     currency :usd
     association :owner, factory: :user
 
+    after :create do |instance|
+      WorkspaceCurrency.create_for(instance)
+    end
+
     trait :with_inactive_membership do
       status :deactivated
       stripe_customer_id "customer123"
@@ -402,12 +416,6 @@ FactoryBot.define do
     trait :with_roles do
       after :create do |instance|
         Role::Base.create_for(instance)
-      end
-    end
-
-    trait :with_currencies do
-      after :create do |instance|
-        WorkspaceCurrency.create_for(instance)
       end
     end
   end

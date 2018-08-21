@@ -10,6 +10,7 @@ member:
   - manage_clients
   - manage_contractors
   - manage_projects
+  - manage_project_templates
   - manage_tasklists
   - manage_tasks
   - manage_todos
@@ -19,6 +20,7 @@ owner:
   - manage_contractors
   - manage_membership
   - manage_projects
+  - manage_project_templates
   - manage_tasklists
   - manage_tasks
   - manage_todos

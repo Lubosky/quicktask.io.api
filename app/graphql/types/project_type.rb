@@ -34,7 +34,7 @@ Types::ProjectType = GraphQL::ObjectType.define do
   field :owner, Types::TeamMemberType do
     description ''
 
-    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project, :owner).load(obj) }
+    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project::Base, :owner).load(obj) }
     resolve ->(resource, _args, _ctx) { resource }
   end
 
@@ -42,7 +42,7 @@ Types::ProjectType = GraphQL::ObjectType.define do
     type types[Types::TasklistType]
     description ''
 
-    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project, :tasklists).load(obj) }
+    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project::Base, :tasklists).load(obj) }
     resolve ->(collection, _args, _ctx) { collection }
   end
 
@@ -50,7 +50,7 @@ Types::ProjectType = GraphQL::ObjectType.define do
     type types[Types::TaskType]
     description ''
 
-    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project, :tasks).load(obj) }
+    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project::Base, :tasks).load(obj) }
     resolve ->(collection, _args, _ctx) { collection }
   end
 

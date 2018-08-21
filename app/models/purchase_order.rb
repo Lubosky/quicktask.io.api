@@ -61,6 +61,6 @@ class PurchaseOrder < ApplicationRecord
   def set_default_attributes
     self.currency ||= owner&.currency
     self.exchange_rate ||= owner&.exchange_rate
-    self.workspace_currency = workspace&.currency
+    self.workspace_currency ||= workspace&.currency
   end
 end

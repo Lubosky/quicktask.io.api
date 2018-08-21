@@ -1,11 +1,11 @@
 require 'rails_helper'
 
-RSpec.describe Project, type: :model do
-  subject { build(:project) }
+RSpec.describe Project::Template, type: :model do
+  subject { build(:project_template) }
 
   context 'validations' do
     before do
-      Project.any_instance.stubs(:ensure_uuid).returns(true)
+      Project::Template.any_instance.stubs(:ensure_uuid).returns(true)
     end
 
     it { is_expected.to belong_to(:client) }

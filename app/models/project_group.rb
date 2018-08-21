@@ -6,7 +6,10 @@ class ProjectGroup < ApplicationRecord
     belongs_to :client
   end
 
-  has_many :projects, inverse_of: :project_group, dependent: :restrict_with_error
+  has_many :projects,
+           class_name: 'Project::Base',
+           dependent: :restrict_with_error,
+           inverse_of: :project_group
 
   validates :name, presence: true
 

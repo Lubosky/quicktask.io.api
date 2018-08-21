@@ -18,6 +18,6 @@ class Team::Project::Duplicate < ApplicationInteractor
   private
 
   def project
-    @_project ||= ::Project.with_preloaded.find_by(id: project_id)
+    @_project ||= ::Project::Base.with_preloaded.find_by(id: project_id)
   end
 end

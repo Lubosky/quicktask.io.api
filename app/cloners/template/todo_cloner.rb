@@ -1,4 +1,4 @@
-class TodoCloner < Clowne::Cloner
+class Template::TodoCloner < Clowne::Cloner
   adapter :active_record
 
   nullify :uuid, :assignee, :completed, :completed_date, :due_date, :position

@@ -93,7 +93,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::Team::ProjectPolicy.new(ctx[:current_workspace_user], Project).index?
+      ::Team::ProjectPolicy.new(ctx[:current_workspace_user], Project::Base).index?
     }
 
     argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
@@ -119,6 +119,40 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     }
 
     resolve ->(project, _args, _ctx) { project }
+  end
+
+
+  field :project_templates do
+    type types[!Types::ProjectTemplateType]
+    description ''
+
+    authorize ->(_obj, _args, ctx) {
+      ::Team::ProjectTemplatePolicy.new(ctx[:current_workspace_user], Project::Template).index?
+    }
+
+    argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
+    argument :page, types.Int, 'Indicates the number of the page. All paginated queries start at page 1.'
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :project_templates).load(obj) }
+    resolve ->(promise, args, _ctx) {
+      promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
+    }
+  end
+
+  field :project_template, Types::ProjectTemplateType do
+    description ''
+
+    argument :project_id, types.ID, 'Globally unique ID of the project template.'
+
+    resource ->(obj, args, _ctx) {
+      obj.project_templates.with_task_map.find(args[:project_template_id])
+    }, pass_through: true
+
+    authorize! ->(project_template, _args, ctx) {
+      ::Team::ProjectTemplatePolicy.new(ctx[:current_workspace_user], project_template).show?
+    }
+
+    resolve ->(project_template, _args, _ctx) { project_template }
   end
 
   field :supported_currencies do

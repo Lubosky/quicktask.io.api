@@ -30,7 +30,10 @@ class Quote < ApplicationRecord
                                   o[:unit_price].blank? || o[:quantity].blank?
                                 }
 
-  after_initialize { self.status ||= :draft }
+  after_initialize {
+    self.status ||= :draft
+    self.quote_type = :quote
+  }
   before_validation :set_default_attributes, on: :create
 
   delegate :languages, :task_types, :units, to: :workspace, prefix: :applicable
@@ -49,6 +52,7 @@ class Quote < ApplicationRecord
             numericality: { greater_than_or_equal_to: 0 }
   validate :validate_start_date_before_due_date
 
+  enum quote_type: [:quote]
   enum status: { draft: 0, sent: 1, accepted: 2, declined: 3, expired: 4, cancelled: 5 } do
     event :submit do
       before do

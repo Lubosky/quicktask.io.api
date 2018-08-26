@@ -1,1 +1,1 @@
-Mime::Type.register 'application/vnd.gliderpath.v1+json', :jsonapi
+Mime::Type.register 'application/vnd.quicktask.v1+json', :jsonapi

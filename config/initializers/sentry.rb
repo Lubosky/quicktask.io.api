@@ -3,5 +3,5 @@ Raven.configure do |config|
   config.environments = %w[production]
   config.excluded_exceptions += ['Sidekiq::Shutdown']
   config.sanitize_fields = Rails.application.config.filter_parameters.map(&:to_s)
-  config.tags = { application: 'GliderPath.TMS.API' }
+  config.tags = { application: 'QuickTask.io.API' }
 end

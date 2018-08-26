@@ -16,7 +16,7 @@ Rails.application.configure do
 
       config.cache_store = :readthis_store, {
         expires_in: 1.week.to_i,
-        namespace: 'gliderpath-cache',
+        namespace: 'quicktask-cache',
         compress: true,
         compression_threshold: 2.kilobytes,
         redis: { url: ENV.fetch('REDIS_CACHE_URL'), driver: :hiredis }

@@ -9,7 +9,7 @@ module Constraints
       default ||
         (request.respond_to?('headers') &&
          request.headers.key?('Accept') &&
-         request.headers['Accept'].include?("application/vnd.gliderpath.v#{version}+json"))
+         request.headers['Accept'].include?("application/vnd.quicktask.v#{version}+json"))
     end
 
     private

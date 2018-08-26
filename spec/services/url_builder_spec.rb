@@ -21,12 +21,12 @@ RSpec.describe UrlBuilder do
 
   describe '#expand' do
     before do
-      subject.expects(:host).returns('https://api.gliderpath.test')
+      subject.expects(:host).returns('https://api.quicktask.test')
     end
 
     it 'returns the right url' do
       expect(subject.expand(params))
-        .to eq('https://api.gliderpath.test/projects/999/tasklists/99/tasks?page=9&sort=desc')
+        .to eq('https://api.quicktask.test/projects/999/tasklists/99/tasks?page=9&sort=desc')
     end
   end
 end

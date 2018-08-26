@@ -6,14 +6,14 @@ RSpec.describe Rack::Deflater, type: :request do
 
     valid_token_authentication
 
-    get url_for([:me, :api, :users]), headers: { 'CONTENT_TYPE' => 'application/vnd.gliderpath.v1+json',
+    get url_for([:me, :api, :users]), headers: { 'CONTENT_TYPE' => 'application/vnd.quicktask.v1+json',
                                             'HTTP_AUTHORIZATION' => "Bearer #{@authentication_token}"
                                           }
 
     expect(response.headers['Content-Encoding']).not_to be
     content_length = response.headers['Content-Length']
 
-    get url_for([:me, :api, :users]), headers: { 'CONTENT_TYPE' => 'application/vnd.gliderpath.v1+json',
+    get url_for([:me, :api, :users]), headers: { 'CONTENT_TYPE' => 'application/vnd.quicktask.v1+json',
                                             'HTTP_ACCEPT_ENCODING' => 'gzip',
                                             'HTTP_AUTHORIZATION' => "Bearer #{@authentication_token}"
                                           }

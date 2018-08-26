@@ -1,8 +1,8 @@
 app:
   name: 'GliderPath'
-  domain: gliderpath.com
-  default_email_address: <%= "gliderbot@#{ENV.fetch('SMTP_DOMAIN', 'gliderpath.test')}" %>
-  notifications_email_address: <%= "notifications@#{ENV.fetch('SMTP_DOMAIN', 'gliderpath.test')}" %>
+  domain: quicktask.io
+  default_email_address: <%= "gliderbot@#{ENV.fetch('SMTP_DOMAIN', 'quicktask.test')}" %>
+  notifications_email_address: <%= "notifications@#{ENV.fetch('SMTP_DOMAIN', 'quicktask.test')}" %>
 
 client:
   url: <%= ENV.fetch('CLIENT_URL', 'http://localhost:3000') %>

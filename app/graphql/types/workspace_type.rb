@@ -93,7 +93,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::Team::ProjectPolicy.new(ctx[:current_workspace_user], Project::Base).index?
+      ::Team::ProjectPolicy.new(ctx[:current_workspace_user], Project::Regular).index?
     }
 
     argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
@@ -101,7 +101,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
 
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :projects).load(obj) }
     resolve ->(promise, args, _ctx) {
-      promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
+      promise.then(proc { |collection| collection.with_task_map.page(args[:page]).per(args[:limit]) })
     }
   end
 
@@ -135,14 +135,14 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
 
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :project_templates).load(obj) }
     resolve ->(promise, args, _ctx) {
-      promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
+      promise.then(proc { |collection| collection.with_task_map.page(args[:page]).per(args[:limit]) })
     }
   end
 
   field :project_template, Types::ProjectTemplateType do
     description ''
 
-    argument :project_id, types.ID, 'Globally unique ID of the project template.'
+    argument :project_template_id, types.ID, 'Globally unique ID of the project template.'
 
     resource ->(obj, args, _ctx) {
       obj.project_templates.with_task_map.find(args[:project_template_id])

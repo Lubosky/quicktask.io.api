@@ -20,14 +20,14 @@ class Tasklist < ApplicationRecord
 
   default_scope { order(:position) }
   scope :for_projects, -> {
-    joins(:project).where(projects: { project_type: :project })
+    joins(:project).where(projects: { project_type: :regular })
   }
   scope :for_project_templates, -> {
     joins(:project).where(projects: { project_type: :template })
   }
 
   validates :project, :title, :workspace, presence: true
-  validates :owner, presence: true, if: -> { project.project_type == 'project' }
+  validates :owner, presence: true, if: -> { project.project_type == 'regular' }
 
   delegate :workspace, to: :project
 

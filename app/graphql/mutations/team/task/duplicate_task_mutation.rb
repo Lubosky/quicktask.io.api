@@ -8,7 +8,24 @@ module Mutations
         argument :workspaceId, !types.ID, as: :workspace_id
         argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
 
-        argument :projectId, !types.ID, 'Globally unique ID of the task.', as: :project_id
+        argument :projectId, !types.ID, 'Globally unique ID of the project.', as: :project_id
+        argument :taskId, !types.ID, 'Globally unique ID of the task.', as: :task_id
+
+        authorize! ->(_obj, _args, ctx) {
+          ::Team::TaskPolicy.new(ctx[:current_workspace_user], ::Task).create?
+        }
+
+        resolve DuplicateTaskMutationResolver.new
+      end
+
+      DuplicateTemplateTaskMutation = GraphQL::Field.define do
+        type Types::TaskType
+        description 'Duplicates the task within a template.'
+
+        argument :workspaceId, !types.ID, as: :workspace_id
+        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+
+        argument :projectTemplateId, !types.ID, 'Globally unique ID of the project template.', as: :project_template_id
         argument :taskId, !types.ID, 'Globally unique ID of the task.', as: :task_id
 
         authorize! ->(_obj, _args, ctx) {

@@ -40,6 +40,23 @@ Types::MutationType = GraphQL::ObjectType.define do
   field :updateTodo, Mutations::Team::Todo::UpdateTodoMutation
   field :updateTodoPosition, Mutations::Team::Todo::UpdateTodoPositionMutation
   field :updateTodoStatus, Mutations::Team::Todo::UpdateTodoStatusMutation
+  field :deleteTodo, Mutations::Team::Todo::DeleteTodoMutation
+
+  field :createProjectTemplate, Mutations::Team::ProjectTemplate::CreateProjectTemplateMutation
+  field :updateProjectTemplate, Mutations::Team::ProjectTemplate::UpdateProjectTemplateMutation
+  field :deleteProjectTemplate, Mutations::Team::ProjectTemplate::DeleteProjectTemplateMutation
+
+  field :createTemplateTasklist, Mutations::Team::Tasklist::CreateTemplateTasklistMutation
+  field :updateTemplateTasklistPosition, Mutations::Team::Tasklist::UpdateTasklistPositionMutation
+
+  field :createMultipleTemplateTasks, Mutations::Team::Task::CreateMultipleTasksMutation
+  field :updateTemplateTaskPosition, Mutations::Team::Task::UpdateTaskPositionMutation
+
+  field :createSingleTemplateTask, Mutations::Team::Task::CreateSingleTemplateTaskMutation
+  field :createMultipleTemplateTasks, Mutations::Team::Task::CreateMultipleTemplateTasksMutation
+  field :updateTemplateTask, Mutations::Team::Task::UpdateTemplateTaskMutation
+  field :updateTemplateTaskPosition, Mutations::Team::Task::UpdateTemplateTaskPositionMutation
+  field :duplicateTemplateTask, Mutations::Team::Task::DuplicateTemplateTaskMutation
 
   field :createHandOff, Mutations::Team::HandOff::CreateHandOffMutation
   field :updateHandOffStatus, Mutations::Team::HandOff::UpdateHandOffStatusMutation

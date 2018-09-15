@@ -3,14 +3,36 @@ module Mutations
     module Task
       UpdateTaskMutation = GraphQL::Field.define do
         type Types::TaskType
-        description 'Updates a task’s status.'
+        description 'Updates the task.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
         argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
 
-        argument :projectId, !types.ID, 'Globally unique ID of the task.', as: :project_id
+        argument :projectId, !types.ID, 'Globally unique ID of the project.', as: :project_id
         argument :taskId, !types.ID, 'Globally unique ID of the task.', as: :task_id
         argument :input, Inputs::Team::Task::BaseInput
+
+        resource! ->(_obj, args, ctx) {
+          ctx[:current_workspace].tasks.find(args[:task_id])
+        }
+
+        authorize! ->(task, _args, ctx) {
+          ::Team::TaskPolicy.new(ctx[:current_workspace_user], task).update?
+        }
+
+        resolve UpdateTaskMutationResolver.new
+      end
+
+      UpdateTemplateTaskMutation = GraphQL::Field.define do
+        type Types::TaskType
+        description 'Updates the task within a template.'
+
+        argument :workspaceId, !types.ID, as: :workspace_id
+        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+
+        argument :projectTemplateId, !types.ID, 'Globally unique ID of the project.', as: :project_template_id
+        argument :taskId, !types.ID, 'Globally unique ID of the task.', as: :task_id
+        argument :input, Inputs::Team::Task::TemplateInput
 
         resource! ->(_obj, args, ctx) {
           ctx[:current_workspace].tasks.find(args[:task_id])

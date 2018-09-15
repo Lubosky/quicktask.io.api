@@ -6,7 +6,7 @@ class Client < ApplicationRecord
   with_options dependent: :restrict_with_error, inverse_of: :client do
     has_many :client_requests
     has_many :project_groups
-    has_many :projects, class_name: 'Project::Base'
+    has_many :projects, class_name: 'Project::Regular'
     has_many :quotes
   end
 

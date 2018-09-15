@@ -16,7 +16,7 @@ class HandOff < ApplicationRecord
     belongs_to :workspace
   end
 
-  has_one :project, class_name: 'Project::Base', inverse_of: :hand_offs, through: :task
+  has_one :project, class_name: 'Project::Regular', inverse_of: :hand_offs, through: :task
   has_one :purchase_order, inverse_of: :hand_off
 
   belongs_directly_to :workspace

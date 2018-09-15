@@ -18,6 +18,23 @@ module Mutations
         resolve CreateSingleTaskMutationResolver.new
       end
 
+      CreateSingleTemplateTaskMutation = GraphQL::Field.define do
+        type Types::TaskType
+        description 'Creates a task within a template.'
+
+        argument :workspaceId, !types.ID, as: :workspace_id
+        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+
+        argument :tasklistId, !types.ID, 'Globally unique ID of the tasklist.', as: :tasklist_id
+        argument :input, Inputs::Team::Task::TemplateInput
+
+        authorize! ->(_obj, _args, ctx) {
+          ::Team::TaskPolicy.new(ctx[:current_workspace_user], ::Task).create?
+        }
+
+        resolve CreateSingleTaskMutationResolver.new
+      end
+
       class CreateSingleTaskMutationResolver
         def call(_obj, args, ctx)
           context = ctx.to_h.slice(

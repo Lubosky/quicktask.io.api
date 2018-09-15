@@ -11,6 +11,10 @@ FactoryBot.define do
     "name_#{n}"
   end
 
+  sequence :template_name do |n|
+    "Template name ##{n}"
+  end
+
   sequence :title do |n|
     "title_#{n}"
   end
@@ -192,10 +196,10 @@ FactoryBot.define do
     association :workspace
   end
 
-  factory :project, class: Project::Base do
+  factory :project, class: Project::Regular do
     uuid
     name
-    project_type :project
+    project_type :regular
 
     association :client
     association :owner, factory: :team_member
@@ -205,6 +209,8 @@ FactoryBot.define do
   factory :project_template, class: Project::Template do
     uuid
     name
+    template_name
+    template_description Faker::Lorem.paragraph
     project_type :template
 
     association :workspace

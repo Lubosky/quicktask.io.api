@@ -15,8 +15,10 @@ class ProjectCloner < Clowne::Cloner
           :uuid
 
   finalize do |source, record, _params|
+    name = [source.name, I18n.t('common.copy_in_brackets')].delete_if { |a| a.blank? }.join(' ').strip
     timestamp = Time.current.beginning_of_hour + 1.hour
 
+    record.name = name
     record.billed = false
     record.status = :draft
     record.completion_ratio = 0.0

@@ -82,10 +82,14 @@ Types::TaskType = GraphQL::ObjectType.define do
   field :updated_at, Types::DateTimeType, 'The time at which this task was last modified.'
   field :deleted_at, Types::DateTimeType, 'The time at which this task was deleted.'
 
-  field :project, Types::ProjectType do
+
+  field :parent, Types::ProjectableType do
     description ''
 
-    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :project).load(obj) }
+    before_scope ->(obj, _args, _ctx) {
+      AssociationLoader.for(Task, :project).load(obj)
+    }
+
     resolve ->(resource, _args, _ctx) { resource }
   end
 

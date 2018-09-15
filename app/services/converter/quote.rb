@@ -33,7 +33,7 @@ class Converter::Quote
   )
 
   def fulfill_conversion
-    ::Project::Base.transaction do
+    ::Project::Regular.transaction do
       project = build_project
       project.quote = quote
       project.tap(&:save!)
@@ -47,7 +47,7 @@ class Converter::Quote
       hash[:tasklists_attributes] = build_tasklists
     end
 
-    ::Project::Base.new(permitted_attributes)
+    ::Project::Regular.new(permitted_attributes)
   end
 
   def compose_name

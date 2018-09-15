@@ -7,8 +7,10 @@ en:
             assignee:
               already_invited: "already invited"
               must_have_valid_rate: "must have valid rate"
-        project/template:
-          ? base
+  common:
+    copy: "Copy"
+    copy_in_brackets: "[Copy]"
+
   errors:
     messages:
       greater_than_start_date: "must be later than the start date"

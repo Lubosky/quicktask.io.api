@@ -6,7 +6,7 @@ module Inputs
         description ''
 
         argument :ownerId, types.ID, as: :owner_id
-        argument :projectId, types.ID, as: :project_id
+        argument :projectTemplateId, types.ID, as: :project_template_id
         argument :tasklistId, types.ID, as: :tasklist_id
 
         argument :sourceLanguageId, types.ID, as: :source_language_id

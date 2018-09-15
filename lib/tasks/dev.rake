@@ -47,6 +47,8 @@ namespace :dev do
     create_rates
     create_project_groups
     create_projects
+    create_template_tasklists
+    create_template_tasks
     create_tasklists
     create_tasks
     activate_projects
@@ -230,7 +232,25 @@ namespace :dev do
         ::ProjectTemplateBuilder.create_for(member.workspace_user, workspace)
       end
 
-      puts_project_template workspace
+      project_template_one = create(
+        :project_template,
+        owner: member,
+        workspace: workspace
+      )
+
+      project_template_two = create(
+        :project_template,
+        owner: member,
+        workspace: workspace
+      )
+
+      project_template_three = create(
+        :project_template,
+        owner: member,
+        workspace: workspace
+      )
+
+      puts_project_template(workspace)
     end
   end
 
@@ -372,7 +392,7 @@ namespace :dev do
   def activate_projects
     actions = ['prepare', 'plan', 'activate']
 
-    Project::Base.find_each do |project|
+    Project::Regular.find_each do |project|
       project.send("#{actions.sample}!")
     end
   end
@@ -478,7 +498,37 @@ namespace :dev do
         end
       end
 
+      workspace.project_templates.find_each do |template|
+        3.times do
+          create(
+            :tasklist,
+            owner: workspace&.team_members&.sample,
+            project: template,
+            workspace: workspace
+          )
+        end
+      end
+
       puts_tasklist workspace
+    end
+  end
+
+  def create_template_tasklists
+    header 'Template tasklists'
+
+    Workspace.active.find_each do |workspace|
+      workspace.project_templates.find_each do |template|
+        3.times do
+          create(
+            :tasklist,
+            owner: workspace&.team_members&.sample,
+            project: template,
+            workspace: workspace
+          )
+        end
+      end
+
+      puts_template_tasklist workspace
     end
   end
 
@@ -514,6 +564,39 @@ namespace :dev do
 
     print "\n"
     puts_task
+  end
+
+  def create_template_tasks
+    header 'Template tasks'
+    puts "Creating template tasks\u2026\n"
+    print "\n"
+
+    Tasklist.for_project_templates.includes(:project, :workspace).find_each do |tasklist|
+      workspace = tasklist.workspace
+
+      3.times do
+        print "\e[32m.\e[0m"
+
+        source_language = workspace.languages.sample
+        target_language = workspace.languages.where.not(id: source_language.id).sample
+
+        create(
+          :task,
+          tasklist: tasklist,
+          owner: workspace.team_members.sample,
+          project: tasklist.project,
+          workspace: workspace,
+          color: Task.colors.keys.sample,
+          source_language: source_language,
+          target_language: target_language,
+          task_type: workspace.task_types.sample,
+          unit: workspace.units.sample
+        )
+      end
+    end
+
+    print "\n"
+    puts_template_task
   end
 
   def create_hand_offs
@@ -744,8 +827,16 @@ namespace :dev do
     puts "\e[32mTasks created! ^_^\e[0m"
   end
 
+  def puts_template_task
+    puts "\e[32mTemplate tasks created! ^_^\e[0m"
+  end
+
   def puts_tasklist(workspace)
     puts "Tasklists for workspace: #{workspace.name}"
+  end
+
+  def puts_template_tasklist(workspace)
+    puts "Template tasklists for workspace: #{workspace.name}"
   end
 
   def puts_task_type(workspace)

@@ -2,7 +2,11 @@ ApplicationSchema = GraphQL::Schema.define do
   max_depth 7
 
   resolve_type ->(_type, root, _context) {
-    "Types::#{root.model_name}Type".safe_constantize
+    if root.respond_to?(:graphql_type)
+      "Types::#{root.graphql_type}Type".safe_constantize
+    else
+      "Types::#{root.model_name}Type".safe_constantize
+    end
   }
 
   # Last Instrumenter is executed as first, so ensure correct order

@@ -21,7 +21,7 @@ RSpec.describe Workspace, type: :model do
     it { is_expected.to have_many(:members).class_name('WorkspaceUser').with_foreign_key(:workspace_id) }
     it { is_expected.to have_many(:project_groups) }
     it { is_expected.to have_many(:project_templates).class_name('Project::Template') }
-    it { is_expected.to have_many(:projects).class_name('Project::Base') }
+    it { is_expected.to have_many(:projects).class_name('Project::Regular') }
     it { is_expected.to have_many(:quotes) }
     it { is_expected.to have_many(:rates) }
     it { is_expected.to have_many(:services) }

@@ -6,7 +6,7 @@ class TeamMember < ApplicationRecord
   belongs_to :workspace, inverse_of: :team_members, class_name: 'Workspace'
 
   with_options inverse_of: :owner, foreign_key: :owner_id do
-    has_many :projects, class_name: 'Project::Base'
+    has_many :projects, class_name: 'Project::Regular'
     has_many :tasklists
     has_many :tasks
   end

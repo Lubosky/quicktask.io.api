@@ -2,6 +2,7 @@ class Project::Template < Project
   set_project_type :template
 
   BLANK_NAME = ''.freeze
+  GRAPHQL_TYPE = 'ProjectTemplate'.freeze
 
   with_options optional: true do
     belongs_to :owner, class_name: 'TeamMember', foreign_key: :owner_id
@@ -26,6 +27,10 @@ class Project::Template < Project
   validates :name, presence: true, allow_blank: true
   with_options unless: :system_template do
     validates :template_name, :template_description, presence: true
+  end
+
+  def graphql_type
+    GRAPHQL_TYPE
   end
 
   private

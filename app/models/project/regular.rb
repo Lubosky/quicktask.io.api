@@ -1,5 +1,7 @@
-class Project::Base < Project
-  set_project_type :project
+class Project::Regular < Project
+  set_project_type :regular
+
+  GRAPHQL_TYPE = 'Project'.freeze
 
   with_options inverse_of: :projects do
     belongs_to :owner, class_name: 'TeamMember', foreign_key: :owner_id
@@ -26,7 +28,7 @@ class Project::Base < Project
   has_one :project_estimate, dependent: :destroy, foreign_key: :project_id
   has_one :quote, through: :project_estimate
 
-  default_scope { where(project_type: :project) }
+  default_scope { where(project_type: :regular) }
   scope :with_task_map, -> { select("projects.*, #{TaskMapQuery.query}") }
 
   validates :name, :client, :owner, presence: true
@@ -97,6 +99,10 @@ class Project::Base < Project
     end
   end
 
+  def graphql_type
+    GRAPHQL_TYPE
+  end
+
   def generate_quote
     Converter::Project.generate_quote(self, owner) unless self.quote
   end
@@ -107,7 +113,7 @@ class Project::Base < Project
     if respond_to?(:collection_map)
       collection = collection_map
     else
-      collection = ::Project::Base.where(id: id).
+      collection = ::Project::Regular.where(id: id).
         pluck(TaskMapQuery.query).
         first
     end

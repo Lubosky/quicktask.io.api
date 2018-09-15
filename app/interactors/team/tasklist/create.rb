@@ -1,5 +1,5 @@
 class Team::Tasklist::Create < ApplicationInteractor
-  object :project
+  object :parent, class: Project
 
   string :title
 
@@ -16,7 +16,7 @@ class Team::Tasklist::Create < ApplicationInteractor
   private
 
   def tasklist
-    @tasklist ||= project.tasklists.build(tasklist_attributes.except(:project))
+    @tasklist ||= parent.tasklists.build(tasklist_attributes.except(:parent))
   end
 
   def tasklist_attributes

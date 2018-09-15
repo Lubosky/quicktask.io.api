@@ -7,7 +7,7 @@ class ProjectGroup < ApplicationRecord
   end
 
   has_many :projects,
-           class_name: 'Project::Base',
+           class_name: 'Project::Regular',
            dependent: :restrict_with_error,
            inverse_of: :project_group
 

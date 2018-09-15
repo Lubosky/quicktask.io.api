@@ -1,7 +1,7 @@
 class Template::ProjectCloner < Clowne::Cloner
   adapter :active_record
 
-  init_as { |source, _target| ::Project::Base.new(workspace: source.workspace) }
+  init_as { |source, _target| ::Project::Regular.new(workspace: source.workspace) }
 
   include_association :tasklists, clone_with: ::Template::TasklistCloner, params: true
 
@@ -22,7 +22,7 @@ class Template::ProjectCloner < Clowne::Cloner
 
     record.owner = owner
     record.client = client
-    record.project_type = :project
+    record.project_type = :regular
     record.name = name
     record.status = :draft
     record.task_count = 0

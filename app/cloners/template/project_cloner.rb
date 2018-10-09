@@ -16,12 +16,21 @@ class Template::ProjectCloner < Clowne::Cloner
           :completed_date,
           :billed
 
-
-  finalize do |source, record, owner:, client:, name:|
+  finalize do |
+    source,
+    record,
+    owner:,
+    client_id:,
+    project_group_id: nil,
+    name:,
+    description: nil,
+    automated_workflow: true,
+    internal: false
+  |
     timestamp = Time.current.beginning_of_hour + 1.hour
 
     record.owner = owner
-    record.client = client
+    record.client_id = client_id
     record.project_type = :regular
     record.name = name
     record.status = :draft
@@ -29,6 +38,8 @@ class Template::ProjectCloner < Clowne::Cloner
     record.completed_task_count = 0
     record.completion_ratio = 0.0
     record.billed = false
+    record.automated_workflow = automated_workflow
+    record.internal = internal
     record.start_date = timestamp
 
     if source.start_date && source.due_date

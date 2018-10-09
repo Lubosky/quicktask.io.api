@@ -8,24 +8,7 @@ module Mutations
         argument :workspaceId, !types.ID, as: :workspace_id
         argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
 
-        argument :projectId, !types.ID, 'Globally unique ID of the project.', as: :project_id
-        argument :taskId, !types.ID, 'Globally unique ID of the task.', as: :task_id
-
-        authorize! ->(_obj, _args, ctx) {
-          ::Team::TaskPolicy.new(ctx[:current_workspace_user], ::Task).create?
-        }
-
-        resolve DuplicateTaskMutationResolver.new
-      end
-
-      DuplicateTemplateTaskMutation = GraphQL::Field.define do
-        type Types::TaskType
-        description 'Duplicates the task within a template.'
-
-        argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
-
-        argument :projectTemplateId, !types.ID, 'Globally unique ID of the project template.', as: :project_template_id
+        argument :tasklistId, !types.ID, 'Globally unique ID of the tasklist.', as: :tasklist_id
         argument :taskId, !types.ID, 'Globally unique ID of the task.', as: :task_id
 
         authorize! ->(_obj, _args, ctx) {
@@ -44,9 +27,11 @@ module Mutations
             :request
           )
 
+          task = ctx[:current_workspace].tasks.find_by(id: args[:task_id])
+
           inputs = {}.tap do |hash|
             hash[:context] = context
-            hash[:task_id] = args[:task_id]
+            hash[:task] = task
           end
 
           action = ::Team::Task::Duplicate.run(inputs)

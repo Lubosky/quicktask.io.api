@@ -38,6 +38,14 @@ Types::ProjectType = GraphQL::ObjectType.define do
     resolve ->(resource, _args, _ctx) { resource }
   end
 
+  field :hand_offs do
+    type types[Types::HandOffType]
+    description ''
+
+    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project::Regular, :hand_offs).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
   field :tasklists do
     type types[Types::TasklistType]
     description ''

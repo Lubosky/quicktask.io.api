@@ -16,6 +16,7 @@ class Project::Template < Project
     workflow_type: [:integer, default: nil]
 
   default_scope { where(project_type: :template) }
+  scope :except_system_templates, -> { metadata_where(system_template: false) }
   scope :with_task_map, -> { select("projects.*, #{TaskMapQuery.query}") }
 
   enum status: [:no_status, :draft]

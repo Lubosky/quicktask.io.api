@@ -11,6 +11,8 @@ class Team::HandOff::Create < ApplicationInteractor
         errors.merge!(hand_off.errors)
         rollback
       end
+
+      hand_off.tap(&:assign!) if hand_off.valid? && assign_directly?
     end
 
     token = HandOffToken.generate_for(hand_off).to_s

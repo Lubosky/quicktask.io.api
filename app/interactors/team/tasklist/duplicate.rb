@@ -1,8 +1,8 @@
-class Team::Task::Duplicate < ApplicationInteractor
-  object :task
+class Team::Tasklist::Duplicate < ApplicationInteractor
+  object :tasklist
 
   def execute
-    cloned = ::TaskCloner.call(task, clone_directly: true)
+    cloned = ::TasklistCloner.call(tasklist, clone_directly: true)
 
     transaction do
       unless cloned.save!

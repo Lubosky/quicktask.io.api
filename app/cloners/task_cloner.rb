@@ -5,9 +5,16 @@ class TaskCloner < Clowne::Cloner
 
   nullify :start_date, :due_date, :completed_date, :position, :status, :uuid
 
-  finalize do |source, record, _params|
+  finalize do |source, record, clone_directly: false|
+    cloned_title = [
+      source.title,
+      I18n.t('common.copy_in_brackets')
+    ].delete_if { |a| a.blank? }.join(' ').strip
+
+    title = clone_directly ? cloned_title : source.title
     timestamp = Time.current.beginning_of_hour + 1.hour
 
+    record.title = title
     record.start_date = timestamp
     record.status = :uncompleted
 

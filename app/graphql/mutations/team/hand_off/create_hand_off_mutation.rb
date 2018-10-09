@@ -38,7 +38,6 @@ module Mutations
 
           action = ::Team::HandOff::Create.run(inputs)
           if action.valid?
-            p action.result
             action.result
           else
             action.errors

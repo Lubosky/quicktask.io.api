@@ -12,11 +12,11 @@ Types::PurchaseOrderType = GraphQL::ObjectType.define do
 
     before_scope ->(obj, _args, _ctx) {
       if obj.owner_type == 'TeamMember'
-        AssociationLoader.for(TeamMember, :owner).load(obj)
+        AssociationLoader.for(PurchaseOrder, :owner).load(obj)
       elsif obj.owner_type == 'Contractor'
-        AssociationLoader.for(Contractor, :owner).load(obj)
+        AssociationLoader.for(PurchaseOrder, :owner).load(obj)
       elsif obj.owner_type == 'ClientContact'
-        AssociationLoader.for(ClientContact, :owner).load(obj)
+        AssociationLoader.for(PurchaseOrder, :owner).load(obj)
       end
     }
 
@@ -27,15 +27,15 @@ Types::PurchaseOrderType = GraphQL::ObjectType.define do
   field :issuer, Types::TeamMemberType do
     description ''
 
-    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(TeamMember, :issuer).load(obj) }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(PurchaseOrder, :issuer).load(obj) }
     resolve ->(resource, _args, _ctx) { resource }
   end
 
-  field :updater_id, !types.ID, 'Globally unique ID of the updater.'
+  field :updater_id, types.ID, 'Globally unique ID of the updater.'
   field :updater, Types::TeamMemberType do
     description ''
 
-    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(TeamMember, :updater).load(obj) }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(PurchaseOrder, :updater).load(obj) }
     resolve ->(resource, _args, _ctx) { resource }
   end
 
@@ -43,7 +43,7 @@ Types::PurchaseOrderType = GraphQL::ObjectType.define do
   field :hand_off, Types::HandOffType do
     description ''
 
-    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(HandOff, :hand_off).load(obj) }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(PurchaseOrder, :hand_off).load(obj) }
     resolve ->(resource, _args, _ctx) { resource }
   end
 
@@ -51,7 +51,7 @@ Types::PurchaseOrderType = GraphQL::ObjectType.define do
   field :workspace, Types::WorkspaceType do
     description ''
 
-    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :workspace).load(obj) }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(PurchaseOrder, :workspace).load(obj) }
     resolve ->(resource, _args, _ctx) { resource }
   end
 
@@ -61,6 +61,7 @@ Types::PurchaseOrderType = GraphQL::ObjectType.define do
   field :issue_date, Types::DateTimeType, 'The time at which this purchase order was issued.'
   field :billed, !types.Boolean, ''
   field :currency, Types::CurrencyType, 'The currency of the purchase order.'
+  field :currency_data, Types::JSONType, ''
   field :discount, !Types::BigDecimalType, ''
   field :surcharge, !Types::BigDecimalType, ''
   field :subtotal, !Types::BigDecimalType, ''

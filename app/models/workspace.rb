@@ -28,6 +28,7 @@ class Workspace < ApplicationRecord
     has_many :project_groups
     has_many :project_templates, class_name: '::Project::Template'
     has_many :projects, class_name: '::Project::Regular'
+    has_many :purchase_orders
     has_many :quotes
     has_many :rates, foreign_key: :workspace_id
     has_many :services

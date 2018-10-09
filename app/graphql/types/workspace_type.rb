@@ -55,7 +55,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
 
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :clients).load(obj) }
     resolve ->(promise, args, _ctx) {
-      promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
+      promise.then(proc { |collection| collection })
     }
   end
 
@@ -153,6 +153,23 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     }
 
     resolve ->(project_template, _args, _ctx) { project_template }
+  end
+
+  field :purchase_orders do
+    type types[!Types::PurchaseOrderType]
+    description ''
+
+    authorize ->(_obj, _args, ctx) {
+      ::Team::PurchaseOrderPolicy.new(ctx[:current_workspace_user], PurchaseOrder).index?
+    }
+
+    argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
+    argument :page, types.Int, 'Indicates the number of the page. All paginated queries start at page 1.'
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :purchase_orders).load(obj) }
+    resolve ->(promise, args, _ctx) {
+      promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
+    }
   end
 
   field :supported_currencies do

@@ -158,6 +158,16 @@ Types::TaskType = GraphQL::ObjectType.define do
     resolve ->(collection, _args, _ctx) { collection }
   end
 
+  field :hand_off, Types::HandOffType do
+    description ''
+
+    argument :hand_off_id, types.ID, 'Globally unique ID of the hand-off.'
+
+    resource ->(obj, args, _ctx) { obj.hand_offs.find(args[:hand_off_id]) }, pass_through: true
+    authorize! ->(hand_off, _args, ctx) { ::Team::HandOffPolicy.new(ctx[:current_workspace_user], hand_off).show? }
+    resolve ->(hand_off, _args, _ctx) { hand_off }
+  end
+
   field :pending_hand_offs do
     type types[!Types::HandOffType]
     description ''

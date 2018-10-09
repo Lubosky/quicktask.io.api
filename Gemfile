@@ -21,10 +21,11 @@ gem 'discriminator'
 gem 'geocoder'
 gem 'google-id-token'
 gem 'graphiql-rails'
+gem 'graphql'
 gem 'graphql-batch'
 gem 'graphql-errors'
+gem 'graphql-libgraphqlparser', require: 'graphql/libgraphqlparser'
 gem 'graphql-pundit'
-gem 'graphql'
 gem 'has_scope'
 gem 'hiredis'
 gem 'html-pipeline'
@@ -53,7 +54,7 @@ gem 'readthis'
 gem 'redis'
 gem 'rinku'
 gem 'sanitize'
-gem 'sass-rails'
+gem 'sassc-rails'
 gem 'sentry-raven'
 gem 'sidekiq'
 gem 'sidekiq-unique-jobs'
@@ -67,7 +68,7 @@ group :development, :test do
   gem 'dotenv-rails'
   gem 'faker'
   gem 'marginalia'
-  gem 'rubocop', '~> 0.51.0', require: false
+  gem 'rubocop'
 end
 
 group :development do
@@ -85,6 +86,7 @@ group :test do
   gem 'rspec-collection_matchers'
   gem 'rspec-its'
   gem 'rspec-rails'
+  gem 'rubocop-rspec'
   gem 'shoulda-matchers'
   gem 'simplecov', require: false
   gem 'stripe-ruby-mock', require: 'stripe_mock'

@@ -11,8 +11,8 @@
     text-decoration: none !important
 
   +mq($max, $mobile-screen)
-    @extend .auto-width-on-mobile
     display: block !important
+    width: auto !important
 
   @each $name, $color in (primary: $green, secondary: $purple)
     &--#{$name}

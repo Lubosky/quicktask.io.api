@@ -498,17 +498,6 @@ namespace :dev do
         end
       end
 
-      workspace.project_templates.find_each do |template|
-        3.times do
-          create(
-            :tasklist,
-            owner: workspace&.team_members&.sample,
-            project: template,
-            workspace: workspace
-          )
-        end
-      end
-
       puts_tasklist workspace
     end
   end
@@ -517,7 +506,7 @@ namespace :dev do
     header 'Template tasklists'
 
     Workspace.active.find_each do |workspace|
-      workspace.project_templates.find_each do |template|
+      workspace.project_templates.except_system_templates.find_each do |template|
         3.times do
           create(
             :tasklist,
@@ -572,6 +561,8 @@ namespace :dev do
     print "\n"
 
     Tasklist.for_project_templates.includes(:project, :workspace).find_each do |tasklist|
+      next if tasklist&.project&.project_type == 'template' && tasklist&.project&.system_template?
+
       workspace = tasklist.workspace
 
       3.times do

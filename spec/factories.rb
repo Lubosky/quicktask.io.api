@@ -26,14 +26,14 @@ FactoryBot.define do
   factory :client do
     uuid
     name
-    currency :usd
+    currency { :usd }
     workspace
   end
 
   factory :client_contact do
     uuid
-    first_name Faker::Name.first_name
-    last_name Faker::Name.last_name
+    first_name { Faker::Name.first_name }
+    last_name { Faker::Name.last_name }
     email
     association :client, factory: :client
     association :workspace, factory: :workspace
@@ -41,10 +41,10 @@ FactoryBot.define do
 
   factory :client_request, class: ClientRequest::Other do
     uuid
-    subject Faker::Job.title
-    start_date DateTime.current
-    due_date DateTime.current + 5.hours
-    unit_count 10
+    subject { Faker::Job.title }
+    start_date { DateTime.current }
+    due_date { DateTime.current + 5.hours }
+    unit_count { 10 }
 
     workspace
     client
@@ -60,13 +60,13 @@ FactoryBot.define do
   factory :contractor do
     uuid
     email
-    currency :usd
+    currency { :usd }
     association :workspace, factory: :workspace
   end
 
   factory :hand_off do
     uuid
-    rate_applied Random.rand(0.99...99.99)
+    rate_applied { Random.rand(0.99...99.99) }
 
     association :assignee, factory: :contractor
     association :assigner, factory: :team_member
@@ -74,34 +74,34 @@ FactoryBot.define do
     association :workspace, factory: :workspace
 
     trait :accepted do
-      accepted_at DateTime.current
+      accepted_at { DateTime.current }
     end
 
     trait :rejected do
-      rejected_at DateTime.current
+      rejected_at { DateTime.current }
     end
 
     trait :expired do
-      expired_at DateTime.current
+      expired_at { DateTime.current }
     end
 
     trait :cancelled do
-      cancelled_at DateTime.current
+      cancelled_at { DateTime.current }
       association :canceller, factory: :team_member
     end
   end
 
   factory :language, aliases: [:source_language, :target_language] do
     uuid
-    code :en
+    code { :en }
     name
     association :workspace, factory: :workspace
   end
 
   factory :line_item do
     uuid
-    quantity 10
-    unit_price 10
+    quantity { 10 }
+    unit_price { 10 }
 
     workspace
     association :bookkeepable, factory: :quote
@@ -114,15 +114,15 @@ FactoryBot.define do
 
   factory :membership, aliases: [:active_membership] do
     uuid
-    quantity 1
-    status :trialing
+    quantity { 1 }
+    status { :trialing }
     association :owner, factory: :user
     association :workspace
     plan { Plan.first || create(:plan) }
 
     factory :inactive_membership do
       deactivated_on { Time.zone.today }
-      status :deactivated
+      status { :deactivated }
 
       factory :paused_membership_restarting_today do
         scheduled_for_reactivation_on { Time.zone.today }
@@ -141,51 +141,51 @@ FactoryBot.define do
 
   factory :plan do
     uuid
-    name 'Airborne Bucket [M]'
-    stripe_plan_id 'tms.GliderPath.AirborneBucket.Monthly'
-    price 29.99
-    range 1..5
-    billing_interval 'month'
-    trial_period_days 14
+    name { 'Airborne Bucket [M]' }
+    stripe_plan_id { 'tms.GliderPath.AirborneBucket.Monthly' }
+    price { 29.99 }
+    range { 1..5 }
+    billing_interval { 'month' }
+    trial_period_days { 14 }
 
     trait :with_range_up_to_15 do
-      name 'Soaring Bucket [M]'
-      stripe_plan_id 'tms.GliderPath.SoaringBucket.Monthly'
-      price 26.99
-      range 6..15
-      billing_interval 'month'
+      name { 'Soaring Bucket [M]' }
+      stripe_plan_id { 'tms.GliderPath.SoaringBucket.Monthly' }
+      price { 26.99 }
+      range { 6..15 }
+      billing_interval { 'month' }
     end
 
     trait :with_range_up_to_100 do
-      name 'Cruising Bucket [M]'
-      stripe_plan_id 'tms.GliderPath.CruisingBucket.Monthly'
-      price 23.99
-      range 16..100
-      billing_interval 'month'
+      name { 'Cruising Bucket [M]' }
+      stripe_plan_id { 'tms.GliderPath.CruisingBucket.Monthly' }
+      price { 23.99 }
+      range { 16..100 }
+      billing_interval { 'month' }
     end
 
     trait :annual do
-      name 'Airborne Bucket [A]'
-      stripe_plan_id 'tms.GliderPath.AirborneBucket.Annually'
-      price 299.00
-      range 1..5
-      billing_interval 'year'
+      name { 'Airborne Bucket [A]' }
+      stripe_plan_id { 'tms.GliderPath.AirborneBucket.Annually' }
+      price { 299.00 }
+      range { 1..5 }
+      billing_interval { 'year' }
     end
 
     trait :annual_with_range_up_to_15 do
-      name 'Soaring Bucket [A]'
-      stripe_plan_id 'tms.GliderPath.SoaringBucket.Annually'
-      price 269.00
-      range 6..15
-      billing_interval 'year'
+      name { 'Soaring Bucket [A]' }
+      stripe_plan_id { 'tms.GliderPath.SoaringBucket.Annually' }
+      price { 269.00 }
+      range { 6..15 }
+      billing_interval { 'year' }
     end
 
     trait :annual_with_range_up_to_100 do
-      name 'Cruising Bucket [A]'
-      stripe_plan_id 'tms.GliderPath.CruisingBucket.Annually'
-      price 239.00
-      range 16..100
-      billing_interval 'year'
+      name { 'Cruising Bucket [A]' }
+      stripe_plan_id { 'tms.GliderPath.CruisingBucket.Annually' }
+      price { 239.00 }
+      range { 16..100 }
+      billing_interval { 'year' }
     end
   end
 
@@ -199,7 +199,7 @@ FactoryBot.define do
   factory :project, class: Project::Regular do
     uuid
     name
-    project_type :regular
+    project_type { :regular }
 
     association :client
     association :owner, factory: :team_member
@@ -210,38 +210,38 @@ FactoryBot.define do
     uuid
     name
     template_name
-    template_description Faker::Lorem.paragraph
-    project_type :template
+    template_description { Faker::Lorem.paragraph }
+    project_type { :template }
 
     association :workspace
   end
 
   factory :quote do
     uuid
-    subject Faker::Job.title
-    status :draft
-    issue_date DateTime.current
-    expiry_date DateTime.current + 7.days
-    start_date DateTime.current
-    due_date DateTime.current + 1.days
+    subject { Faker::Job.title }
+    status { :draft }
+    issue_date { DateTime.current }
+    expiry_date { DateTime.current + 7.days }
+    start_date { DateTime.current }
+    due_date { DateTime.current + 1.days }
 
     association :workspace, factory: :workspace
     association :client, factory: :client
     association :owner, factory: :team_member
 
     trait :with_discount do
-      discount 10
+      discount { 10 }
     end
 
     trait :with_surcharge do
-      surcharge 10
+      surcharge { 10 }
     end
   end
 
   factory :role, class: Role::Base do
     uuid
     name
-    permission_level :member
+    permission_level { :member }
     association :workspace, factory: :workspace
 
     factory :client_role, class: Role::Client
@@ -251,7 +251,7 @@ FactoryBot.define do
 
   factory :service do
     uuid
-    classification :translation
+    classification { :translation }
     name
     association :workspace, factory: :workspace
   end
@@ -262,7 +262,7 @@ FactoryBot.define do
     association :workspace, factory: :workspace
 
     trait :default do
-      default true
+      default { true }
     end
   end
 
@@ -279,10 +279,10 @@ FactoryBot.define do
     uuid
     title
 
-    color :no_color
+    color { :no_color }
 
-    start_date DateTime.current
-    due_date DateTime.current + 1.day
+    start_date { DateTime.current }
+    due_date { DateTime.current + 1.day }
 
     association :owner, factory: :team_member
     association :tasklist, factory: :tasklist
@@ -297,31 +297,31 @@ FactoryBot.define do
   factory :task_type do
     uuid
     name
-    classification :translation
+    classification { :translation }
     workspace
 
     trait :billable do
-      billable true
+      billable { true }
     end
 
     trait :internal do
-      internal true
+      internal { true }
     end
 
     trait :preferred do
-      preferred true
+      preferred { true }
     end
 
     trait :interpreting do
-      classification :interpreting
+      classification { :interpreting }
     end
 
     trait :localization do
-      classification :localization
+      classification { :localization }
     end
 
     trait :other do
-      classification :other
+      classification { :other }
     end
   end
 
@@ -335,13 +335,13 @@ FactoryBot.define do
     uuid
     title
 
-    due_date DateTime.current + 1.day
+    due_date { DateTime.current + 1.day }
 
     association :task, factory: :task
     association :workspace, factory: :workspace
 
     trait :completed do
-      completed true
+      completed { true }
     end
 
     trait :with_assignee do
@@ -351,8 +351,8 @@ FactoryBot.define do
 
   factory :token do
     association :user, factory: :user
-    issued_at Time.current
-    expiry_date Time.current + 12.hours
+    issued_at { Time.current }
+    expiry_date { Time.current + 12.hours }
   end
 
   factory :unit do
@@ -364,29 +364,29 @@ FactoryBot.define do
   factory :user do
     uuid
     email
-    password 'p@ssword'
-    first_name Faker::Name.first_name
-    last_name Faker::Name.last_name
+    password { 'p@ssword' }
+    first_name { Faker::Name.first_name }
+    last_name { Faker::Name.last_name }
 
     trait :with_google do
       google_uid
-      password 'p@ssword'
-      password_automatically_set true
+      password { 'p@ssword' }
+      password_automatically_set { true }
     end
 
     trait :confirmed_user do
-      email_confirmed true
+      email_confirmed { true }
     end
 
     trait :deactivated_user do
-      deactivated_at Time.current
+      deactivated_at { Time.current }
     end
   end
 
   factory :workspace do
     uuid
     name
-    currency :usd
+    currency { :usd }
     association :owner, factory: :user
 
     after :create do |instance|
@@ -394,8 +394,8 @@ FactoryBot.define do
     end
 
     trait :with_inactive_membership do
-      status :deactivated
-      stripe_customer_id "customer123"
+      status { :deactivated }
+      stripe_customer_id { "customer123" }
 
       after :create do |instance|
         create(:inactive_membership, workspace: instance)
@@ -403,7 +403,7 @@ FactoryBot.define do
     end
 
     trait :with_membership do
-      status :active
+      status { :active }
 
       transient do
         plan { create(:plan) }
@@ -428,7 +428,7 @@ FactoryBot.define do
 
   factory :workspace_currency do
     uuid
-    code :jpy
+    code { :jpy }
     association :workspace, factory: :workspace
   end
 

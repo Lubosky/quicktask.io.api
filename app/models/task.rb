@@ -36,6 +36,27 @@ class Task < ApplicationRecord
     has_one :accepted_purchase_order, class_name: 'PurchaseOrder', through: :assignment, source: :purchase_order
   end
 
+  with_options class_name: 'TaskDependency', dependent: :destroy do
+    has_many :dependent_task_relations, foreign_key: :dependent_on_task_id, inverse_of: :precedent_task
+    has_many :precedent_task_relations, foreign_key: :task_id, inverse_of: :dependent_task
+  end
+
+  with_options class_name: 'Task' do
+    has_many :dependent_tasks, through: :dependent_task_relations do
+      def << (dependent_tasks)
+        dependent_tasks -= self if dependent_tasks.respond_to?(:to_a)
+        super dependent_tasks unless include?(dependent_tasks)
+      end
+    end
+
+    has_many :precedent_tasks, through: :precedent_task_relations do
+      def << (precedent_tasks)
+        precedent_tasks -= self if precedent_tasks.respond_to?(:to_a)
+        super precedent_tasks unless include?(precedent_tasks)
+      end
+    end
+  end
+
   has_many :potential_assignees,
            ->(task) { where(id: PotentialAssigneesQuery.build_query(task)) },
            through: :workspace,
@@ -71,10 +92,8 @@ class Task < ApplicationRecord
 
   acts_as_list scope: :tasklist, top_of_list: 0
 
-  alias :following_task :lower_item
-  alias :following_tasks :lower_items
-  alias :precedent_task :higher_item
-  alias :precedent_tasks :higher_items
+  alias :prior_task :higher_item
+  alias :next_task :lower_item
 
   counter_culture :project,
                   column_name: :task_count,
@@ -89,7 +108,7 @@ class Task < ApplicationRecord
                   column_name: proc { |r| r.completed? ? 'completed_task_count' : nil },
                   touch: true
 
-  default_scope { joins(:task_type).preload(:task_type).order(:tasklist_id, :position) }
+  default_scope { order(:tasklist_id, :position) }
 
   scope :with_status, ->(status) { where(status: status) }
   scope :except_status, ->(status) { where.not(status: status) }
@@ -221,6 +240,24 @@ class Task < ApplicationRecord
         map(&:to_sym).
         each { |f| hash[f] = send("#{f}") }
     end
+  end
+
+  def blocked_by
+    case project.workflow_type.to_sym
+    when :default then [prior_task].compact
+    when :custom then precedent_tasks
+    else [] end
+  end
+
+  def blocking
+    case project.workflow_type.to_sym
+    when :default then [next_task].compact
+    when :custom then dependent_tasks
+    else [] end
+  end
+
+  def remove_dependencies
+    TaskDependency.for_task(self).delete_all
   end
 
   private

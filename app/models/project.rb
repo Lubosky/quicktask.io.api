@@ -8,6 +8,8 @@
     has_many :tasks, through: :tasklists
   end
 
+  has_many :task_dependencies, through: :tasks, source: :precedent_task_relations
+
   discriminate Project, on: :project_type
 
   enum workflow_type: [:none, :default, :custom], _prefix: true
@@ -24,6 +26,8 @@
     self.workflow_type ||= :default
   end
 
+  after_save :remove_task_dependencies, if: :workflow_has_changed?
+
   scope :with_preloaded, -> {
     joins(tasklists: { tasks: [:task_type, :todos] }).
       preload(tasklists: { tasks: [:task_type, :todos] })
@@ -39,8 +43,16 @@
     workflow_type.in?(['default', 'custom'])
   end
 
+  def workflow_has_changed?
+    saved_change_to_workflow_type? && workflow_type_before_last_save === 'custom'
+  end
+
   def is_internal?
     internal?
+  end
+
+  def remove_task_dependencies
+    TaskDependency.where(task_id: task_ids).delete_all
   end
 
   def ordered_tasklist_ids

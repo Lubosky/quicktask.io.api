@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_08_12_083558) do
+ActiveRecord::Schema.define(version: 2018_10_09_145246) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -509,6 +509,14 @@ ActiveRecord::Schema.define(version: 2018_08_12_083558) do
     t.index ["workspace_id"], name: "index_specializations_on_workspace_id"
   end
 
+  create_table "task_dependencies", id: false, force: :cascade do |t|
+    t.bigint "task_id", null: false
+    t.bigint "dependent_on_task_id", null: false
+    t.index ["dependent_on_task_id"], name: "index_task_dependencies_on_dependent_on_task_id"
+    t.index ["task_id", "dependent_on_task_id"], name: "index_task_dependencies_on_task_id_and_dependent_on_task_id"
+    t.index ["task_id"], name: "index_task_dependencies_on_task_id"
+  end
+
   create_table "task_types", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
     t.string "uuid", limit: 24, null: false
     t.bigint "workspace_id", null: false
@@ -660,4 +668,6 @@ ActiveRecord::Schema.define(version: 2018_08_12_083558) do
   add_foreign_key "service_tasks", "services"
   add_foreign_key "service_tasks", "task_types"
   add_foreign_key "specialization_relations", "specializations"
+  add_foreign_key "task_dependencies", "tasks"
+  add_foreign_key "task_dependencies", "tasks", column: "dependent_on_task_id"
 end

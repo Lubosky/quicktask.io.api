@@ -5,11 +5,11 @@ class Team::ProjectTemplate::Update < ApplicationInteractor
 
   string :template_name, default: nil
   string :template_description, default: nil
+  string :workflow_type, default: nil
 
   string :description, default: nil
   string :identifier, default: nil
 
-  boolean :automated_workflow, default: true
   boolean :internal, default: false
 
   def execute

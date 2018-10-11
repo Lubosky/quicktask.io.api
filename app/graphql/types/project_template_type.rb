@@ -11,7 +11,9 @@ Types::ProjectTemplateType = GraphQL::ObjectType.define do
   field :template_name, types.String, 'Name of the project template.'
   field :template_description, types.String, 'Description of the project template.'
   field :system_template, types.Boolean, ''
-  field :workflow_type, types.String, ''
+  field :workflow_template, types.String, ''
+
+  field :workflow_type, Types::WorkflowType, ''
 
   field :identifier, types.String, ''
 
@@ -22,7 +24,6 @@ Types::ProjectTemplateType = GraphQL::ObjectType.define do
 
   field :task_count, types.Int, 'Count of the tasks.'
 
-  field :automated_workflow, types.Boolean, ''
   field :internal, types.Boolean, 'Indicates whether the created project will be for internal or for external client.'
 
   field :ordered_tasklist_ids, types[types.String], ''

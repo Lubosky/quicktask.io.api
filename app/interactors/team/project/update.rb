@@ -8,12 +8,12 @@ class Team::Project::Update < ApplicationInteractor
   string :name, default: nil
   string :description, default: nil
   string :identifier, default: nil
+  string :workflow_type, default: nil
 
   date_time :start_date, default: nil
   date_time :due_date, default: nil
   date_time :completed_date, default: nil
 
-  boolean :automated_workflow, default: true
   boolean :internal, default: false
 
   def execute

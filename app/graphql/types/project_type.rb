@@ -14,6 +14,7 @@ Types::ProjectType = GraphQL::ObjectType.define do
   field :name, types.String, 'Name of the project'
   field :description, types.String, 'Description of the project.'
   field :status, types.String, 'The status of the project.'
+  field :workflow_type, Types::WorkflowType, ''
   field :start_date, Types::DateTimeType, 'Start date of the project.'
   field :due_date, Types::DateTimeType, 'Due date of the project.'
   field :completed_date, Types::DateTimeType, 'Completed date of the project.'
@@ -21,7 +22,6 @@ Types::ProjectType = GraphQL::ObjectType.define do
   field :completed_task_count, types.Int, 'Count of the completed tasks.'
   field :completion_ratio, types.Float, ''
   field :billed, types.Boolean, 'Indicates whether the project is billed or not.'
-  field :automated_workflow, types.Boolean, ''
   field :internal, types.Boolean, 'Indicates whether this project is internal or for external client.'
 
   field :ordered_tasklist_ids, types[types.String], ''

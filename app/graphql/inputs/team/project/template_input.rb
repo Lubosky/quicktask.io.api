@@ -6,11 +6,11 @@ module Inputs
         description ''
 
         argument :templateName, types.String, as: :template_name
-        argument :templateDescription, types.String, as: :template_description
+        argument :templateDescription, types.String
+        argument :workflowType, Types::WorkflowType, as: :template_description
         argument :description, types.String
         argument :identifier, types.String
         argument :internal, types.Boolean
-        argument :automatedWorkflow, types.Boolean, as: :automated_workflow
       end
     end
   end

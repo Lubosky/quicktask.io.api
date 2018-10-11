@@ -6,12 +6,12 @@ class Team::Project::Create < ApplicationInteractor
   string :name
   string :description, default: nil
   string :identifier, default: nil
+  string :workflow_type, default: nil
 
   date_time :start_date, default: nil
   date_time :due_date, default: nil
   date_time :completed_date, default: nil
 
-  boolean :automated_workflow, default: true
   boolean :internal, default: false
 
   def execute
@@ -51,7 +51,7 @@ class Team::Project::Create < ApplicationInteractor
       :project_group_id,
       :name,
       :description,
-      :automated_workflow,
+      :workflow_type,
       :internal
     )
   end

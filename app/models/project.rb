@@ -10,15 +10,19 @@
 
   discriminate Project, on: :project_type
 
+  enum workflow_type: [:none, :default, :custom], _prefix: true
+
   jsonb_accessor :settings,
-    automated_workflow: [:boolean, default: true],
     internal: [:boolean, default: false]
 
   accepts_nested_attributes_for :tasklists,
                                 allow_destroy: true,
                                 reject_if: ->(o) { o['title'].blank? }
 
-  after_initialize { self.status ||= :draft }
+  after_initialize do
+    self.status ||= :draft
+    self.workflow_type ||= :default
+  end
 
   scope :with_preloaded, -> {
     joins(tasklists: { tasks: [:task_type, :todos] }).
@@ -32,7 +36,7 @@
   end
 
   def has_automated_workflow?
-    automated_workflow?
+    workflow_type.in?(['default', 'custom'])
   end
 
   def is_internal?

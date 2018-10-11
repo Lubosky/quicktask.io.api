@@ -1,11 +1,11 @@
 class Team::ProjectTemplate::Create < ApplicationInteractor
   string :template_name
   string :template_description, default: nil
+  string :workflow_type, default: nil
 
   string :description, default: nil
   string :identifier, default: nil
 
-  boolean :automated_workflow, default: true
   boolean :internal, default: false
 
   def execute

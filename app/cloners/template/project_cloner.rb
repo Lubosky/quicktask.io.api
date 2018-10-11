@@ -24,7 +24,6 @@ class Template::ProjectCloner < Clowne::Cloner
     project_group_id: nil,
     name:,
     description: nil,
-    automated_workflow: true,
     internal: false
   |
     timestamp = Time.current.beginning_of_hour + 1.hour
@@ -38,7 +37,6 @@ class Template::ProjectCloner < Clowne::Cloner
     record.completed_task_count = 0
     record.completion_ratio = 0.0
     record.billed = false
-    record.automated_workflow = automated_workflow
     record.internal = internal
     record.start_date = timestamp
 

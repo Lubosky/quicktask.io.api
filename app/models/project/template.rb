@@ -13,14 +13,14 @@ class Project::Template < Project
     template_name: [:string, default: nil],
     template_description: [:string, default: nil],
     system_template: [:boolean, default: false],
-    workflow_type: [:integer, default: nil]
+    workflow_template: [:integer, default: nil]
 
   default_scope { where(project_type: :template) }
   scope :except_system_templates, -> { metadata_where(system_template: false) }
   scope :with_task_map, -> { select("projects.*, #{TaskMapQuery.query}") }
 
   enum status: [:no_status, :draft]
-  enum workflow_type: [:kanban, :team, :weekday]
+  enum workflow_template: [:kanban, :team, :weekday]
 
   before_validation { self.name ||= BLANK_NAME }
   before_destroy :check_deletable

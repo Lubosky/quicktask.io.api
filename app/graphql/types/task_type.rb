@@ -151,6 +151,12 @@ Types::TaskType = GraphQL::ObjectType.define do
     resolve ->(resource, _args, _ctx) { resource }
   end
 
+  field :tags, types[!Types::TagType] do
+    description ''
+    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Task, :tags).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
   field :todos, types[!Types::TodoType] do
     description ''
     before_scope ->(obj, _args, ctx) { AssociationLoader.for(Task, :todos).load(obj) }

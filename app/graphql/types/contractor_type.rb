@@ -45,5 +45,11 @@ Types::ContractorType = GraphQL::ObjectType.define do
     resolve ->(collection, _args, _ctx) {
       collection
     }
+
+    field :tags, types[!Types::TagType] do
+      description ''
+      before_scope ->(obj, _args, ctx) { AssociationLoader.for(Contractor, :tags).load(obj) }
+      resolve ->(collection, _args, _ctx) { collection }
+    end
   end
 end

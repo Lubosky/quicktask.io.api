@@ -13,6 +13,12 @@ Types::ClientType = GraphQL::ObjectType.define do
   field :currency, Types::CurrencyType, 'The currency of the client.'
   field :tax_number, types.String, 'The tax number of the client.'
 
+  field :tags, types[!Types::TagType] do
+    description ''
+    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Client, :tags).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
   field :created_at, Types::DateTimeType, 'The time at which this record was created.'
   field :updated_at, Types::DateTimeType, 'The time at which this record was last modified.'
   field :deleted_at, Types::DateTimeType, 'The time at which this record was deleted.'

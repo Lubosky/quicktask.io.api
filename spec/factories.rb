@@ -266,6 +266,20 @@ FactoryBot.define do
     end
   end
 
+  factory :tagging do
+    uuid
+
+    association :workspace
+    association :taggable, factory: :task
+    association :tag, factory: :tag
+  end
+
+  factory :tag do
+    uuid
+    name
+    association :workspace, factory: :workspace
+  end
+
   factory :tasklist do
     uuid
     title

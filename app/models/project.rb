@@ -1,5 +1,5 @@
  class Project < ApplicationRecord
-  include EnsureUUID
+  include EnsureUUID, Taggable
 
   belongs_to :workspace, inverse_of: :projects
 

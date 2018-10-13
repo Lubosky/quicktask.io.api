@@ -34,6 +34,8 @@ class Workspace < ApplicationRecord
     has_many :services
     has_many :specializations, foreign_key: :workspace_id
     has_many :supported_currencies, class_name: 'WorkspaceCurrency', foreign_key: :workspace_id
+    has_many :taggings
+    has_many :tags
     has_many :task_types
     has_many :tasklists
     has_many :tasks

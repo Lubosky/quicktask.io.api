@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_09_145246) do
+ActiveRecord::Schema.define(version: 2018_10_11_211036) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -507,6 +507,35 @@ ActiveRecord::Schema.define(version: 2018_10_09_145246) do
     t.datetime "deleted_at"
     t.index ["uuid"], name: "index_specializations_on_uuid", unique: true
     t.index ["workspace_id"], name: "index_specializations_on_workspace_id"
+  end
+
+  create_table "taggings", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "workspace_id", null: false
+    t.bigint "tag_id", null: false
+    t.string "taggable_type", null: false
+    t.bigint "taggable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["tag_id"], name: "index_taggings_on_tag_id"
+    t.index ["taggable_type", "taggable_id", "tag_id"], name: "index_taggings_on_taggable_type_and_taggable_id_and_tag_id"
+    t.index ["taggable_type", "taggable_id"], name: "index_taggings_on_taggable_type_and_taggable_id"
+    t.index ["workspace_id", "taggable_type", "taggable_id", "tag_id"], name: "index_unique_taggings", unique: true
+    t.index ["workspace_id"], name: "index_taggings_on_workspace_id"
+  end
+
+  create_table "tags", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.bigint "workspace_id", null: false
+    t.string "name", null: false
+    t.integer "color"
+    t.integer "tagging_count", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["name"], name: "index_tags_on_name"
+    t.index ["workspace_id", "name", "deleted_at"], name: "index_tags_on_workspace_id_and_name_and_deleted_at", unique: true
+    t.index ["workspace_id"], name: "index_tags_on_workspace_id"
   end
 
   create_table "task_dependencies", id: false, force: :cascade do |t|

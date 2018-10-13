@@ -1,5 +1,5 @@
 class Task < ApplicationRecord
-  include BelongsDirectly, EnsureUUID, HasLocation
+  include BelongsDirectly, EnsureUUID, HasLocation, Taggable
 
   TRANSLATION_FIELDS = %w(source_language_id target_language_id task_type_id unit_id)
   INTERPRETING_FIELDS = %w(location source_language_id target_language_id task_type_id unit_id)

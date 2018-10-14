@@ -17,7 +17,6 @@ class Project::Template < Project
 
   default_scope { where(project_type: :template) }
   scope :except_system_templates, -> { metadata_where(system_template: false) }
-  scope :with_task_map, -> { select("projects.*, #{TaskMapQuery.query}") }
 
   enum status: [:no_status, :draft]
   enum workflow_template: [:kanban, :team, :weekday]
@@ -35,18 +34,6 @@ class Project::Template < Project
   end
 
   private
-
-  def ordered_task_map
-    if respond_to?(:collection_map)
-      collection = collection_map
-    else
-      collection = ::Project::Template.where(id: id).
-        pluck(TaskMapQuery.query).
-        first
-    end
-
-    collection ? collection.reduce(Hash.new, :merge) : Hash.new
-  end
 
   def check_deletable
     if self.system_template?

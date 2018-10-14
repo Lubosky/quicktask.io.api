@@ -54,12 +54,4 @@
   def remove_task_dependencies
     TaskDependency.where(task_id: task_ids).delete_all
   end
-
-  def ordered_tasklist_ids
-    ordered_task_map.keys
-  end
-
-  def ordered_task_ids
-    ordered_task_map
-  end
 end

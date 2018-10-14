@@ -101,7 +101,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
 
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :projects).load(obj) }
     resolve ->(promise, args, _ctx) {
-      promise.then(proc { |collection| collection.with_task_map.page(args[:page]).per(args[:limit]) })
+      promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
     }
   end
 
@@ -111,7 +111,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     argument :project_id, types.ID, 'Globally unique ID of the project.'
 
     resource ->(obj, args, _ctx) {
-      obj.projects.with_task_map.find(args[:project_id])
+      obj.projects.find(args[:project_id])
     }, pass_through: true
 
     authorize! ->(project, _args, ctx) {
@@ -135,7 +135,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
 
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :project_templates).load(obj) }
     resolve ->(promise, args, _ctx) {
-      promise.then(proc { |collection| collection.with_task_map.page(args[:page]).per(args[:limit]) })
+      promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
     }
   end
 
@@ -145,7 +145,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     argument :project_template_id, types.ID, 'Globally unique ID of the project template.'
 
     resource ->(obj, args, _ctx) {
-      obj.project_templates.with_task_map.find(args[:project_template_id])
+      obj.project_templates.find(args[:project_template_id])
     }, pass_through: true
 
     authorize! ->(project_template, _args, ctx) {

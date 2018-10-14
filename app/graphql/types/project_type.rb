@@ -24,8 +24,33 @@ Types::ProjectType = GraphQL::ObjectType.define do
   field :billed, types.Boolean, 'Indicates whether the project is billed or not.'
   field :internal, types.Boolean, 'Indicates whether this project is internal or for external client.'
 
-  field :ordered_tasklist_ids, types[types.String], ''
-  field :ordered_task_ids, Types::JSONType, ''
+  field :tasklist_ids, types[types.String] do
+    description ''
+
+    before_scope ->(obj, _args, _ctx) {
+      AssociationLoader.for(Project::Regular, :tasklists).load(obj).then(&:ids)
+    }
+    resolve ->(ids, _args, _ctx) { ids }
+  end
+
+  field :task_ids, Types::JSONType do
+    description ''
+
+    before_scope ->(obj, _args, ctx) {
+      Promise.all([
+        AssociationLoader.for(Project::Regular, :tasklists).load(obj),
+        AssociationLoader.for(Project::Regular, :tasks).load(obj),
+      ]).then do |result|
+        keys = result.first.ids
+        tasks = result.last.group_by(&:tasklist_id)
+
+        keys.each_with_object({}) do |key, hash|
+          hash[key] = tasks[key] ? tasks[key].map { |task| task.id.to_s } : []
+        end
+      end
+    }
+    resolve ->(result, _args, _ctx) { result.then { |values| values } }
+  end
 
   field :created_at, Types::DateTimeType, 'The time at which this project was created.'
   field :updated_at, Types::DateTimeType, 'The time at which this project was last modified.'

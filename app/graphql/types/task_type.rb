@@ -11,8 +11,6 @@ Types::TaskType = GraphQL::ObjectType.define do
   field :workspace_id, !types.ID, 'Globally unique ID of the workspace.'
 
   field :source_language_id, types.ID, 'Globally unique ID of the language.'
-  field :source_language_name, types.String, ''
-  field :source_language_code, types.String, ''
   field :source_language, Types::LanguageType do
     description ''
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :source_language).load(obj) }
@@ -20,8 +18,6 @@ Types::TaskType = GraphQL::ObjectType.define do
   end
 
   field :target_language_id, types.ID, 'Globally unique ID of the language.'
-  field :target_language_name, types.String, ''
-  field :target_language_code, types.String, ''
   field :target_language, Types::LanguageType do
     description ''
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :target_language).load(obj) }
@@ -29,8 +25,6 @@ Types::TaskType = GraphQL::ObjectType.define do
   end
 
   field :task_type_id, types.ID, 'Globally unique ID of the task type.'
-  field :task_type_name, types.String, ''
-  field :task_type_classification, types.String, ''
   field :task_type, Types::TaskTypeType do
     description ''
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :task_type).load(obj) }
@@ -38,7 +32,6 @@ Types::TaskType = GraphQL::ObjectType.define do
   end
 
   field :unit_id, types.ID, 'Globally unique ID of the unit.'
-  field :unit_name, types.String, ''
   field :unit, Types::UnitType do
     description ''
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :unit).load(obj) }

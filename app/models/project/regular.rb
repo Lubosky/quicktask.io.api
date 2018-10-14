@@ -29,7 +29,6 @@ class Project::Regular < Project
   has_one :quote, through: :project_estimate
 
   default_scope { where(project_type: :regular) }
-  scope :with_task_map, -> { select("projects.*, #{TaskMapQuery.query}") }
 
   validates :name, :client, :owner, presence: true
 
@@ -105,19 +104,5 @@ class Project::Regular < Project
 
   def generate_quote
     Converter::Project.generate_quote(self, owner) unless self.quote
-  end
-
-  private
-
-  def ordered_task_map
-    if respond_to?(:collection_map)
-      collection = collection_map
-    else
-      collection = ::Project::Regular.where(id: id).
-        pluck(TaskMapQuery.query).
-        first
-    end
-
-    collection ? collection.reduce(Hash.new, :merge) : Hash.new
   end
 end

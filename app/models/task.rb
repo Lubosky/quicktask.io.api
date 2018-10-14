@@ -108,7 +108,7 @@ class Task < ApplicationRecord
                   column_name: proc { |r| r.completed? ? 'completed_task_count' : nil },
                   touch: true
 
-  default_scope { order(:tasklist_id, :position) }
+  default_scope { joins(:task_type).preload(:task_type).order(:tasklist_id, :position) }
 
   scope :with_status, ->(status) { where(status: status) }
   scope :except_status, ->(status) { where.not(status: status) }

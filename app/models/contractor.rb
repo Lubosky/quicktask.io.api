@@ -10,6 +10,17 @@ class Contractor < ApplicationRecord
 
   has_many :tasks, through: :assignments, source: :task
 
+  has_many :rate_assignments,
+           dependent: :delete_all,
+           foreign_key: :contractor_id,
+           inverse_of: :contractor
+
+  has_many :assigned_rates,
+           class_name: '::Rate',
+           inverse_of: :default_contractor,
+           source: :rate,
+           through: :rate_assignments
+
   has_many :contractor_rates,
            class_name: 'Rate::Contractor',
            dependent: :delete_all,

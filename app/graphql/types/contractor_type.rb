@@ -19,10 +19,8 @@ Types::ContractorType = GraphQL::ObjectType.define do
   field :updated_at, Types::DateTimeType, 'The time at which this record was last modified.'
   field :deleted_at, Types::DateTimeType, 'The time at which this record was deleted.'
 
-  field :member_rates do
-    type types[!Types::RateType]
+  field :member_rates, types[!Types::RateType] do
     description ''
-
     argument :task_id, types.ID
 
     before_scope ->(obj, args, _ctx) {
@@ -39,17 +37,14 @@ Types::ContractorType = GraphQL::ObjectType.define do
       else
         AssociationLoader.for(Contractor, :contractor_rates).load(obj)
       end
-
     }
 
-    resolve ->(collection, _args, _ctx) {
-      collection
-    }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
 
-    field :tags, types[!Types::TagType] do
-      description ''
-      before_scope ->(obj, _args, ctx) { AssociationLoader.for(Contractor, :tags).load(obj) }
-      resolve ->(collection, _args, _ctx) { collection }
-    end
+  field :tags, types[!Types::TagType] do
+    description ''
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Contractor, :tags).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
   end
 end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_11_211036) do
+ActiveRecord::Schema.define(version: 2018_10_13_102753) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -447,6 +447,14 @@ ActiveRecord::Schema.define(version: 2018_10_11_211036) do
     t.index ["workspace_id"], name: "index_quotes_on_workspace_id"
   end
 
+  create_table "rate_assignments", id: false, force: :cascade do |t|
+    t.bigint "contractor_id", null: false
+    t.bigint "rate_id", null: false
+    t.index ["contractor_id"], name: "index_rate_assignments_on_contractor_id"
+    t.index ["rate_id", "contractor_id"], name: "index_rate_assignments_on_rate_id_and_contractor_id"
+    t.index ["rate_id"], name: "index_rate_assignments_on_rate_id"
+  end
+
   create_table "rates", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
     t.string "uuid", limit: 24, null: false
     t.bigint "task_type_id", null: false
@@ -694,6 +702,8 @@ ActiveRecord::Schema.define(version: 2018_10_11_211036) do
   add_foreign_key "project_estimates", "quotes"
   add_foreign_key "proposals", "client_requests"
   add_foreign_key "proposals", "quotes"
+  add_foreign_key "rate_assignments", "contractors"
+  add_foreign_key "rate_assignments", "rates"
   add_foreign_key "service_tasks", "services"
   add_foreign_key "service_tasks", "task_types"
   add_foreign_key "specialization_relations", "specializations"

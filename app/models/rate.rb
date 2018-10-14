@@ -14,6 +14,13 @@ class Rate < ApplicationRecord
              foreign_key: :workspace_id,
              inverse_of: :rates
 
+  has_one :rate_assignment, foreign_key: :rate_id, inverse_of: :rate, dependent: :delete
+  has_one :default_contractor,
+          class_name: '::Contractor',
+          inverse_of: :assigned_rates,
+          source: :contractor,
+          through: :rate_assignment
+
   enum classification: {
     translation: 0,
     interpreting: 1,

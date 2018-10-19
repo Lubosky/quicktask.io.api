@@ -32,6 +32,18 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     resolve ->(resource, _args, _ctx) { resource }
   end
 
+  field :available_tags do
+    type !types[!Types::TagType]
+    description ''
+
+    authorize ->(_obj, _args, ctx) {
+      ::TagPolicy.new(ctx[:current_workspace_user], Tag).index?
+    }
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :tags).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
   field :impersonations do
     type !types[!Types::WorkspaceUserType]
     description ''

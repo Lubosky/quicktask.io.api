@@ -151,23 +151,50 @@ class Task < ApplicationRecord
   delegate :project, :workspace, to: :tasklist
   delegate :classification, to: :task_type
 
-  enum color: [:no_color, :purple, :blue, :green, :amber, :pink, :red, :orange, :brown, :rainbow]
+  enum color: [
+    :no_color,
+    :red,
+    :orange,
+    :yellow_orange,
+    :yellow,
+    :yellow_green,
+    :green,
+    :blue_green,
+    :aqua,
+    :blue,
+    :indigo,
+    :purple,
+    :magenta,
+    :hot_pink,
+    :pink,
+    :cool_gray
+  ]
   enum recurring_type: [:none, :day, :week, :biweekly, :work_day, :month, :quarterly, :half_year, :year], _prefix: true
   enum status: [:uncompleted, :completed] do
     event :complete do
+      before do
+        self.completed_date = Time.current
+        self.completed_unit_count = self.unit_count if self.unit_count
+      end
+
       transition :uncompleted => :completed
     end
 
     event :uncomplete do
+      before do
+        self.completed_date = nil
+      end
+
       transition :completed => :uncompleted
     end
 
     event :reset do
       before do
+        self.completed_date = nil
         self.completed_unit_count = 0
       end
 
-      transition :completed => :uncompleted
+      transition all => :uncompleted
     end
   end
 

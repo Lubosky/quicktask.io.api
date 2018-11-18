@@ -5,6 +5,24 @@ class Tag < ApplicationRecord
 
   has_many :taggings, dependent: :destroy
 
+  enum color: [
+    :red,
+    :orange,
+    :yellow_orange,
+    :yellow,
+    :yellow_green,
+    :green,
+    :blue_green,
+    :aqua,
+    :blue,
+    :indigo,
+    :purple,
+    :magenta,
+    :hot_pink,
+    :pink,
+    :cool_gray
+  ]
+
   scope :by_weight, -> { order(tagging_count: :desc) }
 
   validates :name, :workspace, presence: true

@@ -11,6 +11,7 @@ Types::UserType = GraphQL::ObjectType.define do
     property :google_uid
   end
 
+  field :name, !types.String, 'The user’s name.'
   field :first_name, !types.String, 'The user’s first name.'
   field :last_name, !types.String, 'The user’s last name.'
   field :email_confirmed, !types.Boolean, 'True if the user’s email is currently marked confirmed, false if not.'

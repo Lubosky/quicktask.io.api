@@ -13,7 +13,7 @@ Types::ProjectType = GraphQL::ObjectType.define do
   field :identifier, types.String, ''
   field :name, types.String, 'Name of the project'
   field :description, types.String, 'Description of the project.'
-  field :status, types.String, 'The status of the project.'
+  field :status, Types::ProjectStatusType, 'The status of the project.'
   field :workflow_type, Types::WorkflowType, ''
   field :start_date, Types::DateTimeType, 'Start date of the project.'
   field :due_date, Types::DateTimeType, 'Due date of the project.'

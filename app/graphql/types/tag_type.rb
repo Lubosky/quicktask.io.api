@@ -8,7 +8,7 @@ Types::TagType = GraphQL::ObjectType.define do
   field :workspace_id, !types.ID, 'Globally unique ID of the workspace.'
 
   field :name, !types.String, 'Name of the tag.'
-  field :color, types.Int, 'Color of the tag.'
+  field :color, Types::ColorType, 'Color of the tag.'
   field :tagging_count, !types.Int, ''
 
   field :created_at, Types::DateTimeType, 'The time at which this tag was created.'

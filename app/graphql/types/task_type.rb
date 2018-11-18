@@ -55,7 +55,7 @@ Types::TaskType = GraphQL::ObjectType.define do
       end
     }
 
-    resolve ->(collection, _args, _ctx) { collection.is_a?(Array) ? collection : Array.wrap(collection) }
+    resolve ->(collection, _args, _ctx) { result.then { |collection| collection.is_a?(Array) ? collection : Array.wrap(collection) } }
   end
 
   field :precedent_tasks, types[Types::TaskType] do
@@ -75,7 +75,7 @@ Types::TaskType = GraphQL::ObjectType.define do
       end
     }
 
-    resolve ->(collection, _args, _ctx) { collection.is_a?(Array) ? collection : Array.wrap(collection) }
+    resolve ->(result, _args, _ctx) { result.then { |collection| collection.is_a?(Array) ? collection : Array.wrap(collection) } }
   end
 
   field :prior_task, Types::TaskType do
@@ -111,7 +111,7 @@ Types::TaskType = GraphQL::ObjectType.define do
   field :title, types.String, 'The title of the task.'
   field :description, types.String, 'The description of the task.'
   field :classification, types.String, 'The classification of the task.'
-  field :color, types.String, 'The color of the task.'
+  field :color, Types::ColorType, 'The color of the task.'
   field :status, types.String, 'The status of the task.'
   field :start_date, Types::DateTimeType, ''
   field :due_date, Types::DateTimeType, 'Due date of the task.'

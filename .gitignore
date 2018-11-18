@@ -2,6 +2,7 @@
 .bundle
 .env.*
 !.env.sample
+.tool-versions
 /config/xr.json
 /coverage/
 /log/

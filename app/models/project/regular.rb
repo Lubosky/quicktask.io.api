@@ -43,16 +43,25 @@ class Project::Regular < Project
     archived: 7
   } do
     event :nullify do
+      before do
+        self.completed_date = nil
+      end
+
       transition all - [:archived] => :no_status
     end
 
     event :prepare do
+      before do
+        self.completed_date = nil
+      end
+
       transition all - [:archived] => :draft
     end
 
     event :plan do
       before do
         self.generate_quote
+        self.completed_date = nil
       end
 
       transition all - [:archived] => :planned
@@ -61,6 +70,7 @@ class Project::Regular < Project
     event :activate do
       before do
         self.generate_quote
+        self.completed_date = nil
       end
 
       transition all - [:archived] => :active
@@ -69,6 +79,7 @@ class Project::Regular < Project
     event :suspend do
       before do
         self.generate_quote
+        self.completed_date = nil
       end
 
       transition all - [:archived] => :on_hold
@@ -77,8 +88,9 @@ class Project::Regular < Project
     event :complete do
       before do
         self.generate_quote
-        tasks.find_each(&:complete!)
+        tasks.except_status(:completed).find_each(&:complete!)
         hand_offs.pending.find_each(&:cancel!)
+        self.completed_date = Time.current
       end
 
       transition all - [:no_status, :draft, :archived] => :completed
@@ -88,6 +100,7 @@ class Project::Regular < Project
       before do
         tasks.find_each(&:reset!)
         hand_offs.pending.find_each(&:cancel!)
+        self.completed_date = nil
       end
 
       transition all - [:archived] => :cancelled

@@ -57,7 +57,7 @@ gem 'sanitize'
 gem 'sassc-rails'
 gem 'sentry-raven'
 gem 'sidekiq'
-gem 'sidekiq-unique-jobs'
+gem 'sidekiq-unique-jobs', github: 'mhenrixon/sidekiq-unique-jobs'
 gem 'simple_scheduler'
 gem 'stateful_enum'
 gem 'sinatra', require: false

@@ -6,7 +6,7 @@ module Mutations
         description 'Deletes the project template from the workspace.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :projectTemplateId, !types.ID, 'Globally unique ID of the project template.', as: :project_template_id
 
@@ -15,7 +15,7 @@ module Mutations
         }
 
         authorize! ->(project_template, _args, ctx) {
-          ::Team::ProjectTemplatePolicy.new(ctx[:current_workspace_user], project_template).destroy?
+          ::Team::ProjectTemplatePolicy.new(ctx[:current_account], project_template).destroy?
         }
 
         resolve DeleteProjectTemplateMutationResolver.new
@@ -26,7 +26,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

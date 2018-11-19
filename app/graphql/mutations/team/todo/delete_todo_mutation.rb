@@ -6,7 +6,7 @@ module Mutations
         description 'Deletes the todo from the workspace.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :todoId, !types.ID, 'Globally unique ID of the todo.', as: :todo_id
 
@@ -15,7 +15,7 @@ module Mutations
         }
 
         authorize! ->(todo, _args, ctx) {
-          ::Team::TodoPolicy.new(ctx[:current_workspace_user], todo).destroy?
+          ::Team::TodoPolicy.new(ctx[:current_account], todo).destroy?
         }
 
         resolve DeleteTodoMutationResolver.new
@@ -26,7 +26,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

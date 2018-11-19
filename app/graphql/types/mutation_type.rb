@@ -9,7 +9,7 @@ Types::MutationType = GraphQL::ObjectType.define do
   field :updatePassword, Mutations::UpdateUserPasswordMutation
   field :updateTimeZone, Mutations::UpdateUserTimeZoneMutation
 
-  field :updateWorkspaceUserSettings, Mutations::WorkspaceUser::UpdateWorkspaceUserSettingsMutation
+  field :updateWorkspaceAccountSettings, Mutations::WorkspaceAccount::UpdateWorkspaceAccountSettingsMutation
 
   field :createClient, Mutations::Team::Client::CreateClientMutation
   field :updateClient, Mutations::Team::Client::UpdateClientMutation

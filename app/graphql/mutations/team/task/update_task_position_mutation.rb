@@ -6,7 +6,7 @@ module Mutations
         description 'Updates the position of the task.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :taskId, !types.ID, 'Globally unique ID of the task.', as: :task_id
         argument :input, Inputs::Team::Task::BaseInput
@@ -16,7 +16,7 @@ module Mutations
         }
 
         authorize! ->(task, _args, ctx) {
-          ::Team::TaskPolicy.new(ctx[:current_workspace_user], task).update?
+          ::Team::TaskPolicy.new(ctx[:current_account], task).update?
         }
 
         resolve UpdateTaskPositionMutationResolver.new
@@ -27,7 +27,7 @@ module Mutations
         description 'Updates the position of the task within a template.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :taskId, !types.ID, 'Globally unique ID of the task.', as: :task_id
         argument :input, Inputs::Team::Task::TemplateInput
@@ -37,7 +37,7 @@ module Mutations
         }
 
         authorize! ->(task, _args, ctx) {
-          ::Team::TaskPolicy.new(ctx[:current_workspace_user], task).update?
+          ::Team::TaskPolicy.new(ctx[:current_account], task).update?
         }
 
         resolve UpdateTaskPositionMutationResolver.new
@@ -48,7 +48,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

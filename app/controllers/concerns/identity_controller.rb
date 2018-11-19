@@ -14,8 +14,8 @@ module IdentityController
   end
 
   def ensure_workspace_for
-    define_current_workspace_user
-    public_send(:current_workspace_user)
+    define_current_account
+    public_send(:current_account)
   end
 
   def revoke_for
@@ -90,13 +90,13 @@ module IdentityController
       unauthorized_entity unless authenticate_entity
     when :ensure_workspace
       unauthorized_entity unless ensure_entity
-    when :ensure_workspace_user
+    when :ensure_workspace_account
       unauthorized_entity unless ensure_workspace_entity
     when :current_user
       authenticate_entity
     when :current_workspace
       ensure_entity
-    when :current_workspace_user
+    when :current_account
       ensure_workspace_entity
     when :revoke_token
       revoke_entity
@@ -141,14 +141,14 @@ module IdentityController
     end
   end
 
-  def define_current_workspace_user
-    unless self.respond_to?(:current_workspace_user)
-      memoization_variable_name = :@_current_workspace_user
-      self.class.send(:define_method, :current_workspace_user) do
+  def define_current_account
+    unless self.respond_to?(:current_account)
+      memoization_variable_name = :@_current_account
+      self.class.send(:define_method, :current_account) do
         unless instance_variable_defined?(memoization_variable_name)
           current =
             begin
-              set_current_workspace_user
+              set_current_account
             rescue ActiveRecord::RecordNotFound
               nil
             end
@@ -167,15 +167,15 @@ module IdentityController
     end
   end
 
-  def set_current_workspace_user
-    if impersonation_type = graphql_variables[:impersonationType]
-      set_current_workspace_user_for(impersonation_type)
+  def set_current_account
+    if account_type = graphql_variables[:accountType]
+      set_current_account_for(account_type)
     else
-      current_workspace.members.find_by(user: current_user)
+      current_workspace.accounts.find_by(user: current_user)
     end
   end
 
-  def set_current_workspace_user_for(identifier)
+  def set_current_account_for(identifier)
     case identifier.underscore.to_sym
     when :team_member
       current_workspace.collaborating_team_members.find_by(user: current_user)

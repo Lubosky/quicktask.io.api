@@ -6,7 +6,7 @@ module Mutations
         description 'Updates the project.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :id, !types.ID, 'Globally unique ID of the project.'
         argument :input, Inputs::Team::Client::BaseInput
@@ -16,7 +16,7 @@ module Mutations
         }
 
         authorize! ->(project, _args, ctx) {
-          ::Team::ClientPolicy.new(ctx[:current_workspace_user], project).update?
+          ::Team::ClientPolicy.new(ctx[:current_account], project).update?
         }
 
         resolve UpdateClientMutationResolver.new
@@ -27,7 +27,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

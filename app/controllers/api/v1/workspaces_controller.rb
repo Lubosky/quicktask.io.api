@@ -1,7 +1,7 @@
 class Api::V1::WorkspacesController < Api::BaseController
   before_action :authenticate_user
   before_action :ensure_workspace, except: [:create]
-  before_action :ensure_workspace_user, except: [:index, :create]
+  before_action :ensure_workspace_account, except: [:index, :create]
 
   deserializable_resource :workspace, only: [:create]
 

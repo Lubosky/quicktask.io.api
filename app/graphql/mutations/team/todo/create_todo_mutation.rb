@@ -6,13 +6,13 @@ module Mutations
         description 'Creates a todo.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :taskId, !types.ID, 'Globally unique ID of the task.', as: :task_id
         argument :input, Inputs::Team::Todo::BaseInput
 
         authorize! ->(_obj, _args, ctx) {
-          ::Team::TodoPolicy.new(ctx[:current_workspace_user], ::Todo).create?
+          ::Team::TodoPolicy.new(ctx[:current_account], ::Todo).create?
         }
 
         resolve CreateTodoMutationResolver.new
@@ -23,7 +23,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

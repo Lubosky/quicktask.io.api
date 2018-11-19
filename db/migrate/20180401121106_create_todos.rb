@@ -4,7 +4,7 @@ class CreateTodos < ActiveRecord::Migration[5.2]
       t.string      :uuid, null: false, limit: 24
       t.belongs_to  :task, null: false
       t.belongs_to  :workspace, null: false
-      t.belongs_to  :assignee, references: :workspace_user
+      t.belongs_to  :assignee, references: :workspace_account
 
       t.string      :title, null: false
 

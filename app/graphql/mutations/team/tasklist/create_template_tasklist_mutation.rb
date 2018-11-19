@@ -6,13 +6,13 @@ module Mutations
         description 'Creates a tasklist.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :projectTemplateId, !types.ID, 'Globally unique ID of the project template.', as: :project_template_id
         argument :input, Inputs::Team::Tasklist::TemplateInput
 
         authorize! ->(_obj, _args, ctx) {
-          ::Team::TasklistPolicy.new(ctx[:current_workspace_user], ::Tasklist).create?
+          ::Team::TasklistPolicy.new(ctx[:current_account], ::Tasklist).create?
         }
 
         resolve CreateTemplateTasklistMutationResolver.new
@@ -23,7 +23,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

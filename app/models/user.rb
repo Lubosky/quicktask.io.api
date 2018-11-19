@@ -10,9 +10,9 @@ class User < ApplicationRecord
     has_many :owned_memberships, class_name: 'Membership'
   end
 
-  has_many :members, class_name: 'WorkspaceUser', foreign_key: :user_id
+  has_many :accounts, class_name: 'WorkspaceAccount', foreign_key: :user_id
   has_many :workspaces,
-           through: :members,
+           through: :accounts,
            class_name: 'Workspace',
            foreign_key: :workspace_id
   has_many :tokens, foreign_key: :subject_id, dependent: :delete_all
@@ -97,8 +97,8 @@ class User < ApplicationRecord
   end
 
   def synchronize_common_attributes
-    self.members.
-      includes(:member, :user).
+    self.accounts.
+      includes(:account, :user).
       find_each(&:synchronize_common_attributes)
   end
 

@@ -1,7 +1,7 @@
 class Api::V1::Team::ProjectsController < Api::V1::Team::ApplicationController
   before_action :authenticate_user
   before_action :ensure_workspace
-  before_action :ensure_workspace_user
+  before_action :ensure_workspace_account
   before_action :load_resource,
                 only: [:show, :update, :destroy, :nullify, :prepare, :plan, :activate, :suspend, :complete, :cancel, :archive]
 

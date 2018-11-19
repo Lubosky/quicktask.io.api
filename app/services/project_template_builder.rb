@@ -1,10 +1,10 @@
 class ProjectTemplateBuilder
-  def self.create_for(workspace_user, workspace)
-    new(workspace_user, workspace).call
+  def self.create_for(workspace_account, workspace)
+    new(workspace_account, workspace).call
   end
 
-  def initialize(workspace_user, workspace)
-    @team_member = workspace_user.member
+  def initialize(workspace_account, workspace)
+    @team_member = workspace_account.account
     @workspace = workspace
   end
 

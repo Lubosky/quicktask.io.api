@@ -1,7 +1,7 @@
 module Inputs
-  module WorkspaceUser
+  module WorkspaceAccount
     SettingsInput = GraphQL::InputObjectType.define do
-      name 'WorkspaceUserSettingsInput'
+      name 'WorkspaceAccountSettingsInput'
       description ''
 
       argument :projectSortOption, types.String, as: :project_sort_option

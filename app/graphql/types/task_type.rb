@@ -156,7 +156,7 @@ Types::TaskType = GraphQL::ObjectType.define do
     resolve ->(collection, _args, _ctx) { collection }
   end
 
-  field :potential_assignees, types[!Types::MemberType] do
+  field :potential_assignees, types[!Types::AccountType] do
     description ''
     before_scope ->(obj, _args, _ctx) {
       return [] unless obj.assignable?
@@ -183,7 +183,7 @@ Types::TaskType = GraphQL::ObjectType.define do
     resolve ->(collection, _args, _ctx) { collection }
   end
 
-  field :assignee, Types::MemberType do
+  field :assignee, Types::AccountType do
     description ''
     before_scope ->(obj, _args, _ctx) {
       AssociationLoader.for(Task, :assignment).load(obj).then do |assignment|
@@ -210,7 +210,7 @@ Types::TaskType = GraphQL::ObjectType.define do
     description ''
     argument :hand_off_id, types.ID, 'Globally unique ID of the hand-off.'
     resource ->(obj, args, _ctx) { obj.hand_offs.find(args[:hand_off_id]) }, pass_through: true
-    authorize! ->(hand_off, _args, ctx) { ::Team::HandOffPolicy.new(ctx[:current_workspace_user], hand_off).show? }
+    authorize! ->(hand_off, _args, ctx) { ::Team::HandOffPolicy.new(ctx[:current_account], hand_off).show? }
     resolve ->(hand_off, _args, _ctx) { hand_off }
   end
 

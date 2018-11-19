@@ -48,7 +48,7 @@ FactoryBot.define do
 
     workspace
     client
-    association :owner, factory: [:workspace_user, :with_client]
+    association :owner, factory: [:workspace_account, :with_client]
     association :service, factory: [:service]
     unit
 
@@ -359,7 +359,7 @@ FactoryBot.define do
     end
 
     trait :with_assignee do
-      association :assignee, factory: :workspace_user
+      association :assignee, factory: :workspace_account
     end
   end
 
@@ -446,19 +446,19 @@ FactoryBot.define do
     association :workspace, factory: :workspace
   end
 
-  factory :workspace_user do
+  factory :workspace_account do
     uuid
-    association :member, factory: :team_member
+    association :account, factory: :team_member
     association :role, factory: :role
     association :workspace, factory: :workspace
     association :user, factory: :user
 
     trait :with_client do
-      association :member, factory: :client_contact
+      association :account, factory: :client_contact
     end
 
     trait :with_collaborator do
-      association :member, factory: :collaborator
+      association :account, factory: :collaborator
     end
   end
 end

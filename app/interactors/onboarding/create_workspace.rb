@@ -10,8 +10,8 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
       create_task_types
       create_units
       create_units
-      member = create_workspace_user
-      create_project_templates(member)
+      account = create_workspace_account
+      create_project_templates(account)
     end
     workspace
   end
@@ -22,8 +22,8 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
     Language.create_for(workspace)
   end
 
-  def create_project_templates(member)
-    ::ProjectTemplateBuilder.create_for(member, workspace)
+  def create_project_templates(account)
+    ::ProjectTemplateBuilder.create_for(account, workspace)
   end
 
   def create_specializations
@@ -56,9 +56,9 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
     Role::Base.create_for(workspace)
   end
 
-  def create_workspace_user
-    unless workspace_user.save
-      errors.merge!(workspace_user.errors)
+  def create_workspace_account
+    unless workspace_account.save
+      errors.merge!(workspace_account.errors)
       rollback
     end
   end
@@ -79,8 +79,8 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
     @workspace ||= Workspace.new(workspace_attributes)
   end
 
-  def workspace_user
-    @workspace_user ||= WorkspaceUser.new(workspace_user_attributes)
+  def workspace_account
+    @workspace_account ||= WorkspaceAccount.new(workspace_account_attributes)
   end
 
   def team_member_attributes
@@ -97,9 +97,9 @@ class Onboarding::CreateWorkspace < ApplicationInteractor
     end
   end
 
-  def workspace_user_attributes
+  def workspace_account_attributes
     {}.tap do |hash|
-      hash[:member] = team_member
+      hash[:account] = team_member
       hash[:role] = role
       hash[:user] = user
       hash[:workspace] = workspace

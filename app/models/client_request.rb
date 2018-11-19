@@ -2,7 +2,7 @@ class ClientRequest < ApplicationRecord
   include EnsureUUID
 
   belongs_to :client, inverse_of: :client_requests
-  belongs_to :owner, class_name: 'WorkspaceUser'
+  belongs_to :owner, class_name: 'WorkspaceAccount'
   belongs_to :service
   belongs_to :source_language, class_name: 'Language', optional: true
   belongs_to :unit

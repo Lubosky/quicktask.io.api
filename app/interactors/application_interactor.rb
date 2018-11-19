@@ -8,7 +8,7 @@ class ApplicationInteractor < ActiveInteraction::Base
       hash :context, default: {} do
         object :current_user, default: nil, class: User
         object :current_workspace, default: nil, class: Workspace
-        object :current_workspace_user, default: nil, class: WorkspaceUser
+        object :current_account, default: nil, class: WorkspaceAccount
       end
     end
 
@@ -22,8 +22,8 @@ class ApplicationInteractor < ActiveInteraction::Base
       context[:current_workspace]
     end
 
-    def current_workspace_user
-      context[:current_workspace_user]
+    def current_account
+      context[:current_account]
     end
   end
   include Context

@@ -1,7 +1,7 @@
 class Api::V1::Team::TasksController < ApplicationController
   before_action :authenticate_user
   before_action :ensure_workspace
-  before_action :ensure_workspace_user
+  before_action :ensure_workspace_account
   before_action :load_project,
                 only: [:show, :update, :destroy, :nullify, :prepare, :plan, :activate, :suspend, :complete, :cancel, :archive]
   before_action :load_tasklist,

@@ -18,7 +18,7 @@ RSpec.describe Workspace, type: :model do
     it { is_expected.to have_many(:default_contractor_rates) }
     it { is_expected.to have_many(:hand_offs) }
     it { is_expected.to have_many(:languages) }
-    it { is_expected.to have_many(:members).class_name('WorkspaceUser').with_foreign_key(:workspace_id) }
+    it { is_expected.to have_many(:accounts).class_name('WorkspaceAccount').with_foreign_key(:workspace_id) }
     it { is_expected.to have_many(:project_groups) }
     it { is_expected.to have_many(:project_templates).class_name('Project::Template') }
     it { is_expected.to have_many(:projects).class_name('Project::Regular') }

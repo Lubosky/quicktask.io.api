@@ -9,11 +9,11 @@ Types::QueryType = GraphQL::ObjectType.define do
 
   field :workspace, Types::WorkspaceType do
     argument :workspaceId, !types.ID, as: :workspace_id
-    argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+    argument :accountType, !Types::ImpersonationType, as: :account_type
 
     authorize ->(_obj, args, ctx) {
-      ctx[:current_workspace_user] &&
-        ctx[:current_workspace_user].workspace_id == args[:workspace_id].to_i
+      ctx[:current_account] &&
+        ctx[:current_account].workspace_id == args[:workspace_id].to_i
     }
 
     resolve ->(_obj, _args, ctx) { ctx[:current_workspace] }

@@ -7,7 +7,7 @@ Types::PurchaseOrderType = GraphQL::ObjectType.define do
 
   field :owner_type, !types.String, 'Type of the workspace user.'
   field :owner_id, !types.ID, 'Globally unique ID of the owner.'
-  field :owner, Types::MemberType do
+  field :owner, Types::AccountType do
     description ''
 
     before_scope ->(obj, _args, _ctx) {

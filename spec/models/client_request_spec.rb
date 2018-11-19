@@ -5,7 +5,7 @@ RSpec.describe ClientRequest, type: :model do
   let!(:client) { create(:client, workspace: workspace) }
   let!(:owner) {
     create(
-      :workspace_user,
+      :workspace_account,
       :with_client,
       workspace: workspace,
       role: Role::Client.create(name: 'Client', workspace: workspace)
@@ -30,7 +30,7 @@ RSpec.describe ClientRequest, type: :model do
     end
 
     it { is_expected.to belong_to(:client) }
-    it { is_expected.to belong_to(:owner).class_name('WorkspaceUser') }
+    it { is_expected.to belong_to(:owner).class_name('WorkspaceAccount') }
     it { is_expected.to belong_to(:service) }
     it { is_expected.to belong_to(:source_language).class_name('Language') }
     it { is_expected.to belong_to(:unit) }

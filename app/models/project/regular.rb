@@ -12,7 +12,7 @@ class Project::Regular < Project
   has_many :possible_collaborators,
            -> { where(status: :active) },
            through: :workspace,
-           source: :members
+           source: :accounts
 
   with_options dependent: :destroy, inverse_of: :project do
     with_options through: :tasks do

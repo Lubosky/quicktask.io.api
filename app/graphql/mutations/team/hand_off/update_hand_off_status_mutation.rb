@@ -6,7 +6,7 @@ module Mutations
         description 'Updates a hand-off’s status.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :handOffId, !types.ID, 'Globally unique ID of the hand-off.', as: :hand_off_id
         argument :input, Inputs::Team::HandOff::ActionInput
@@ -16,7 +16,7 @@ module Mutations
         }
 
         authorize! ->(hand_off, _args, ctx) {
-          ::Team::HandOffPolicy.new(ctx[:current_workspace_user], hand_off).update?
+          ::Team::HandOffPolicy.new(ctx[:current_account], hand_off).update?
         }
 
         resolve UpdateHandOffStatusMutationResolver.new
@@ -27,7 +27,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

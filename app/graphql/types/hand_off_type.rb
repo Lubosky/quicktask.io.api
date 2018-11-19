@@ -6,8 +6,8 @@ Types::HandOffType = GraphQL::ObjectType.define do
   field :uuid, !types.String, 'A unique substitute for a hand-off ID.'
 
   field :assignee_id, !types.ID, 'Globally unique ID of the assignee.'
-  field :assignee_type, !types.String, 'Type of the workspace user.'
-  field :assignee, Types::MemberType do
+  field :assignee_type, !types.String, 'Type of the workspace account.'
+  field :assignee, Types::AccountType do
     description ''
 
     before_scope ->(obj, _args, _ctx) {

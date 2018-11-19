@@ -7,12 +7,12 @@ class Role::Base < ApplicationRecord
 
   belongs_to :workspace, foreign_key: :workspace_id
 
-  has_many :members, through: :workspace, class_name: 'WorkspaceUser'
+  has_many :accounts, through: :workspace, class_name: 'WorkspaceAccount'
 
   discriminate Role, on: :permission_level
 
   scope :assigned_to, ->(user) {
-    includes(workspace: :members).where(organization_members: { user_id: user.id })
+    includes(workspace: :accounts).where(organization_members: { user_id: user.id })
   }
 
   scope :by_workspace, ->(workspace) {
@@ -57,7 +57,7 @@ class Role::Base < ApplicationRecord
 
   def check_deletable
     errors.add(:base, 'Can\'t delete an account owner\'s role') if permission_level.to_sym == :owner
-    errors.add(:base, 'Can\'t delete a role') if members.exists?
+    errors.add(:base, 'Can\'t delete a role') if accounts.exists?
     errors.add(:base, 'Can\'t delete a default role') if default?
   end
 

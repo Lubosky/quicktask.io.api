@@ -25,7 +25,7 @@ class Team::TeamMember::UpdateProfile < ApplicationInteractor
   end
 
   def team_member
-    @_team_member ||= current_workspace_user.member
+    @_team_member ||= current_account.account
   end
 
   def user

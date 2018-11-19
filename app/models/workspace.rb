@@ -24,7 +24,7 @@ class Workspace < ApplicationRecord
     end
     has_many :hand_offs
     has_many :languages
-    has_many :members, class_name: 'WorkspaceUser', foreign_key: :workspace_id
+    has_many :accounts, class_name: 'WorkspaceAccount', foreign_key: :workspace_id
     has_many :project_groups
     has_many :project_templates, class_name: '::Project::Template'
     has_many :projects, class_name: '::Project::Regular'
@@ -46,10 +46,10 @@ class Workspace < ApplicationRecord
     has_one :membership
   end
 
-  with_options class_name: 'WorkspaceUser', foreign_key: :workspace_id, inverse_of: :workspace do
-    has_many :collaborating_team_members, -> { where(member_type: 'TeamMember') }
-    has_many :collaborating_contractors, -> { where(member_type: 'Contractor') }
-    has_many :collaborating_clients, -> { where(member_type: 'ClientContact') }
+  with_options class_name: 'WorkspaceAccount', foreign_key: :workspace_id, inverse_of: :workspace do
+    has_many :collaborating_team_members, -> { where(account_type: 'TeamMember') }
+    has_many :collaborating_contractors, -> { where(account_type: 'Contractor') }
+    has_many :collaborating_clients, -> { where(account_type: 'ClientContact') }
   end
 
   has_many :roles, class_name: 'Role::Base', dependent: :destroy
@@ -60,7 +60,7 @@ class Workspace < ApplicationRecord
     hand_off_valid_period: [:integer, default: nil]
 
   scope :accessible_by, ->(user) {
-    joins(:members).where(organization_members: { user_id: user.id }).distinct
+    joins(:accounts).where(organization_accounts: { user_id: user.id }).distinct
   }
 
   before_create { self.hand_off_valid_period ||= 24 }

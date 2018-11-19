@@ -6,12 +6,12 @@ module Mutations
         description 'Creates a new project in a workspace.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :input, Inputs::Team::Client::BaseInput
 
         authorize! ->(_obj, _args, ctx) {
-          ::Team::ClientPolicy.new(ctx[:current_workspace_user], ::Client).create?
+          ::Team::ClientPolicy.new(ctx[:current_account], ::Client).create?
         }
 
         resolve CreateClientMutationResolver.new
@@ -22,7 +22,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

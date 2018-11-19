@@ -1,14 +1,14 @@
 require 'rails_helper'
 
-RSpec.describe WorkspaceUser, type: :model do
-  subject { build(:workspace_user) }
+RSpec.describe WorkspaceAccount, type: :model do
+  subject { build(:workspace_account) }
 
   context 'validations' do
     before do
-      WorkspaceUser.any_instance.stubs(:ensure_uuid).returns(true)
+      WorkspaceAccount.any_instance.stubs(:ensure_uuid).returns(true)
     end
 
-    it { is_expected.to belong_to(:member) }
+    it { is_expected.to belong_to(:account) }
     it { is_expected.to belong_to(:role).class_name('Role::Base') }
     it { is_expected.to belong_to(:user) }
     it { is_expected.to belong_to(:workspace) }
@@ -20,7 +20,7 @@ RSpec.describe WorkspaceUser, type: :model do
     it { is_expected.to validate_presence_of(:task_view_type) }
     it { is_expected.to validate_presence_of(:user) }
     it { is_expected.to validate_presence_of(:workspace) }
-    it { is_expected.to validate_uniqueness_of(:user_id).scoped_to([:member_type, :member_id]) }
+    it { is_expected.to validate_uniqueness_of(:user_id).scoped_to([:account_type, :account_id]) }
 
     it { is_expected.to validate_presence_of(:uuid) }
     it { is_expected.to validate_uniqueness_of(:uuid) }

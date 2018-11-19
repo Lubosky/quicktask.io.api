@@ -42,7 +42,7 @@ namespace :dev do
     create_clients
     create_client_contacts
     create_contractors
-    create_workspace_users
+    create_workspace_accounts
     create_project_templates
     create_rates
     create_project_groups
@@ -229,7 +229,7 @@ namespace :dev do
       member = workspace.team_members.sample
 
       if member.present?
-        ::ProjectTemplateBuilder.create_for(member.workspace_user, workspace)
+        ::ProjectTemplateBuilder.create_for(member.workspace_account, workspace)
       end
 
       project_template_one = create(
@@ -682,8 +682,8 @@ namespace :dev do
     end
   end
 
-  def create_workspace_users
-    header 'Workspace Users'
+  def create_workspace_accounts
+    header 'Workspace Accounts'
 
     Workspace.active.find_each do |workspace|
       team_member = create(
@@ -694,14 +694,14 @@ namespace :dev do
         email: Faker::Internet.email
       )
 
-      workspace_user = create(
-        :workspace_user,
-        member: team_member,
+      workspace_account = create(
+        :workspace_account,
+        account: team_member,
         role: workspace.roles.find_by(permission_level: :owner),
         workspace: workspace,
         user: workspace.owner
       )
-      puts_workspace_user workspace_user
+      puts_workspace_account workspace_account
 
       contractor = create(
         :contractor,
@@ -711,26 +711,26 @@ namespace :dev do
         email: Faker::Internet.email
       )
 
-      workspace_user = create(
-        :workspace_user,
-        member: contractor,
+      workspace_account = create(
+        :workspace_account,
+        account: contractor,
         role: workspace.roles.find_by(permission_level: :collaborator),
         workspace: workspace,
         user: User.find_by(email: 'contractor@example.dev')
       )
-      puts_workspace_user workspace_user
+      puts_workspace_account workspace_account
 
       workspace.clients.find_each do |client|
         cc = client.client_contacts.first
 
-        workspace_user = create(
-          :workspace_user,
-          member: cc,
+        workspace_account = create(
+          :workspace_account,
+          account: cc,
           role: workspace.roles.find_by(permission_level: :client),
           workspace: workspace,
           user: create(:user, :confirmed_user, first_name: cc.first_name, last_name: cc.first_name, email: cc.email)
         )
-        puts_workspace_user workspace_user
+        puts_workspace_account workspace_account
       end
     end
   end
@@ -854,7 +854,7 @@ namespace :dev do
     puts "Currencies for workspace: #{workspace.name}"
   end
 
-  def puts_workspace_user(workspace_user)
-    puts "Workspace user w/ role #{workspace_user.role.name} in workspace: #{workspace_user.workspace.name}"
+  def puts_workspace_account(workspace_account)
+    puts "Workspace account w/ role #{workspace_account.role.name} in workspace: #{workspace_account.workspace.name}"
   end
 end

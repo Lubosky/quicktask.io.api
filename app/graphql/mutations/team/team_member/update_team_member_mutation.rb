@@ -6,7 +6,7 @@ module Mutations
         description 'Updates the attributes of team member.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :id, !types.ID, 'Globally unique ID of the team member.'
         argument :input, Inputs::Team::TeamMember::BaseInput
@@ -16,7 +16,7 @@ module Mutations
         }
 
         authorize! ->(team_member, _args, ctx) {
-          ::Team::TeamMemberPolicy.new(ctx[:current_workspace_user], team_member).update?
+          ::Team::TeamMemberPolicy.new(ctx[:current_account], team_member).update?
         }
 
         resolve UpdateTeamMemberMutationResolver.new
@@ -27,7 +27,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

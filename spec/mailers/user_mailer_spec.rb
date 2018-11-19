@@ -12,7 +12,7 @@ RSpec.describe UserMailer do
     its(:to) { should eq [user.email] }
 
     it 'contains the password reset token' do
-      expect(subject.body.encoded).to match(token)
+      expect(URI.decode(subject.body.encoded).scan(token).size).to eq(1)
     end
   end
 end

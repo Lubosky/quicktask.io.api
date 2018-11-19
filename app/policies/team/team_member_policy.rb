@@ -4,7 +4,7 @@ class Team::TeamMemberPolicy < ApplicationPolicy
   end
 
   def update_profile?
-    @user.team_member? && @user.member.id == @record.id
+    @user.team_member? && @user.account.id == @record.id
   end
 
   class Scope < Scope

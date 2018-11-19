@@ -9,7 +9,7 @@ RSpec.describe Role::Base, type: :model do
     end
 
     it { is_expected.to belong_to(:workspace) }
-    it { is_expected.to have_many(:members).through(:workspace).class_name('WorkspaceUser') }
+    it { is_expected.to have_many(:accounts).through(:workspace).class_name('WorkspaceAccount') }
 
     it { is_expected.to validate_presence_of(:permission_level) }
     it { is_expected.to validate_presence_of(:name) }

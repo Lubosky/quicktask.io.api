@@ -40,9 +40,9 @@ Types::UserType = GraphQL::ObjectType.define do
     resolve ->(collection, _args, _ctx) { collection }
   end
 
-  field :workspace_users, !types[!Types::WorkspaceUserType] do
+  field :workspace_accounts, !types[!Types::WorkspaceAccountType] do
     description ''
-    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(User, :members).load(obj) }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(User, :accounts).load(obj) }
     resolve ->(collection, _args, _ctx) { collection }
   end
 end

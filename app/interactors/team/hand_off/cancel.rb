@@ -11,6 +11,6 @@ class Team::HandOff::Cancel < ApplicationInteractor
   private
 
   def canceller
-    current_workspace_user.member
+    current_account.account
   end
 end

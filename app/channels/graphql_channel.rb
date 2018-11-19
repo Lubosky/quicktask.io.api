@@ -43,7 +43,7 @@ class GraphqlChannel < ApplicationCable::Channel
     {
       current_user: current_user,
       current_workspace: current_workspace,
-      current_workspace_user: current_workspace_user,
+      current_account: current_account,
       channel: self,
       request: {
         remote_ip: request.remote_ip,

@@ -13,9 +13,9 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
   field :team_member_count, !types.Int, ''
   field :team_member_limit, !types.Int, ''
 
-  field :me, Types::WorkspaceUserType do
+  field :me, Types::WorkspaceAccountType do
     description 'Returns the workspace user record for the currently authorized workspace user.'
-    resolve ->(_obj, _args, ctx) { ctx[:current_workspace_user] }
+    resolve ->(_obj, _args, ctx) { ctx[:current_account] }
   end
 
   field :owner, Types::UserType do
@@ -37,18 +37,18 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::TagPolicy.new(ctx[:current_workspace_user], Tag).index?
+      ::TagPolicy.new(ctx[:current_account], Tag).index?
     }
 
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :tags).load(obj) }
     resolve ->(collection, _args, _ctx) { collection }
   end
 
-  field :impersonations do
-    type !types[!Types::WorkspaceUserType]
+  field :workspace_accounts do
+    type !types[!Types::WorkspaceAccountType]
     description ''
 
-    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :members).load(obj) }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :accounts).load(obj) }
     resolve ->(promise, _args, ctx) {
       promise.then(proc { |collection| collection.where(user: ctx[:current_user]) })
     }
@@ -59,7 +59,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::Team::ClientPolicy.new(ctx[:current_workspace_user], Client).index?
+      ::Team::ClientPolicy.new(ctx[:current_account], Client).index?
     }
 
     argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
@@ -76,7 +76,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::Team::ContractorPolicy.new(ctx[:current_workspace_user], Contractor).index?
+      ::Team::ContractorPolicy.new(ctx[:current_account], Contractor).index?
     }
 
     argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
@@ -93,7 +93,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::LanguagePolicy.new(ctx[:current_workspace_user], Language).index?
+      ::LanguagePolicy.new(ctx[:current_account], Language).index?
     }
 
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :languages).load(obj) }
@@ -105,7 +105,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::Team::ProjectPolicy.new(ctx[:current_workspace_user], Project::Regular).index?
+      ::Team::ProjectPolicy.new(ctx[:current_account], Project::Regular).index?
     }
 
     argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
@@ -127,7 +127,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     }, pass_through: true
 
     authorize! ->(project, _args, ctx) {
-      ::Team::ProjectPolicy.new(ctx[:current_workspace_user], project).show?
+      ::Team::ProjectPolicy.new(ctx[:current_account], project).show?
     }
 
     resolve ->(project, _args, _ctx) { project }
@@ -139,7 +139,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::Team::ProjectTemplatePolicy.new(ctx[:current_workspace_user], Project::Template).index?
+      ::Team::ProjectTemplatePolicy.new(ctx[:current_account], Project::Template).index?
     }
 
     argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
@@ -161,7 +161,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     }, pass_through: true
 
     authorize! ->(project_template, _args, ctx) {
-      ::Team::ProjectTemplatePolicy.new(ctx[:current_workspace_user], project_template).show?
+      ::Team::ProjectTemplatePolicy.new(ctx[:current_account], project_template).show?
     }
 
     resolve ->(project_template, _args, _ctx) { project_template }
@@ -172,7 +172,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::Team::PurchaseOrderPolicy.new(ctx[:current_workspace_user], PurchaseOrder).index?
+      ::Team::PurchaseOrderPolicy.new(ctx[:current_account], PurchaseOrder).index?
     }
 
     argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
@@ -189,7 +189,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::Team::WorkspaceCurrencyPolicy.new(ctx[:current_workspace_user], WorkspaceCurrency).index?
+      ::Team::WorkspaceCurrencyPolicy.new(ctx[:current_account], WorkspaceCurrency).index?
     }
 
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :supported_currencies).load(obj) }
@@ -202,7 +202,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::Team::TaskTypePolicy.new(ctx[:current_workspace_user], TaskType).index?
+      ::Team::TaskTypePolicy.new(ctx[:current_account], TaskType).index?
     }
 
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :task_types).load(obj) }
@@ -214,7 +214,7 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     description ''
 
     authorize ->(_obj, _args, ctx) {
-      ::UnitPolicy.new(ctx[:current_workspace_user], Unit).index?
+      ::UnitPolicy.new(ctx[:current_account], Unit).index?
     }
 
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :units).load(obj) }

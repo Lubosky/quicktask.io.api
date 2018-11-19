@@ -6,12 +6,12 @@ module Mutations
         description 'Creates a new project in a workspace.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :input, Inputs::Team::Contractor::BaseInput
 
         authorize! ->(_obj, _args, ctx) {
-          ::Team::ContractorPolicy.new(ctx[:current_workspace_user], ::Contractor).create?
+          ::Team::ContractorPolicy.new(ctx[:current_account], ::Contractor).create?
         }
 
         resolve CreateContractorMutationResolver.new
@@ -22,7 +22,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

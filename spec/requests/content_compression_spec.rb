@@ -29,7 +29,7 @@ RSpec.describe Rack::Deflater, type: :request do
     workspace = create(:workspace, :with_roles, owner: user, name: 'Subscribed Space')
     role = workspace.roles.find_by(permission_level: :owner)
     create(:team_member, workspace: workspace)
-    create(:workspace_user, role: role, user: user, workspace: workspace)
+    create(:workspace_account, role: role, user: user, workspace: workspace)
     token = create(:token, user: user)
     @authentication_token = token_for(user_id: user.id, token_id: token.id)
   end

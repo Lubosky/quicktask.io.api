@@ -6,16 +6,14 @@ module Mutations
         description 'Updates the project.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :input, Inputs::Team::TeamMember::BaseInput
 
-        resource! ->(_obj, _args, ctx) {
-          ctx[:current_workspace_user].member
-        }
+        resource! ->(_obj, _args, ctx) { ctx[:current_account].account }
 
         authorize! ->(team_member, _args, ctx) {
-          ::Team::TeamMemberPolicy.new(ctx[:current_workspace_user], team_member).update_profile?
+          ::Team::TeamMemberPolicy.new(ctx[:current_account], team_member).update_profile?
         }
 
         resolve UpdateTeamMemberProfileMutationResolver.new
@@ -26,7 +24,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

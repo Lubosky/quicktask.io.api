@@ -6,14 +6,14 @@ module Mutations
         description 'Creates a hand-off.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :projectId, !types.ID, 'Globally unique ID of the project.', as: :project_id
         argument :taskId, !types.ID, 'Globally unique ID of the task.', as: :task_id
         argument :input, Inputs::Team::HandOff::BaseInput
 
         authorize! ->(_obj, _args, ctx) {
-          ::Team::HandOffPolicy.new(ctx[:current_workspace_user], ::HandOff).create?
+          ::Team::HandOffPolicy.new(ctx[:current_account], ::HandOff).create?
         }
 
         resolve CreateHandOffMutationResolver.new
@@ -24,7 +24,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

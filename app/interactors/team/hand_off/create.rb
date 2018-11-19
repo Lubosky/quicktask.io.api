@@ -52,7 +52,7 @@ class Team::HandOff::Create < ApplicationInteractor
 
   def hand_off_attributes
     attributes.tap do |hash|
-      hash[:assigner] = current_workspace_user.member
+      hash[:assigner] = current_account.account
       hash[:assignee] = assignee
       hash[:assignment] = assign_directly?
     end

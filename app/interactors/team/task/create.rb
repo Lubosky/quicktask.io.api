@@ -32,7 +32,7 @@ class Team::Task::Create < ApplicationInteractor
 
   def task_attributes
     attributes.tap do |hash|
-      hash[:owner] = current_workspace_user.member
+      hash[:owner] = current_account.account
     end
   end
 end

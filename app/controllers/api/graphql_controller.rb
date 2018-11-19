@@ -24,7 +24,7 @@ module Api
       {
         current_user: current_user,
         current_workspace: current_workspace,
-        current_workspace_user: current_workspace_user,
+        current_account: current_account,
         request: {
           remote_ip: request.remote_ip,
           host: request.host,

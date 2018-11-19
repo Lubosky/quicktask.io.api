@@ -7,7 +7,7 @@ class Todo < ApplicationRecord
   end
 
   belongs_to :assignee,
-             class_name: 'WorkspaceUser',
+             class_name: 'WorkspaceAccount',
              foreign_key: :assignee_id,
              inverse_of: :assigned_todos,
              optional: true

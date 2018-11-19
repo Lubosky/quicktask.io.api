@@ -6,7 +6,7 @@ module Mutations
         description 'Updates a project’s status.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :projectId, !types.ID, 'Globally unique ID of the project.', as: :project_id
         argument :input, Inputs::Team::Project::StatusInput
@@ -16,7 +16,7 @@ module Mutations
         }
 
         authorize! ->(project, _args, ctx) {
-          ::Team::ProjectPolicy.new(ctx[:current_workspace_user], project).update?
+          ::Team::ProjectPolicy.new(ctx[:current_account], project).update?
         }
 
         resolve UpdateProjectStatusMutationResolver.new
@@ -27,7 +27,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

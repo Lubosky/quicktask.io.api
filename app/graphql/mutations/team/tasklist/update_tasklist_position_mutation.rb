@@ -6,7 +6,7 @@ module Mutations
         description 'Updates a tasklist’s position.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
-        argument :impersonationType, !Types::ImpersonationType, as: :impersonation_type
+        argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :tasklistId, !types.ID, 'Globally unique ID of the tasklist.', as: :tasklist_id
         argument :input, Inputs::Team::Tasklist::BaseInput
@@ -16,7 +16,7 @@ module Mutations
         }
 
         authorize! ->(tasklist, _args, ctx) {
-          ::Team::TasklistPolicy.new(ctx[:current_workspace_user], tasklist).update?
+          ::Team::TasklistPolicy.new(ctx[:current_account], tasklist).update?
         }
 
         resolve UpdateTasklistPositionMutationResolver.new
@@ -27,7 +27,7 @@ module Mutations
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
-            :current_workspace_user,
+            :current_account,
             :request
           )
 

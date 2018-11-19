@@ -6,7 +6,7 @@ class Team::HandOff::Accept < ApplicationInteractor
   string :last_name, default: -> { assignee.last_name }
   string :password, default: nil
 
-  validates :email, :first_name, :last_name, :password, presence: true, unless: :has_workspace_user?
+  validates :email, :first_name, :last_name, :password, presence: true, unless: :has_workspace_account?
 
   def execute
     transaction do
@@ -15,9 +15,9 @@ class Team::HandOff::Accept < ApplicationInteractor
         rollback
       end
 
-      unless has_workspace_user?
+      unless has_workspace_account?
         create_user
-        create_workspace_user
+        create_workspace_account
       end
     end
     deliver_email
@@ -32,13 +32,13 @@ class Team::HandOff::Accept < ApplicationInteractor
     mail.deliver_later
   end
 
-  def create_workspace_user
-    unless workspace_user.save
-      errors.merge!(workspace_user.errors)
+  def create_workspace_account
+    unless workspace_account.save
+      errors.merge!(workspace_account.errors)
       rollback
     end
 
-    workspace_user.activate if workspace_user.valid?
+    workspace_account.activate if workspace_account.valid?
   end
 
   def create_user
@@ -52,8 +52,8 @@ class Team::HandOff::Accept < ApplicationInteractor
     @assignee ||= hand_off.assignee
   end
 
-  def has_workspace_user?
-    assignee.workspace_user.present?
+  def has_workspace_account?
+    assignee.workspace_account.present?
   end
 
   def permission_level
@@ -68,17 +68,17 @@ class Team::HandOff::Accept < ApplicationInteractor
     @user ||= User.new(user_attributes)
   end
 
-  def workspace_user
-    @workspace_user ||= WorkspaceUser.new(workspace_user_attributes)
+  def workspace_account
+    @workspace_account ||= WorkspaceAccount.new(workspace_account_attributes)
   end
 
   def workspace
     @workspace ||= hand_off.workspace
   end
 
-  def workspace_user_attributes
+  def workspace_account_attributes
     {}.tap do |hash|
-      hash[:member] = assignee
+      hash[:account] = assignee
       hash[:role] = role
       hash[:user] = user
       hash[:workspace] = workspace

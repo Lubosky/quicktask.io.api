@@ -40,17 +40,17 @@ RSpec.describe Tag, type: :model do
     it 'returns a tag with the same name' do
       existing = Tag.create!(name: 'pancakes', workspace: workspace)
 
-      expect(Tag.find_or_create('pancakes', workspace)).to eq(existing)
+      expect(Tag.find_or_create(name: 'pancakes', workspace: workspace)).to eq(existing)
     end
 
     it 'returns a tag with the same normalized name' do
       existing = Tag.create!(name: 'pancakes', workspace: workspace)
 
-      expect(Tag.find_or_create('Pancakes', workspace)).to eq(existing)
+      expect(Tag.find_or_create(name: 'Pancakes', workspace: workspace)).to eq(existing)
     end
 
     it 'creates a new tag if no matches exist' do
-      expect(Tag.find_or_create('pancakes', workspace)).to be_persisted
+      expect(Tag.find_or_create(name: 'pancakes', workspace: workspace)).to be_persisted
     end
   end
 

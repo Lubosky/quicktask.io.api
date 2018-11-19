@@ -3,7 +3,12 @@ module Taggable
 
   included do
     has_many :taggings, class_name: 'Tagging', as: :taggable
-    has_many :tags, class_name: 'Tag', through: :taggings, dependent: :destroy
+    has_many :tags, class_name: 'Tag', through: :taggings, dependent: :destroy do
+      def << (values)
+        values -= self if values.respond_to?(:to_a)
+        super values unless include?(values)
+      end
+    end
 
     after_save :persist_tags
     after_commit :reset_tag_names, on: %i[ create update ]

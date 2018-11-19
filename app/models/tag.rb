@@ -38,9 +38,9 @@ class Tag < ApplicationRecord
       name: TagNormalizer.normalizer.call(name)).first
   end
 
-  def self.find_or_create(name, workspace)
+  def self.find_or_create(color: :cool_gray, name:, workspace:)
     find_by_name_and_workspace(name, workspace) ||
-      create(workspace: workspace, name: name)
+      create(workspace: workspace, name: name, color: color)
   end
 
   def name=(name)

@@ -23,7 +23,7 @@ class Tagged::Persistence
 
   def add_new
     added.each do |name|
-      taggable.tags << tagger.find_or_create(name, workspace)
+      taggable.tags << tagger.find_or_create(name: name, workspace: workspace)
     end
   end
 

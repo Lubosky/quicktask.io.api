@@ -51,6 +51,7 @@ namespace :dev do
     create_template_tasks
     create_tasklists
     create_tasks
+    create_tags
     activate_projects
     create_todos
     create_hand_offs
@@ -483,6 +484,29 @@ namespace :dev do
     end
   end
 
+  def create_tags
+    header 'Tags'
+    puts "Creating tags\u2026\n"
+    print "\n"
+
+    Task.all.sample(300).each do |taggable|
+      print "\e[32m.\e[0m"
+
+      3.times do
+        tag = Tag.find_or_create(
+          color: Tag.colors.keys.sample,
+          name: Faker::Team.mascot,
+          workspace: taggable.workspace
+        )
+
+        taggable.tags << tag
+      end
+    end
+
+    print "\n"
+    puts_tag
+  end
+
   def create_tasklists
     header 'Tasklists'
 
@@ -541,6 +565,7 @@ namespace :dev do
           owner: workspace.team_members.sample,
           project: tasklist.project,
           workspace: workspace,
+          description: Faker::Lorem.paragraph,
           color: Task.colors.keys.sample,
           status: Task.statuses.keys.sample,
           source_language: source_language,
@@ -577,6 +602,7 @@ namespace :dev do
           owner: workspace.team_members.sample,
           project: tasklist.project,
           workspace: workspace,
+          description: Faker::Lorem.paragraph,
           color: Task.colors.keys.sample,
           source_language: source_language,
           target_language: target_language,
@@ -812,6 +838,10 @@ namespace :dev do
 
   def puts_specialization(workspace)
     puts "Specializations for workspace: #{workspace.name}"
+  end
+
+  def puts_tag
+    puts "\e[32mTags created! ^_^\e[0m"
   end
 
   def puts_task

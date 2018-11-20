@@ -1,6 +1,8 @@
 class Tag < ApplicationRecord
   include EnsureUUID
 
+  TAGGABLE_TYPES = ['Client', 'Contractor', 'Task'].freeze
+
   belongs_to :workspace, inverse_of: :tags
 
   has_many :taggings, dependent: :destroy

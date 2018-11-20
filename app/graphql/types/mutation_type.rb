@@ -57,6 +57,13 @@ Types::MutationType = GraphQL::ObjectType.define do
   field :updateTemplateTaskPosition, Mutations::Team::Task::UpdateTemplateTaskPositionMutation
   field :duplicateTemplateTask, Mutations::Team::Task::DuplicateTaskMutation
 
+  field :createSingleTag, Mutations::Team::Tag::CreateSingleTagMutation
+  field :createMultipleTags, Mutations::Team::Tag::CreateMultipleTagsMutation
+  field :updateTag, Mutations::Team::Tag::UpdateTagMutation
+  field :addTag, Mutations::Team::Tag::AddTagMutation
+  field :removeTag, Mutations::Team::Tag::RemoveTagMutation
+  field :deleteTag, Mutations::Team::Tag::DeleteTagMutation
+
   field :createHandOff, Mutations::Team::HandOff::CreateHandOffMutation
   field :updateHandOffStatus, Mutations::Team::HandOff::UpdateHandOffStatusMutation
 

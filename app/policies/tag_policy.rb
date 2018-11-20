@@ -15,6 +15,14 @@ class TagPolicy < ApplicationPolicy
     @user.team_member? && @user.workspace_id == @record.workspace_id
   end
 
+  def add?
+    @user.team_member? && @user.workspace_id == @record.workspace_id
+  end
+
+  def remove?
+    @user.team_member? && @user.workspace_id == @record.workspace_id
+  end
+
   def destroy?
     @user.team_member? && @user.workspace_id == @record.workspace_id
   end

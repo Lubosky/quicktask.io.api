@@ -64,6 +64,10 @@ Types::MutationType = GraphQL::ObjectType.define do
   field :removeTag, Mutations::Team::Tag::RemoveTagMutation
   field :deleteTag, Mutations::Team::Tag::DeleteTagMutation
 
+  field :createNote, Mutations::Team::Note::CreateNoteMutation
+  field :updateNote, Mutations::Team::Note::UpdateNoteMutation
+  field :deleteNote, Mutations::Team::Note::DeleteNoteMutation
+
   field :createHandOff, Mutations::Team::HandOff::CreateHandOffMutation
   field :updateHandOffStatus, Mutations::Team::HandOff::UpdateHandOffStatusMutation
 

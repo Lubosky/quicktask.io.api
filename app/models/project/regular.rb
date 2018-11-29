@@ -23,7 +23,10 @@ class Project::Regular < Project
         has_many :accepted_purchase_orders, source: :accepted_purchase_order
       end
     end
+
   end
+
+  has_many :notes, as: :annotatable, dependent: :delete_all
 
   has_one :project_estimate, dependent: :destroy, foreign_key: :project_id
   has_one :quote, through: :project_estimate

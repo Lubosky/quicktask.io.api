@@ -10,10 +10,27 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_10_13_102753) do
+ActiveRecord::Schema.define(version: 2018_11_29_151031) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "annotations", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
+    t.string "uuid", limit: 24, null: false
+    t.string "annotatable_type", null: false
+    t.bigint "annotatable_id", null: false
+    t.string "author_type", null: false
+    t.bigint "author_id", null: false
+    t.bigint "workspace_id", null: false
+    t.string "annotation_type", null: false
+    t.text "content", default: ""
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.datetime "deleted_at"
+    t.index ["annotatable_type", "annotatable_id"], name: "index_annotations_on_annotatable_type_and_annotatable_id"
+    t.index ["author_type", "author_id"], name: "index_annotations_on_author_type_and_author_id"
+    t.index ["workspace_id"], name: "index_annotations_on_workspace_id"
+  end
 
   create_table "charges", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
     t.string "uuid", limit: 24, null: false

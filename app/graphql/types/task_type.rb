@@ -237,4 +237,10 @@ Types::TaskType = GraphQL::ObjectType.define do
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :accepted_purchase_order).load(obj) }
     resolve ->(resource, _args, _ctx) { resource }
   end
+
+  field :notes, types[!Types::NoteType] do
+    description ''
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :notes).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
+  end
 end

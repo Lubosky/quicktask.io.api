@@ -69,6 +69,8 @@ class Task < ApplicationRecord
            source_type: 'Contractor',
            through: :hand_offs
 
+  has_many :notes, as: :annotatable, dependent: :delete_all
+
   has_one :project_owner, class_name: 'TeamMember', through: :project, source: :owner
 
   with_options foreign_key: :assignee_id, source: :assignee, through: :assignment do
@@ -108,7 +110,8 @@ class Task < ApplicationRecord
                   column_name: proc { |r| r.completed? ? 'completed_task_count' : nil },
                   touch: true
 
-  default_scope { joins(:task_type).preload(:task_type).order(:tasklist_id, :position) }
+  # default_scope { joins(:task_type).preload(:task_type).order(:tasklist_id, :position) }
+  default_scope { order(:tasklist_id, :position) }
 
   scope :with_status, ->(status) { where(status: status) }
   scope :except_status, ->(status) { where.not(status: status) }

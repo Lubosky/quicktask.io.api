@@ -23,6 +23,8 @@ class TeamMember < ApplicationRecord
            foreign_key: :assigner_id,
            inverse_of: :assigner
 
+  has_many :notes, as: :author
+
   has_one :workspace_currency,
           -> (c) { where(code: c.currency) },
           through: :workspace,

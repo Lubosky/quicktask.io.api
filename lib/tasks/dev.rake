@@ -51,6 +51,7 @@ namespace :dev do
     create_template_tasks
     create_tasklists
     create_tasks
+    create_notes
     create_tags
     activate_projects
     create_todos
@@ -341,6 +342,40 @@ namespace :dev do
       email: Faker::Internet.email
     )
   end
+
+  def create_notes
+    header 'Notes'
+
+    puts "Creating notes for projects\u2026\n"
+    print "\n"
+
+    Project::Regular.all.find_each do |project|
+      5.times do
+        workspace = project.workspace
+        author = workspace.team_members.sample
+        project.notes.create(author: author, content: Faker::Lorem.paragraph)
+
+        print "\e[32m.\e[0m"
+      end
+    end
+
+    puts "Creating notes for tasks\u2026\n"
+    print "\n"
+
+    Task.all.find_each do |task|
+      3.times do
+        workspace = task.workspace
+        author = workspace.team_members.sample
+        task.notes.create(author: author, content: Faker::Lorem.paragraph)
+
+        print "\e[32m.\e[0m"
+      end
+    end
+
+    print "\n"
+    puts_note
+  end
+
 
   def create_project_groups
     header 'Project Groups'
@@ -814,6 +849,10 @@ namespace :dev do
 
   def puts_membership(membership)
     puts "Membership for workspace: #{membership.workspace.name}"
+  end
+
+  def puts_note
+    puts "\e[32mNotes created! ^_^\e[0m"
   end
 
   def puts_project_group(project_group, workspace)

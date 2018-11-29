@@ -1,5 +1,5 @@
 ApplicationSchema = GraphQL::Schema.define do
-  max_depth 7
+  max_depth 8
 
   resolve_type ->(_type, root, _context) {
     if root.respond_to?(:graphql_type)

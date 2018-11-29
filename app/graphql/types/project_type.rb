@@ -83,7 +83,7 @@ Types::ProjectType = GraphQL::ObjectType.define do
     type types[Types::TaskType]
     description ''
 
-    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Project::Regular, :tasks).load(obj) }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Project::Regular, :tasks).load(obj) }
     resolve ->(collection, _args, _ctx) { collection }
   end
 
@@ -94,7 +94,13 @@ Types::ProjectType = GraphQL::ObjectType.define do
     argument :task_id, types.ID, 'Globally unique ID of the task.'
 
     resource ->(obj, args, _ctx) { obj.tasks.find(args[:task_id]) }, pass_through: true
-    authorize! ->(task, _args, ctx) { ::Team::TaskPolicy.new(ctx[:current_account], task).show? }
+    authorize! ->(task, _args, _ctx) { ::Team::TaskPolicy.new(ctx[:current_account], task).show? }
     resolve ->(task, _args, _ctx) { task }
+  end
+
+  field :notes, types[!Types::NoteType] do
+    description ''
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Project::Regular, :notes).load(obj) }
+    resolve ->(collection, _args, _ctx) { collection }
   end
 end

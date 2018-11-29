@@ -40,3 +40,5 @@ GraphQL::Errors.configure(ApplicationSchema) do
     GraphQL::ExecutionError.new(exception.message)
   end
 end
+
+GraphQL::Relay::ConnectionType.bidirectional_pagination = true

@@ -117,6 +117,19 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     }
   end
 
+  connection :projects_connection, Types::ProjectType.connection_type do
+    description ''
+
+    authorize ->(_obj, _args, ctx) {
+      ::Team::ProjectPolicy.new(ctx[:current_account], Project::Regular).index?
+    }
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :projects).load(obj) }
+    resolve ->(promise, args, _ctx) {
+      promise.then(proc { |collection| collection })
+    }
+  end
+
   field :project, Types::ProjectType do
     description ''
 

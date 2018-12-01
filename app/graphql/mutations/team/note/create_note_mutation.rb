@@ -9,7 +9,7 @@ module Mutations
         argument :accountType, !Types::ImpersonationType, as: :account_type
 
         argument :parentId, !types.ID, 'Unique ID of the parent.', as: :parent_id
-        argument :parentType, !Types::AnnotatableType, 'The type of this parent.', as: :parent_type
+        argument :parentType, !types.String, 'The type of this parent.', as: :parent_type
 
         argument :input, Inputs::Team::Note::BaseInput
 

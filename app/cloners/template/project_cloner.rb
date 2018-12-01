@@ -24,6 +24,7 @@ class Template::ProjectCloner < Clowne::Cloner
     project_group_id: nil,
     name:,
     description: nil,
+    workflow_type:,
     internal: false
   |
     timestamp = Time.current.beginning_of_hour + 1.hour
@@ -32,6 +33,7 @@ class Template::ProjectCloner < Clowne::Cloner
     record.client_id = client_id
     record.project_type = :regular
     record.name = name
+    record.workflow_type = workflow_type
     record.status = :draft
     record.task_count = 0
     record.completed_task_count = 0

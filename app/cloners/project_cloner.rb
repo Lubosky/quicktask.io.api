@@ -19,6 +19,7 @@ class ProjectCloner < Clowne::Cloner
     timestamp = Time.current.beginning_of_hour + 1.hour
 
     record.name = name
+    record.workflow_type = source.workflow_type
     record.billed = false
     record.status = :draft
     record.completion_ratio = 0.0

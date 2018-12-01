@@ -28,7 +28,7 @@ class Team::Project::Create < ApplicationInteractor
 
   def project
     if template.blank?
-      @project ||= current_workspace.projects.build(project_attributes)
+      @project ||= current_workspace.projects.build(project_attributes.except(:template_id))
     else
       @project ||= Template::ProjectCloner.call(template, template_attributes)
     end

@@ -22,9 +22,9 @@ module Api
 
     def context
       {
-        current_user: User.find_by(email: 'google@example.dev'),
-        current_workspace: Workspace.find(234064377173508119),
-        current_account: WorkspaceAccount.find(234064516961272223),
+        current_user: current_user,
+        current_workspace: current_workspace,
+        current_account: current_account,
         request: {
           remote_ip: request.remote_ip,
           host: request.host,

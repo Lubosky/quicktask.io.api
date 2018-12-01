@@ -94,7 +94,7 @@ Types::ProjectType = GraphQL::ObjectType.define do
     argument :task_id, types.ID, 'Globally unique ID of the task.'
 
     resource ->(obj, args, _ctx) { obj.tasks.find(args[:task_id]) }, pass_through: true
-    authorize! ->(task, _args, _ctx) { ::Team::TaskPolicy.new(ctx[:current_account], task).show? }
+    authorize! ->(task, _args, ctx) { ::Team::TaskPolicy.new(ctx[:current_account], task).show? }
     resolve ->(task, _args, _ctx) { task }
   end
 

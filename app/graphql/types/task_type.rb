@@ -146,13 +146,13 @@ Types::TaskType = GraphQL::ObjectType.define do
 
   field :tags, types[!Types::TagType] do
     description ''
-    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Task, :tags).load(obj) }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :tags).load(obj) }
     resolve ->(collection, _args, _ctx) { collection }
   end
 
   field :todos, types[!Types::TodoType] do
     description ''
-    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Task, :todos).load(obj) }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :todos).load(obj) }
     resolve ->(collection, _args, _ctx) { collection }
   end
 
@@ -179,7 +179,7 @@ Types::TaskType = GraphQL::ObjectType.define do
 
   field :invitees, types[!Types::ContractorType] do
     description ''
-    before_scope ->(obj, _args, ctx) { AssociationLoader.for(Task, :invitees).load(obj) }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Task, :invitees).load(obj) }
     resolve ->(collection, _args, _ctx) { collection }
   end
 

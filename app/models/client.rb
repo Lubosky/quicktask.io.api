@@ -34,6 +34,14 @@ class Client < ApplicationRecord
 
   delegate :exchange_rate, to: :workspace_currency
 
+  after_create :refresh_client_cache
+  after_destroy :refresh_client_cache
+
+  def refresh_client_cache
+    return unless workspace
+    Workspaces::ClientsCountService.new(workspace).refresh_cache
+  end
+
   def rates
     client_rates.
       union(workspace.default_client_rates).

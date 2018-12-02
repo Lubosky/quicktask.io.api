@@ -37,6 +37,14 @@ class Contractor < ApplicationRecord
   validates :currency, presence: true, length: { is: 3 }
   validates :email, email: true, allow_blank: true
 
+  after_create :refresh_contractor_cache
+  after_destroy :refresh_contractor_cache
+
+  def refresh_contractor_cache
+    return unless workspace
+    Workspaces::ContractorsCountService.new(workspace).refresh_cache
+  end
+
   def rates
     contractor_rates.
       union(workspace.default_contractor_rates).

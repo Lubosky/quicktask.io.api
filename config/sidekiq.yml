@@ -1,4 +1,3 @@
----
 :concurrency: 5
 :pidfile: tmp/pids/sidekiq.pid
 production:
@@ -6,3 +5,4 @@ production:
 :queues:
   - default
   - mailers
+  - searchkick

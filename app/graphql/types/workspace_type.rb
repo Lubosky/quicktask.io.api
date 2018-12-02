@@ -209,7 +209,6 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     resolve ->(collection, _args, _ctx) { collection }
   end
 
-
   field :task_types do
     type types[!Types::TaskTypeType]
     description ''

@@ -1,5 +1,5 @@
 class Task < ApplicationRecord
-  include BelongsDirectly, EnsureUUID, HasLocation, Taggable
+  include BelongsDirectly, EnsureUUID, HasLocation, SQL::Pattern, Taggable
 
   TRANSLATION_FIELDS = %w(source_language_id target_language_id task_type_id unit_id)
   INTERPRETING_FIELDS = %w(location source_language_id target_language_id task_type_id unit_id)
@@ -11,6 +11,12 @@ class Task < ApplicationRecord
     localization: LOCALIZATION_FIELDS,
     other: OTHER_FIELDS
   }
+
+  searchkick callbacks: :async,
+             index_name: -> { "#{Rails.env}-#{self.model_name.plural}" },
+             routing: true,
+             searchable: [:title, :description],
+             word_middle: [:title, :description]
 
   with_options inverse_of: :tasks do
     belongs_to :owner, class_name: 'TeamMember', foreign_key: :owner_id
@@ -110,8 +116,79 @@ class Task < ApplicationRecord
                   column_name: proc { |r| r.completed? ? 'completed_task_count' : nil },
                   touch: true
 
-  # default_scope { joins(:task_type).preload(:task_type).order(:tasklist_id, :position) }
   default_scope { order(:tasklist_id, :position) }
+
+  scope :preload_associations, -> { preload(:task_type, :todos) }
+
+  scope :assigned, -> { where('EXISTS (SELECT TRUE FROM hand_offs WHERE task_id = tasks.id AND accepted_at IS NOT NULL)') }
+  scope :unassigned, -> { where('NOT EXISTS (SELECT TRUE FROM hand_offs WHERE task_id = tasks.id AND accepted_at IS NOT NULL)') }
+  scope :assigned_to, ->(a) {
+    hand_offs = HandOff.arel_table
+
+    query = arel_table.project('true').where(hand_offs[:assignee_id].eq(a.id)).exists
+    where(query.to_sql)
+  }
+
+  scope :created_by, ->(o) {
+    query = arel_table.project('true').where(arel_table[:owner_id].eq(o.id)).exists
+    where(query.to_sql)
+  }
+
+  scope :created_by_or_assigned_to, ->(u) {
+    hand_offs = HandOff.arel_table
+    team_members = TeamMember.arel_table
+
+    assignee_query = hand_offs.
+      project('true').
+      where(hand_offs[:assignee_id].eq(u.id).and(hand_offs[:assignee_type].eq('TeamMember'))).exists
+    owner_query = arel_table.project('true').where(arel_table[:owner_id].eq(u.id)).exists
+
+    where(assignee_query.or(owner_query).to_sql)
+  }
+
+  scope :by_project, ->(ids) { where(project_id: ids) }
+  scope :references_project, -> { references(:project) }
+  scope :completed_late, -> { where(arel_table[:completed_date].gt(arel_table[:due_date])) }
+
+  scope :with_due_date, -> { where.not(due_date: nil) }
+  scope :without_due_date, -> { where(due_date: nil) }
+  scope :due_before, ->(date) { where(arel_table[:due_date].lteq(date)) }
+  scope :due_between, ->(from_date, to_date) {
+    where(arel_table[:due_date].gteq(from_date).and(arel_table[:due_date].lteq(to_date)))
+  }
+  scope :due_tomorrow, -> { where(arel_table[:due_date].eq(Date.tomorrow)) }
+
+  scope :grouped_by_due_date, -> {
+    select(Arel.sql("date_trunc('day', due_date), count(1)")).group(1)
+  }
+
+  scope :order_due_date_asc, -> { reorder(Arel.sql('tasks.due_date IS NULL, tasks.due_date ASC')) }
+  scope :order_due_date_desc, -> { reorder(Arel.sql('tasks.due_date IS NULL, tasks.due_date DESC')) }
+  scope :order_closest_future_date, -> {
+    reorder(Arel.sql(
+      'CASE WHEN tasks.due_date >= now() THEN 0 ELSE 1 END ASC, ABS(extract(epoch from (now() - tasks.due_date))) ASC'
+    ))
+  }
+
+  scope :with_overdue_count, -> {
+    completed_query = arel_table[:completed_date].eq(nil)
+    due_query = arel_table[:due_date].not_eq(nil)
+    overdue_query = arel_table[:due_date].lteq(Time.current)
+    not_deleted_query = arel_table[:deleted_at].eq(nil)
+
+    overdue_count_query = arel_table.
+      project(arel_table[:id].count.as('overdue_tasks_count')).
+        where(completed_query.
+          and(due_query).
+          and(overdue_query).
+          and(not_deleted_query)
+        ).to_sql
+
+    where(completed_query.
+          and(due_query).
+          and(overdue_query).
+          and(not_deleted_query)).pluck(arel_table[:id].count.as('overdue_tasks_count').to_sql)
+  }
 
   scope :with_status, ->(status) { where(status: status) }
   scope :except_status, ->(status) { where.not(status: status) }
@@ -143,9 +220,8 @@ class Task < ApplicationRecord
         and(hand_offs[:valid_through].lteq(1.hour.from_now))
       )
   }
-  scope :with_preloaded, -> {
-    joins(:task_type, :todos).preload(:task_type, :todos)
-  }
+
+  scope :search_import, -> { includes(:task_type, assignment: :assignee) }
 
   validates :owner, :project, :tasklist, :task_type, :title, :workspace, presence: true
   validates :location, absence: true, unless: :interpreting_task?
@@ -210,6 +286,28 @@ class Task < ApplicationRecord
   before_validation :ensure_location_is_nullified, unless: :interpreting_task?
   before_save :update_task_data, if: :association_fields_changed?
   after_commit :update_project_completion_ratio, on: :update
+  after_create :refresh_task_cache
+  after_destroy :refresh_task_cache
+
+  def self.full_search(query)
+    fuzzy_search(query, [:title, :description])
+  end
+
+  def self.sort_by_attribute(method)
+    case method.to_s
+    when 'closest_future_date' then order_closest_future_date
+    when 'due_date'      then order_due_date_asc
+    when 'due_date_asc'  then order_due_date_asc
+    when 'due_date_desc' then order_due_date_desc
+    else
+      super
+    end
+  end
+
+  def refresh_task_cache
+    return unless workspace
+    Workspaces::TasksCountService.new(workspace).refresh_cache
+  end
 
   def translation_task?
     classification == 'translation'
@@ -263,6 +361,15 @@ class Task < ApplicationRecord
     association_fields(precise: true).none? { |f| send(f).blank? }
   end
 
+  def completed_status
+    return nil unless completed_date.present? && due_date.present?
+    completed_late? ? :late : :on_time
+  end
+
+  def completed_late?
+    completed_date > due_date
+  end
+
   def query_fields
     {}.tap do |hash|
       hash[:classification] = self.classification
@@ -288,6 +395,10 @@ class Task < ApplicationRecord
 
   def remove_dependencies
     TaskDependency.for_task(self).delete_all
+  end
+
+  def search_routing
+    workspace_id
   end
 
   private
@@ -321,5 +432,35 @@ class Task < ApplicationRecord
     if due_date && start_date && due_date < start_date
       errors.add(:due_date, :greater_than_start_date)
     end
+  end
+
+  def search_data
+    {
+      title: title,
+      description: description,
+      status: status,
+      completed_status: completed_status,
+      workspace_id: workspace_id,
+      owner_id: owner_id,
+      assignee_id: assignee&.id,
+      project_id: project_id,
+      tasklist_id: tasklist_id,
+      source_language_id: source_language_id,
+      target_language_id: target_language_id,
+      task_type_id: task_type_id,
+      unit_id: unit_id,
+      classification: classification,
+      internal: other_task?,
+      start_on: start_date&.to_date,
+      due_on: due_date&.to_date,
+      start_date: start_date,
+      due_date: due_date,
+      completed_on: completed_date&.to_date,
+      completed_date: completed_date,
+      created_on: created_at&.to_date,
+      updated_on: updated_at&.to_date,
+      created_date: created_at,
+      updated_date: updated_at,
+    }
   end
 end

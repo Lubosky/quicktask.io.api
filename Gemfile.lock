@@ -142,6 +142,14 @@ GEM
       dry-equalizer (~> 0.2)
       dry-logic (~> 0.4, >= 0.4.0)
       dry-types (~> 0.13.1)
+    elasticsearch (6.1.0)
+      elasticsearch-api (= 6.1.0)
+      elasticsearch-transport (= 6.1.0)
+    elasticsearch-api (6.1.0)
+      multi_json
+    elasticsearch-transport (6.1.0)
+      faraday
+      multi_json
     email_spec (2.2.0)
       htmlentities (~> 4.3.3)
       launchy (~> 2.1)
@@ -156,6 +164,8 @@ GEM
       i18n (>= 0.7)
     faraday (0.15.3)
       multipart-post (>= 1.2, < 3)
+    fast_jsonapi (1.5)
+      activesupport (>= 4.2)
     ffi (1.9.25)
     fuubar (2.3.2)
       rspec-core (~> 3.0)
@@ -183,6 +193,7 @@ GEM
       actionpack (>= 4.1)
       activesupport (>= 4.1)
     hashdiff (0.3.7)
+    hashie (3.6.0)
     hiredis (0.6.3)
     html-pipeline (2.9.1)
       activesupport (>= 2)
@@ -396,6 +407,10 @@ GEM
       sprockets (> 3.0)
       sprockets-rails
       tilt
+    searchkick (3.1.2)
+      activemodel (>= 4.2)
+      elasticsearch (>= 5)
+      hashie
     sentry-raven (2.7.4)
       faraday (>= 0.7.6, < 1.0)
     shoulda-matchers (3.1.2)
@@ -475,6 +490,7 @@ DEPENDENCIES
   email_spec
   factory_bot_rails
   faker
+  fast_jsonapi
   fuubar
   geocoder
   google-id-token
@@ -521,6 +537,7 @@ DEPENDENCIES
   rubocop-rspec
   sanitize
   sassc-rails
+  searchkick
   sentry-raven
   shoulda-matchers
   sidekiq

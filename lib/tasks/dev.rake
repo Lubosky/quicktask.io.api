@@ -359,6 +359,7 @@ namespace :dev do
       end
     end
 
+    print "\n"
     puts "Creating notes for tasks\u2026\n"
     print "\n"
 

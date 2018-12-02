@@ -27,6 +27,8 @@
   end
 
   after_save :remove_task_dependencies, if: :workflow_has_changed?
+  after_create :refresh_project_cache
+  after_destroy :refresh_project_cache
 
   scope :with_preloaded, -> {
     joins(tasklists: { tasks: [:task_type, :todos] }).
@@ -37,6 +39,11 @@
 
   def self.set_project_type(type)
     after_initialize { self.project_type = type }
+  end
+
+  def refresh_project_cache
+    return unless workspace
+    Workspaces::ProjectsCountService.new(workspace).refresh_cache
   end
 
   def has_automated_workflow?

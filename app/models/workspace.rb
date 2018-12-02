@@ -119,6 +119,22 @@ class Workspace < ApplicationRecord
     @available_languages = Config::Language.all
   end
 
+  def clients_count
+    Workspaces::ClientsCountService.new(self).refresh_cache
+  end
+
+  def contractors_count
+    Workspaces::ContractorsCountService.new(self).refresh_cache
+  end
+
+  def projects_count
+    Workspaces::ProjectsCountService.new(self).refresh_cache
+  end
+
+  def tasks_count
+    Workspaces::TasksCountService.new(self).refresh_cache
+  end
+
   private
 
   def set_default_attributes

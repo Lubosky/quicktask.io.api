@@ -24,4 +24,10 @@ class Api::V1::SignupTokensController < Api::BaseController
       end
     end
   end
+
+  private
+
+  def resource_serializer
+    GuestSerializer
+  end
 end

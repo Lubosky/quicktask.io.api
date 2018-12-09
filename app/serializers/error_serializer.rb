@@ -1,4 +1,4 @@
-class SerializableError < JSONAPI::Serializable::Error
+class ErrorSerializer < JSONAPI::Serializable::Error
   def id
     super || SecureRandom.uuid
   end

@@ -1,4 +1,8 @@
 class Team::TaskPolicy < Team::ApplicationPolicy
+  def index?
+    @user.team_member? && @user.allowed_to?(:manage_tasks)
+  end
+
   def show?
     @user.team_member? && @user.allowed_to?(:manage_tasks)
   end

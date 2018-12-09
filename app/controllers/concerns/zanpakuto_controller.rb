@@ -121,17 +121,19 @@ module ZanpakutoController
   end
 
   def resource_serializer
-    jsonapi_class
+    klass = resource_name.camelize
+    "#{klass}Serializer".safe_constantize
   end
 
   def respond_with_result(action: nil, **opts)
     if action.success?
-      render jsonapi: action.result,
-             class: opts[:serializer] || resource_serializer,
-             cache: opts[:cache],
-             fields: opts[:fields],
-             include: opts[:include],
-             meta: opts[:meta]
+      options = {}
+      options[:fields] = opts[:fields] if opts[:fields].present?
+      options[:include] = opts[:include] if opts[:include].present?
+      options[:meta] = opts[:meta] if opts[:meta].present?
+      options[:params] = opts[:params] if opts[:params].present?
+
+      render json: resource_serializer.new(action.result, options).serialized_json
     else
       respond_with_errors(action.errors)
     end
@@ -139,40 +141,42 @@ module ZanpakutoController
 
   def respond_with_resource(**opts)
     if resource.errors.empty?
-      render jsonapi: resource,
-             class: opts[:serializer] || resource_serializer,
-             cache: opts[:cache],
-             fields: opts[:fields],
-             include: opts[:include],
-             meta: opts[:meta]
+      options = {}
+      options[:fields] = opts[:fields] if opts[:fields].present?
+      options[:include] = opts[:include] if opts[:include].present?
+      options[:meta] = opts[:meta] if opts[:meta].present?
+      options[:params] = opts[:params] if opts[:params].present?
+
+      render json: resource_serializer.new(resource, options).serialized_json
     else
       respond_with_errors(resource.errors)
     end
   end
 
   def respond_with_collection(**opts)
-    render jsonapi: collection,
-           class: opts[:serializer] || resource_serializer,
-           cache: opts[:cache],
-           fields: opts[:fields],
-           include: opts[:include],
-           meta: opts[:meta]
+    options = {}
+    options[:fields] = opts[:fields] if opts[:fields].present?
+    options[:include] = opts[:include] if opts[:include].present?
+    options[:meta] = opts[:meta] if opts[:meta].present?
+    options[:params] = opts[:params] if opts[:params].present?
+
+    render json: resource_serializer.new(collection, options).serialized_json
   end
 
   def respond_with_standard_error(error, status)
-    serializable_error = SerializableError.create(status: status, detail: error.message)
+    serializable_error = ErrorSerializer.create(status: status, detail: error.message)
     render jsonapi_errors: serializable_error.as_jsonapi, status: status
   end
 
   def respond_with_error(error, status)
     code = I18n.t("errors.#{error}.code")
     detail = I18n.t("errors.#{error}.detail")
-    serializable_error = SerializableError.create(status: status, code: code, detail: detail)
+    serializable_error = ErrorSerializer.create(status: status, code: code, detail: detail)
     render jsonapi_errors: serializable_error.as_jsonapi, status: status
   end
 
   def respond_with_errors(errors, status: 422)
-    jsonapi_errors = SerializableError.from_activemodel_errors(errors)
+    jsonapi_errors = ErrorSerializer.from_activemodel_errors(errors)
     logger.info jsonapi_errors.map(&:as_jsonapi)
     render jsonapi_errors: jsonapi_errors.map(&:as_jsonapi), status: status
   end

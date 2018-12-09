@@ -92,10 +92,10 @@ class Api::V1::Team::ProjectsController < Api::V1::Team::ApplicationController
   private
 
   def accessible_records
-    collection = policy_scope([:team, resource_class])
+    collection = policy_scope([:team, ::Project])
   end
 
   def resource_class
-    current_workspace.projects
+    Project::Regular
   end
 end

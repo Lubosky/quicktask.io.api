@@ -1,4 +1,4 @@
-class Api::V1::Team::TasklistsController < ApplicationController
+class Api::V1::Team::TasklistsController < Api::V1::Team::ApplicationController
   before_action :authenticate_user
   before_action :ensure_workspace
   before_action :ensure_workspace_account

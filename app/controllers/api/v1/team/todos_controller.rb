@@ -1,4 +1,4 @@
-class Api::V1::Team::TodosController < ApplicationController
+class Api::V1::Team::TodosController < Api::V1::Team::ApplicationController
   before_action :authenticate_user
   before_action :ensure_workspace
   before_action :ensure_workspace_account

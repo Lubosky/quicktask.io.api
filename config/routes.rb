@@ -31,6 +31,7 @@ Rails.application.routes.draw do
         end
 
         namespace :team, module: :team, as: :team do
+          resources :dashboard, only: [:index]
           resources :clients
           resources :contractors
           resources :projects do

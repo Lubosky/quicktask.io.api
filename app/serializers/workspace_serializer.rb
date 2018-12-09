@@ -1,9 +1,10 @@
-class SerializableWorkspace < SerializableBase
-  type :workspace
+class WorkspaceSerializer < BaseSerializer
+  set_id    :id
+  set_type  :workspace
 
   attribute :owner_id
-  attribute :customer_id do
-    @object.stripe_customer_id
+  attribute :customer_id do |object|
+    object.stripe_customer_id
   end
 
   attribute :name

@@ -1,5 +1,6 @@
-class SerializableUser < SerializableBase
-  type :user
+class UserSerializer < BaseSerializer
+  set_id    :id
+  set_type  :user
 
   attribute :email
   attribute :status
@@ -9,8 +10,8 @@ class SerializableUser < SerializableBase
   # attribute :avatar
 
   attribute :language
-  attribute :timezone do
-    @object.time_zone
+  attribute :timezone do |object|
+    object.time_zone
   end
   attribute :settings
 end

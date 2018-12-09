@@ -18,7 +18,7 @@ module Api
     rescue_from(ActiveRecord::RecordNotFound)            { |e| respond_with_standard_error e, 404 }
 
     rescue_from NotAuthorizedError do |e|
-      serializable_error = SerializableError.create(status: 403, title: 'Unauthorized', detail: e.message)
+      serializable_error = ErrorSerializer.create(status: 403, title: 'Unauthorized', detail: e.message)
       render jsonapi_errors: [serializable_error].map(&:as_jsonapi), status: 403
     end
 

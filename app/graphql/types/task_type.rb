@@ -156,7 +156,7 @@ Types::TaskType = GraphQL::ObjectType.define do
     resolve ->(collection, _args, _ctx) { collection }
   end
 
-  field :potential_assignees, types[!Types::AccountType] do
+  field :potential_assignees, types[!Types::ProfileType] do
     description ''
     before_scope ->(obj, _args, _ctx) {
       return [] unless obj.assignable?
@@ -183,7 +183,7 @@ Types::TaskType = GraphQL::ObjectType.define do
     resolve ->(collection, _args, _ctx) { collection }
   end
 
-  field :assignee, Types::AccountType do
+  field :assignee, Types::ProfileType do
     description ''
     before_scope ->(obj, _args, _ctx) {
       AssociationLoader.for(Task, :assignment).load(obj).then do |assignment|

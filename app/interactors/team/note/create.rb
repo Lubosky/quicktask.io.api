@@ -21,7 +21,7 @@ class Team::Note::Create < ApplicationInteractor
 
   def note_attributes
     attributes.tap do |hash|
-      hash[:author] = current_account.account
+      hash[:author] = current_account.profile
     end
   end
 end

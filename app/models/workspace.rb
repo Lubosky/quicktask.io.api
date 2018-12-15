@@ -47,9 +47,9 @@ class Workspace < ApplicationRecord
   end
 
   with_options class_name: 'WorkspaceAccount', foreign_key: :workspace_id, inverse_of: :workspace do
-    has_many :collaborating_team_members, -> { where(account_type: 'TeamMember') }
-    has_many :collaborating_contractors, -> { where(account_type: 'Contractor') }
-    has_many :collaborating_clients, -> { where(account_type: 'ClientContact') }
+    has_many :collaborating_team_members, -> { where(profile_type: 'TeamMember') }
+    has_many :collaborating_contractors, -> { where(profile_type: 'Contractor') }
+    has_many :collaborating_clients, -> { where(profile_type: 'ClientContact') }
   end
 
   has_many :roles, class_name: 'Role::Base', dependent: :destroy

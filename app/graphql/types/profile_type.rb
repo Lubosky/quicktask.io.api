@@ -1,5 +1,5 @@
-Types::AccountType = GraphQL::UnionType.define do
-  name 'Account'
+Types::ProfileType = GraphQL::UnionType.define do
+  name 'Profile'
   description 'Possible workspace account types. [ContractorType, ClientContactType, TeamMemberType]'
 
   possible_types [

@@ -20,7 +20,7 @@ Types::NoteType = GraphQL::ObjectType.define do
     resolve ->(resource, _args, _ctx) { resource }
   end
 
-  field :author, Types::AccountType do
+  field :author, Types::ProfileType do
     description ''
     before_scope ->(obj, _args, _ctx) {
       if obj.author_type == 'TeamMember'

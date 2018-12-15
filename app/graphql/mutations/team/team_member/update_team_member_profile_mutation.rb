@@ -10,7 +10,7 @@ module Mutations
 
         argument :input, Inputs::Team::TeamMember::BaseInput
 
-        resource! ->(_obj, _args, ctx) { ctx[:current_account].account }
+        resource! ->(_obj, _args, ctx) { ctx[:current_account].profile }
 
         authorize! ->(team_member, _args, ctx) {
           ::Team::TeamMemberPolicy.new(ctx[:current_account], team_member).update_profile?

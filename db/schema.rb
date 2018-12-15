@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2018_11_29_151031) do
+ActiveRecord::Schema.define(version: 2018_12_15_222728) do
 
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
@@ -250,8 +250,8 @@ ActiveRecord::Schema.define(version: 2018_11_29_151031) do
 
   create_table "organization_accounts", id: :bigint, default: -> { "generate_id()" }, force: :cascade do |t|
     t.string "uuid", limit: 24, null: false
-    t.string "account_type", null: false
-    t.bigint "account_id", null: false
+    t.string "profile_type", null: false
+    t.bigint "profile_id", null: false
     t.bigint "role_id", null: false
     t.bigint "workspace_id", null: false
     t.bigint "user_id", null: false
@@ -262,7 +262,7 @@ ActiveRecord::Schema.define(version: 2018_11_29_151031) do
     t.datetime "updated_at", null: false
     t.datetime "deleted_at"
     t.datetime "deactivated_at"
-    t.index ["account_type", "account_id"], name: "index_organization_accounts_on_account_type_and_account_id"
+    t.index ["profile_type", "profile_id"], name: "index_organization_accounts_on_profile_type_and_profile_id"
     t.index ["role_id"], name: "index_organization_accounts_on_role_id"
     t.index ["user_id"], name: "index_organization_accounts_on_user_id"
     t.index ["uuid"], name: "index_organization_accounts_on_uuid", unique: true

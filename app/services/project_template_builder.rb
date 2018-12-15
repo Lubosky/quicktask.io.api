@@ -4,7 +4,7 @@ class ProjectTemplateBuilder
   end
 
   def initialize(workspace_account, workspace)
-    @team_member = workspace_account.account
+    @team_member = workspace_account.profile
     @workspace = workspace
   end
 

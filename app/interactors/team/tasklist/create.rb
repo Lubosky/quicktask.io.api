@@ -21,7 +21,7 @@ class Team::Tasklist::Create < ApplicationInteractor
 
   def tasklist_attributes
     attributes.tap do |hash|
-      hash[:owner] = current_account.account
+      hash[:owner] = current_account.profile
     end
   end
 end

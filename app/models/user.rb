@@ -98,7 +98,7 @@ class User < ApplicationRecord
 
   def synchronize_common_attributes
     self.accounts.
-      includes(:account, :user).
+      includes(:profile, :user).
       find_each(&:synchronize_common_attributes)
   end
 

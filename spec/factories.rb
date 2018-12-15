@@ -448,17 +448,17 @@ FactoryBot.define do
 
   factory :workspace_account do
     uuid
-    association :account, factory: :team_member
+    association :profile, factory: :team_member
     association :role, factory: :role
     association :workspace, factory: :workspace
     association :user, factory: :user
 
     trait :with_client do
-      association :account, factory: :client_contact
+      association :profile, factory: :client_contact
     end
 
     trait :with_collaborator do
-      association :account, factory: :collaborator
+      association :profile, factory: :collaborator
     end
   end
 end

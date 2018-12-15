@@ -11,6 +11,6 @@ class Team::HandOff::Cancel < ApplicationInteractor
   private
 
   def canceller
-    current_account.account
+    current_account.profile
   end
 end

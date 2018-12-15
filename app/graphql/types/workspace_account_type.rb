@@ -8,11 +8,13 @@ Types::WorkspaceAccountType = GraphQL::ObjectType.define do
   field :workspace_id, !types.ID, 'Globally unique ID of the workspace.'
   field :user_id, !types.ID, 'Globally unique ID of the user.'
 
-  field :account_type, !types.String, 'Type of the workspace user.'
-  field :account, Types::AccountType do
+  field :profile_id, !types.ID, 'Globally unique ID of the profile.'
+  field :profile_type, !types.String, 'Type of the workspace user.'
+
+  field :profile, Types::ProfileType do
     description ''
 
-    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(WorkspaceAccount, :account).load(obj) }
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(WorkspaceAccount, :profile).load(obj) }
     resolve ->(resource, _args, _ctx) { resource }
   end
 

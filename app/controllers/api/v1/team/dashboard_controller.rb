@@ -4,10 +4,10 @@ class Api::V1::Team::DashboardController < Api::V1::Team::ApplicationController
   before_action :ensure_workspace_account
 
   def index
-    collection = accessible_records.results
     options = {}
-    options[:meta] = aggregations
-    render json: ::TaskSerializer.new(collection, options).serialized_json
+    collection = accessible_records.results
+    options[:meta] = meta
+    render json: ::DashboardSerializer.new(collection, options).serialized_json
   end
 
   private
@@ -18,24 +18,28 @@ class Api::V1::Team::DashboardController < Api::V1::Team::ApplicationController
         user: current_entity,
         workspace: current_workspace,
         filters: filters,
-        options: {
-          limit: 50,
-          page: params[:page]
-        }
+        options: options
       ).execute
   end
 
   def current_entity
-    @current_entity ||= current_account.account
+    @current_entity ||= current_account.profile
   end
 
-  def aggregations
-    @aggregations ||= Dashboard::TaskMeta.new(accessible_records).call
+  def meta
+    @meta ||= Dashboard::TaskMeta.new(accessible_records, true).call
   end
 
   def filters
-    params[:filters].to_unsafe_h
+    query = JSON.parse params[:filters]
+    query.transform_keys!(&:underscore)
   end
+
+  def options
+    query = JSON.parse params[:options]
+    query.transform_keys!(&:underscore)
+  end
+
 
   def resource_class
     current_workspace.tasks

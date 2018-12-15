@@ -23,7 +23,11 @@ class TaskSerializer < BaseSerializer
              :comment_count,
              :position,
              :task_data,
-             :metadata
+             :metadata,
+             :project
 
   belongs_to :project
+  has_one :assignee,
+          polymorphic: { Contractor => :contractor, TeamMember => :team_member },
+          serializer: ContractorSerializer
 end

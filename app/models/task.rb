@@ -15,8 +15,9 @@ class Task < ApplicationRecord
   searchkick callbacks: :async,
              index_name: -> { "#{Rails.env}-#{self.model_name.plural}" },
              routing: true,
-             searchable: [:title, :description],
-             word_middle: [:title, :description]
+             searchable: [:title, :description, :project, :tasklist, :source_language, :target_language, :task_type],
+             word_start: [:title],
+             word_middle: [:description]
 
   with_options inverse_of: :tasks do
     belongs_to :owner, class_name: 'TeamMember', foreign_key: :owner_id
@@ -221,7 +222,13 @@ class Task < ApplicationRecord
       )
   }
 
-  scope :search_import, -> { includes(:task_type, assignment: :assignee) }
+  scope :for_project, -> { joins(:project).where(projects: { project_type: :regular }) }
+  scope :search_import, -> {
+    includes(
+      :owner, :task_type, :tasklist, :source_language, :target_language,
+      :unit, :task_type, assignment: :assignee
+    )
+  }
 
   validates :owner, :project, :tasklist, :task_type, :title, :workspace, presence: true
   validates :location, absence: true, unless: :interpreting_task?
@@ -442,13 +449,21 @@ class Task < ApplicationRecord
       completed_status: completed_status,
       workspace_id: workspace_id,
       owner_id: owner_id,
+      owner: owner&.name,
       assignee_id: assignee&.id,
+      assignee: assignee&.name,
       project_id: project_id,
+      project: project&.name,
       tasklist_id: tasklist_id,
+      tasklist: tasklist&.title,
       source_language_id: source_language_id,
+      source_language: source_language&.name,
       target_language_id: target_language_id,
+      target_language: target_language&.name,
       task_type_id: task_type_id,
+      task_type: task_type&.name,
       unit_id: unit_id,
+      unit: unit&.name,
       classification: classification,
       internal: other_task?,
       start_on: start_date&.to_date,

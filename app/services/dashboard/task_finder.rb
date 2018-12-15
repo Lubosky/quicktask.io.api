@@ -9,8 +9,8 @@
 #     assignee_id: integer or 'me' or 'none' or 'any'
 #     owner_id: integer
 #     project_id: integer
+#     start_date: date or 'none', 'all', '30_days', '60_days', '90_days'
 #     due_date: date or 'none', 'overdue', 'today', 'week', or 'month'
-#     created_after: datetime
 #     created_before: datetime
 #     updated_after: datetime
 #     updated_before: datetime
@@ -27,6 +27,7 @@ module Dashboard
   class TaskFinder
     AGGREGATIONS = %i[assignee_id status completed_status]
 
+    ALL = 'all'.freeze
     ANY = 'any'.freeze
     NONE = 'none'.freeze
     ME = 'me'.freeze
@@ -38,6 +39,10 @@ module Dashboard
     TOMORROW = 'tomorrow'.freeze
     THIS_WEEK = 'week'.freeze
     THIS_MONTH = 'month'.freeze
+
+    THIRTY_DAYS = '30_days'.freeze
+    SIXTY_DAYS = '60_days'.freeze
+    NINETY_DAYS = '90_days'.freeze
 
     NO_DUE_DATE = 'no_due_date'.freeze
     DUE_TODAY = 'due_today'.freeze
@@ -58,14 +63,11 @@ module Dashboard
         assignee_id
         owner_id
         project_id
+        start_date
         due_date
         status
         scope
         search
-        sort
-        limit
-        offset
-        page
       ]
     end
 
@@ -74,6 +76,7 @@ module Dashboard
         limit
         offset
         page
+        sort
       ]
     end
 
@@ -83,7 +86,7 @@ module Dashboard
           (v.is_a?(Array) ? v.reject!(&:blank?).blank? : v.blank?)
       }.with_indifferent_access
 
-      normalized_options = options.delete_if { |k, v| !k.to_sym.in?(valid_params) }.with_indifferent_access
+      normalized_options = options.delete_if { |k, v| !k.to_sym.in?(valid_options) }.with_indifferent_access
 
       @user = user
       @workspace = workspace
@@ -99,13 +102,15 @@ module Dashboard
       @tasks ||=
         Task.search(search_query,
           where: query,
+          misspellings: { fields: [:description] },
           routing: workspace&.id,
           aggs: AGGREGATIONS,
           body_options: body_options,
           order: order,
           limit: limit,
           offset: offset,
-          page: page
+          page: page,
+          load: false
         )
     end
 
@@ -114,6 +119,7 @@ module Dashboard
       by_assignee
       by_owner
       by_project
+      by_start_date
       by_due_date
       by_completed_date
     end
@@ -140,6 +146,10 @@ module Dashboard
 
     def project_filter
       filters[:project_id].presence
+    end
+
+    def start_date_filter
+      filters[:start_date].presence
     end
 
     def due_date_filter
@@ -214,17 +224,33 @@ module Dashboard
       owner_filter.to_s.downcase == ME
     end
 
+    def by_start_date
+      return if start_date_filter == ALL || start_date_filter.blank?
+
+      if start_date_filter == NONE
+        term = nil
+      elsif start_date_filter == THIRTY_DAYS
+        term = { gte: Date.today - 30.days }
+      elsif start_date_filter == SIXTY_DAYS
+        term = { gte: Date.today - 60.days }
+      elsif start_date_filter == NINETY_DAYS
+        term = { gte: Date.today - 90.days }
+      end
+
+      query.tap { |h| h[:start_on] = term }
+    end
+
     def by_due_date
       if due_date_filter.present?
-        if filter_by_no_due_date?
+        if due_date_filter == NONE
           term = nil
-        elsif filter_by_overdue?
+        elsif due_date_filter == OVERDUE
           term = { lte: Date.today }
-        elsif filter_by_due_tomorrow?
+        elsif due_date_filter == TOMORROW
           term = Date.tomorrow
-        elsif filter_by_due_this_week?
+        elsif due_date_filter == THIS_WEEK
           term = Date.today.beginning_of_week..Date.today.end_of_week
-        elsif filter_by_due_this_month?
+        elsif due_date_filter == THIS_MONTH
           term = Date.today.beginning_of_month..Date.today.end_of_month
         end
 
@@ -232,35 +258,15 @@ module Dashboard
       end
     end
 
-    def filter_by_no_due_date?
-      due_date_filter == NONE
-    end
-
-    def filter_by_overdue?
-      due_date_filter == OVERDUE
-    end
-
-    def filter_by_due_tomorrow?
-      due_date_filter == TOMORROW
-    end
-
-    def filter_by_due_this_week?
-      due_date_filter == THIS_WEEK
-    end
-
-    def filter_by_due_this_month?
-      due_date_filter == THIS_MONTH
-    end
-
     def by_completed_date
       if completed_date_filter.present?
-        return query.tap { |h| h[:completed_status] = 'late' } if filter_by_completed_late?
+        return query.tap { |h| h[:completed_status] = 'late' } if completed_date_filter == LATE
 
-        if filter_by_completed_today?
+        if completed_date_filter == TODAY
           term = Date.today
-        elsif filter_by_completed_this_week?
+        elsif completed_date_filter == THIS_WEEK
           term = Date.today.beginning_of_week..Date.today.end_of_week
-        elsif filter_by_completed_this_month?
+        elsif completed_date_filter == THIS_MONTH
           term = Date.today.beginning_of_month..Date.today.end_of_month
         end
 
@@ -268,24 +274,8 @@ module Dashboard
       end
     end
 
-    def filter_by_completed_late?
-      completed_date_filter == LATE
-    end
-
-    def filter_by_completed_today?
-      completed_date_filter == TODAY
-    end
-
-    def filter_by_completed_this_week?
-      completed_date_filter == THIS_WEEK
-    end
-
-    def filter_by_completed_this_month?
-      completed_date_filter == THIS_MONTH
-    end
-
     def order
-      case filters[:sort].presence.to_s
+      case options[:sort].presence.to_s
       when 'due_date_asc'  then { due_date: :asc }
       when 'due_date_desc' then { due_date: :desc }
       else { updated_date: :desc } end

@@ -115,6 +115,7 @@ module Dashboard
     end
 
     def filter_criteria
+      by_scope
       by_status
       by_assignee
       by_owner
@@ -130,6 +131,10 @@ module Dashboard
 
     def search_query
       filters[:search].presence || '*'
+    end
+
+    def scope_filter
+      filters[:scope].presence
     end
 
     def status_filter
@@ -168,12 +173,20 @@ module Dashboard
       end
     end
 
-    def by_project
-      query.tap { |h| h[:project_id] = project_filter } if project_filter.present?
+    def by_scope
+      return unless scope_filter.present? && scope_filter.to_s.downcase == ME
+      assignee_param = {}.tap { |h| h[:assignee_id] = user.id }
+      owner_param = {}.tap { |h| h[:owner_id] = user.id }
+
+      query.tap { |h| h[:_or] =  [assignee_param, owner_param] }
     end
 
     def by_status
       query.tap { |h| h[:status] = status_filter } if status_filter.present?
+    end
+
+    def by_project
+      query.tap { |h| h[:project_id] = project_filter } if project_filter.present?
     end
 
     def by_assignee
@@ -246,6 +259,8 @@ module Dashboard
           term = nil
         elsif due_date_filter == OVERDUE
           term = { lte: Date.today }
+        elsif due_date_filter == TODAY
+          term = Date.today
         elsif due_date_filter == TOMORROW
           term = Date.tomorrow
         elsif due_date_filter == THIS_WEEK

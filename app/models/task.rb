@@ -16,7 +16,7 @@ class Task < ApplicationRecord
              index_name: -> { "#{Rails.env}-#{self.model_name.plural}" },
              routing: true,
              searchable: [:title, :description, :project, :tasklist, :source_language, :target_language, :task_type],
-             word_start: [:title],
+             text_start: [:title],
              word_middle: [:description]
 
   with_options inverse_of: :tasks do

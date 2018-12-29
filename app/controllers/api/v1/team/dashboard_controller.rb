@@ -7,7 +7,7 @@ class Api::V1::Team::DashboardController < Api::V1::Team::ApplicationController
     options = {}
     collection = accessible_records.results
     options[:meta] = meta
-    render json: ::DashboardSerializer.new(collection, options).serialized_json
+    render json: Elastic::TaskSerializer.new(collection, options).serialized_json
   end
 
   private

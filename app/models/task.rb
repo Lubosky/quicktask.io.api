@@ -441,10 +441,13 @@ class Task < ApplicationRecord
     end
   end
 
+  public
+
   def search_data
     {
       title: title,
       description: description,
+      color: color,
       status: status,
       completed_status: completed_status,
       workspace_id: workspace_id,
@@ -466,16 +469,11 @@ class Task < ApplicationRecord
       unit: unit&.name,
       classification: classification,
       internal: other_task?,
-      start_on: start_date&.to_date,
-      due_on: due_date&.to_date,
       start_date: start_date,
       due_date: due_date,
-      completed_on: completed_date&.to_date,
       completed_date: completed_date,
-      created_on: created_at&.to_date,
-      updated_on: updated_at&.to_date,
-      created_date: created_at,
-      updated_date: updated_at,
+      created_at: created_at,
+      updated_at: updated_at,
     }
   end
 end

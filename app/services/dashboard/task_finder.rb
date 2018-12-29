@@ -25,7 +25,7 @@
 
 module Dashboard
   class TaskFinder
-    AGGREGATIONS = %i[assignee_id status completed_status]
+    AGGREGATIONS = %i[status completed_status]
 
     ALL = 'all'.freeze
     ANY = 'any'.freeze
@@ -35,10 +35,12 @@ module Dashboard
     ANY_DATE = ''.freeze
     OVERDUE = 'overdue'.freeze
     LATE = 'late'.freeze
+    YESTERDAY = 'yesterday'.freeze
     TODAY = 'today'.freeze
     TOMORROW = 'tomorrow'.freeze
     THIS_WEEK = 'week'.freeze
     THIS_MONTH = 'month'.freeze
+    PREVIOUS_MONTH = 'previous_month'.freeze
 
     THIRTY_DAYS = '30_days'.freeze
     SIXTY_DAYS = '60_days'.freeze
@@ -49,6 +51,13 @@ module Dashboard
     DUE_TOMORROW = 'due_tomorrow'.freeze
     DUE_THIS_WEEK = 'due_this_week'.freeze
     DUE_THIS_MONTH = 'due_this_month'.freeze
+
+    NO_COMPLETED_DATE = 'no_completed_date'.freeze
+    COMPLETED_TODAY = 'completed_today'.freeze
+    COMPLETED_YESTERDAY = 'completed_yesterday'.freeze
+    COMPLETED_THIS_WEEK = 'completed_this_week'.freeze
+    COMPLETED_THIS_MONTH = 'completed_this_month'.freeze
+    COMPLETED_PREVIOUS_MONTH = 'completed_previous_month'.freeze
 
     DUE_DATE = 'due_date'.freeze
     COMPLETED = 'completed'.freeze
@@ -65,6 +74,7 @@ module Dashboard
         project_id
         start_date
         due_date
+        completed_date
         status
         scope
         search
@@ -258,18 +268,18 @@ module Dashboard
         if due_date_filter == NONE
           term = nil
         elsif due_date_filter == OVERDUE
-          term = { lte: Date.today }
+          term = { lte: Time.current }
         elsif due_date_filter == TODAY
-          term = Date.today
+          term = Date.today.beginning_of_day..Date.today.end_of_day
         elsif due_date_filter == TOMORROW
-          term = Date.tomorrow
+          term = Date.tomorrow.beginning_of_day..Date.tomorrow.end_of_day
         elsif due_date_filter == THIS_WEEK
-          term = Date.today.beginning_of_week..Date.today.end_of_week
+          term = Date.today.beginning_of_week.beginning_of_day..Date.today.end_of_week.end_of_day
         elsif due_date_filter == THIS_MONTH
-          term = Date.today.beginning_of_month..Date.today.end_of_month
+          term = Date.today.beginning_of_month.beginning_of_day..Date.today.end_of_month.end_of_day
         end
 
-        query.tap { |h| h[:due_on] = term }
+        query.tap { |h| h[:due_date] = term }
       end
     end
 
@@ -278,14 +288,18 @@ module Dashboard
         return query.tap { |h| h[:completed_status] = 'late' } if completed_date_filter == LATE
 
         if completed_date_filter == TODAY
-          term = Date.today
+          term = Date.today.beginning_of_day..Date.today.end_of_day
+        elsif completed_date_filter == YESTERDAY
+          term = Date.yesterday.beginning_of_day..Date.yesterday.end_of_day
         elsif completed_date_filter == THIS_WEEK
-          term = Date.today.beginning_of_week..Date.today.end_of_week
+          term = Date.today.beginning_of_week.beginning_of_day..Date.today.end_of_week.end_of_day
         elsif completed_date_filter == THIS_MONTH
-          term = Date.today.beginning_of_month..Date.today.end_of_month
+          term = Date.today.beginning_of_month.beginning_of_day..Date.today.end_of_month.end_of_day
+        elsif completed_date_filter == PREVIOUS_MONTH
+          term = Date.today.prev_month.beginning_of_month.beginning_of_day..Date.today.prev_month.end_of_month.end_of_day
         end
 
-        query.tap { |h| h[:completed_on] = term }
+        query.tap { |h| h[:completed_date] = term }
       end
     end
 
@@ -293,6 +307,7 @@ module Dashboard
       case options[:sort].presence.to_s
       when 'due_date_asc'  then { due_date: :asc }
       when 'due_date_desc' then { due_date: :desc }
+      when 'completed_date_desc' then { completed_date: :desc }
       else { updated_date: :desc } end
     end
 
@@ -317,55 +332,139 @@ module Dashboard
     end
 
     def body_options
+      @agg_filters ||= set_agg_filters
+      @agg_due_date_ranges ||= set_date_ranges('due_date')
+      @agg_completed_date_ranges ||= set_date_ranges('completed_date')
+
       {
         aggs: {
-          task: {
-            filter: { term: { status: UNCOMPLETED } },
-            aggs: aggregation_hash
+          assignees: {
+            filter: @agg_filters,
+            aggs: {
+              assignees: {
+                terms: { field: 'assignee_id', size: 100 },
+                aggs: {
+                  name: { top_hits: { size: 1, _source: { include: ['assignee'] } } }
+                }
+              }
+            }
           },
-          assignee: {
-            filter: { term: { assignee_id: user.id } },
-            aggs: aggregation_hash
+          owners: {
+            filter: @agg_filters,
+            aggs: {
+              owners: {
+                terms: { field: 'owner_id', size: 100 },
+                aggs: {
+                  name: { top_hits: { size: 1, _source: { include: ['owner'] } } }
+                }
+              }
+            }
           },
-          owner: {
-            filter: { term: { owner_id: user.id } },
-            aggs: aggregation_hash
-          }
+          projects: {
+            filter: @agg_filters,
+            aggs: {
+              projects: {
+                terms: { field: 'project_id', size: 100 },
+                aggs: {
+                  name: { top_hits: { size: 1, _source: { include: ['project'] } } }
+                }
+              }
+            }
+          },
+          due_date: {
+            filter: set_current_agg_filters(:status, UNCOMPLETED),
+            aggs: @agg_due_date_ranges
+          },
+          completed_date: {
+            filter: set_current_agg_filters(:status, COMPLETED),
+            aggs: @agg_completed_date_ranges
+          },
         }
       }
     end
 
-    def aggregation_hash
-      {
-        due_date_count: {
-          date_range: {
-            field: DUE_DATE,
-            missing: Date.new(0, 1, 1).strftime(DATE_FORMAT),
-            ranges: date_ranges
-          }
-        }
-      }
+    def set_agg_filters
+      get_agg_filters
     end
 
-    def date_ranges
-      past_date           = Date.new(0, 1, 1)
-      yesterday           = Date.yesterday.end_of_day.strftime(DATE_FORMAT)
-      today               = Date.today.strftime(DATE_FORMAT)
-      today_end_of_day    = Date.today.end_of_day.strftime(DATE_FORMAT)
-      tomorrow            = Date.tomorrow.strftime(DATE_FORMAT)
-      tomorrow_end_of_day = Date.tomorrow.end_of_day.strftime(DATE_FORMAT)
-      day_after_tomorrow  = (Date.tomorrow + 1.day).strftime(DATE_FORMAT)
-      end_of_week         = Date.today.end_of_week.end_of_day.strftime(DATE_FORMAT)
-      next_week           = Date.today.next_week.strftime(DATE_FORMAT)
-      end_of_month        = Date.today.end_of_month.end_of_day.strftime(DATE_FORMAT)
+    def set_current_agg_filters(key, value)
+      where = query.dup
+      where.merge!({ key => value })
+
+      get_agg_filters(where)
+    end
+
+    def get_agg_filters(post_query = nil)
+      q = post_query.blank? ? query : post_query
+
+      agg_filters = Hash.new()
+      predicate = Hash.new()
+
+      where_filters = Elastic::Query.transform(q)
+
+      predicate[:must] = where_filters
+      agg_filters[:bool] = predicate
+      return agg_filters
+    end
+
+    def set_date_ranges(param)
+      agg_hash = Hash.new()
+      date_range = Hash.new()
+      predicate = Hash.new()
+      agg_key = "#{param}_count".to_sym
+
+      predicate[:field] = param
+      predicate[:missing] = Date.new(0, 1, 1).strftime(DATE_FORMAT)
+      predicate[:ranges] = send("#{param}_ranges")
+
+      date_range[:date_range] = predicate
+      agg_hash[agg_key] = date_range
+
+      return agg_hash
+    end
+
+    def completed_date_ranges
+      past_date               = Date.new(0, 1, 1)
+      start_of_today          = Date.today.beginning_of_day.strftime(DATE_FORMAT)
+      end_of_today            = Date.today.end_of_day.strftime(DATE_FORMAT)
+      start_of_yesterday      = Date.yesterday.beginning_of_day.strftime(DATE_FORMAT)
+      end_of_yesterday        = Date.yesterday.end_of_day.strftime(DATE_FORMAT)
+      start_of_week           = Date.today.beginning_of_week.beginning_of_day.strftime(DATE_FORMAT)
+      end_of_week             = Date.today.end_of_week.end_of_day.strftime(DATE_FORMAT)
+      start_of_month          = Date.today.beginning_of_month.beginning_of_day.strftime(DATE_FORMAT)
+      end_of_month            = Date.today.end_of_month.end_of_day.strftime(DATE_FORMAT)
+      start_of_previous_month = Date.today.prev_month.beginning_of_month.beginning_of_day.strftime(DATE_FORMAT)
+      end_of_previous_month   = Date.today.prev_month.end_of_month.end_of_day.strftime(DATE_FORMAT)
+
+      return [
+        { key: NO_COMPLETED_DATE, to: past_date.end_of_day.strftime(DATE_FORMAT) },
+        { key: COMPLETED_TODAY, from: start_of_today, to: end_of_today },
+        { key: COMPLETED_YESTERDAY, from: start_of_yesterday, to: end_of_yesterday },
+        { key: COMPLETED_THIS_WEEK, from: start_of_week, to: end_of_week },
+        { key: COMPLETED_THIS_MONTH, from: start_of_month, to: end_of_month },
+        { key: COMPLETED_PREVIOUS_MONTH, from: start_of_previous_month, to: end_of_previous_month }
+      ]
+    end
+
+    def due_date_ranges
+      past_date         = Date.new(0, 1, 1)
+      end_of_yesterday  = Date.yesterday.end_of_day.strftime(DATE_FORMAT)
+      start_of_today    = Date.today.beginning_of_day.strftime(DATE_FORMAT)
+      end_of_today      = Date.today.end_of_day.strftime(DATE_FORMAT)
+      start_of_tomorrow = Date.tomorrow.beginning_of_day.strftime(DATE_FORMAT)
+      end_of_tomorrow   = Date.tomorrow.end_of_day.strftime(DATE_FORMAT)
+      start_of_week     = Date.today.beginning_of_week.beginning_of_day.strftime(DATE_FORMAT)
+      end_of_week       = Date.today.end_of_week.end_of_day.strftime(DATE_FORMAT)
+      start_of_month    = Date.today.beginning_of_month.beginning_of_day.strftime(DATE_FORMAT)
+      end_of_month      = Date.today.end_of_month.end_of_day.strftime(DATE_FORMAT)
 
       return [
         { key: NO_DUE_DATE, to: past_date.end_of_day.strftime(DATE_FORMAT) },
-        { key: OVERDUE, from: past_date.tomorrow.strftime(DATE_FORMAT), to: yesterday },
-        { key: DUE_TODAY, from: today, to: today_end_of_day },
-        { key: DUE_TOMORROW, from: tomorrow, to: tomorrow_end_of_day },
-        { key: DUE_THIS_WEEK, from: day_after_tomorrow, to: end_of_week },
-        { key: DUE_THIS_MONTH, from: next_week, to: end_of_month }
+        { key: OVERDUE, from: past_date.tomorrow.strftime(DATE_FORMAT), to: Time.current },
+        { key: DUE_TODAY, from: start_of_today, to: end_of_today },
+        { key: DUE_TOMORROW, from: start_of_tomorrow, to: end_of_tomorrow },
+        { key: DUE_THIS_WEEK, from: start_of_week, to: end_of_week },
+        { key: DUE_THIS_MONTH, from: start_of_month, to: end_of_month }
       ]
     end
   end

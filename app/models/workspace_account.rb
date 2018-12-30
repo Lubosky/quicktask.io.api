@@ -1,7 +1,7 @@
 class WorkspaceAccount < ApplicationRecord
   self.table_name = :organization_accounts
 
-  include EnsureUUID
+  include AASM, EnsureUUID
 
   belongs_to :profile, polymorphic: true
   belongs_to :role, class_name: 'Role::Base'
@@ -35,14 +35,18 @@ class WorkspaceAccount < ApplicationRecord
   enum project_sort_option: { due_date: 0, identifier: 1, title: 2, updated_at: 3 }, _prefix: true
   enum project_view_type: { grid: 0, list: 1 }, _prefix: true
   enum task_view_type: { column: 0, list: 1 }, _prefix: true
+  enum status: { pending: 0, active: 1, deactivated: 2 }
 
-  enum status: { pending: 0, active: 1, deactivated: 2 } do
+  aasm column: :status, enum: true do
+    state :pending, initial: true
+    state :active, :deactivated
+
     event :activate do
-      transition all - [:active] => :active
+      transitions :from => [:pending, :deactivated], :to => :active
     end
 
     event :deactivate do
-      transition all - [:deactivated] => :deactivated
+      transitions :from =>  [:pending, :active], :to => :deactivated
     end
   end
 

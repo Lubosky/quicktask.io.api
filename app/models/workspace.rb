@@ -1,7 +1,7 @@
 class Workspace < ApplicationRecord
   self.table_name = :organizations
 
-  include EnsureUUID
+  include AASM, EnsureUUID
 
   belongs_to :owner,
              inverse_of: :owned_workspaces,
@@ -73,13 +73,18 @@ class Workspace < ApplicationRecord
                             less_than_or_equal_to: MAX_HAND_OFF_VALID_PERIOD,
                             allow_nil: true
 
-  enum status: { pending: 0, active: 1, deactivated: 2 } do
+  enum status: { pending: 0, active: 1, deactivated: 2 }
+
+  aasm column: :status, enum: true do
+    state :pending, initial: true
+    state :active, :deactivated
+
     event :activate do
-      transition all - [:active] => :active
+      transitions :from => [:pending, :deactivated], :to => :active
     end
 
     event :deactivate do
-      transition all - [:deactivated] => :deactivated
+      transitions :from =>  [:pending, :active], :to => :deactivated
     end
   end
 

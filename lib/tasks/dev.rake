@@ -34,9 +34,9 @@ namespace :dev do
     create_memberships
     create_roles
     create_languages
-    create_services
     create_specializations
     create_task_types
+    create_services
     create_units
     create_workspace_currencies
     create_clients
@@ -56,6 +56,8 @@ namespace :dev do
     activate_projects
     create_todos
     create_hand_offs
+    create_requests
+    create_estimates
   end
 
   def create_users
@@ -87,6 +89,13 @@ namespace :dev do
       email: 'contractor@example.dev'
     )
     puts_user user, 'to become a contractor'
+
+    user = create(
+      :user,
+      :confirmed_user,
+      email: 'client@example.dev'
+    )
+    puts_user user, 'to become a client'
 
     user = create(
       :user,
@@ -210,6 +219,10 @@ namespace :dev do
         )
       end
 
+      workspace.services.each do |service|
+        service.task_types << workspace.task_types.with_type(service.classification).sample(3)
+      end
+
       puts_service workspace
     end
   end
@@ -227,6 +240,9 @@ namespace :dev do
   def create_project_templates
     header 'Project Templates'
 
+    puts "Creating project templates\u2026\n"
+    print "\n"
+
     Workspace.active.find_each do |workspace|
       member = workspace.team_members.sample
 
@@ -234,85 +250,75 @@ namespace :dev do
         ::ProjectTemplateBuilder.create_for(member.workspace_account, workspace)
       end
 
-      project_template_one = create(
-        :project_template,
-        owner: member,
-        workspace: workspace
-      )
+      3.times do
+        print "\e[32m.\e[0m"
 
-      project_template_two = create(
-        :project_template,
-        owner: member,
-        workspace: workspace
-      )
-
-      project_template_three = create(
-        :project_template,
-        owner: member,
-        workspace: workspace
-      )
-
-      puts_project_template(workspace)
+        create(
+          :project_template,
+          owner: member,
+          workspace: workspace
+        )
+      end
     end
+
+    print "\n"
+    puts_project_template
   end
 
   def create_clients
     header 'Clients'
 
+    puts "Creating clients\u2026\n"
+    print "\n"
+
     Workspace.active.find_each do |workspace|
       20.times do
+        print "\e[32m.\e[0m"
+
         create_client(workspace)
       end
     end
+
+    print "\n"
+    puts_client
   end
 
   def create_client(workspace)
-    client = create(
+    create(
       :client,
       workspace: workspace,
       name: Faker::Name.name,
       email: Faker::Internet.email,
       currency: :gbp
     )
-    puts_client client
   end
 
   def create_client_contacts
     header 'Client Contacts'
 
+    puts "Creating client contacts\u2026\n"
+    print "\n"
+
     Workspace.active.find_each do |workspace|
       workspace.clients.find_each do |client|
-        client_contact = create(
-          :client_contact,
-          client: client,
-          workspace: workspace,
-          first_name: Faker::Name.first_name,
-          last_name: Faker::Name.last_name,
-          email: Faker::Internet.email
-        )
-        puts_client_contact client_contact
 
-        client_contact = create(
-          :client_contact,
-          client: client,
-          workspace: workspace,
-          first_name: Faker::Name.first_name,
-          last_name: Faker::Name.last_name,
-          email: Faker::Internet.email
-        )
-        puts_client_contact client_contact
+        3.times do
+          print "\e[32m.\e[0m"
 
-        client_contact = create(
-          :client_contact,
-          client: client,
-          workspace: workspace,
-          first_name: Faker::Name.first_name,
-          last_name: Faker::Name.last_name,
-          email: Faker::Internet.email
-        )
-        puts_client_contact client_contact
+          create(
+            :client_contact,
+            client: client,
+            workspace: workspace,
+            first_name: Faker::Name.first_name,
+            last_name: Faker::Name.last_name,
+            email: Faker::Internet.email
+          )
+        end
       end
     end
+
+    print "\n"
+    puts_client_contact
   end
 
   def create_contractors
@@ -381,49 +387,49 @@ namespace :dev do
   def create_project_groups
     header 'Project Groups'
 
+    puts "Creating project groups\u2026\n"
+    print "\n"
+
     Workspace.active.find_each do |workspace|
       workspace.clients.find_each do |client|
-        project_group = create(
+        print "\e[32m.\e[0m"
+
+        create(
           :project_group,
           client: client,
           workspace: workspace
         )
-        puts_project_group(project_group, workspace)
       end
     end
+
+    print "\n"
+    puts_project_group
   end
 
   def create_projects
     header 'Projects'
 
+    puts "Creating projects\u2026\n"
+    print "\n"
+
     workspace = Workspace.active.first
     owner = workspace.team_members
 
     workspace.clients.find_each do |client|
-      project_one = create(
-        :project,
-        client: client,
-        owner: owner.sample,
-        workspace: workspace
-      )
-      puts_project(project_one, workspace)
+      5.times do
+        print "\e[32m.\e[0m"
 
-      project_two = create(
-        :project,
-        client: client,
-        owner: owner.sample,
-        workspace: workspace
-      )
-      puts_project(project_two, workspace)
-
-      project_three = create(
-        :project,
-        client: client,
-        owner: owner.sample,
-        workspace: workspace
-      )
-      puts_project(project_three, workspace)
+        create(
+          :project,
+          client: client,
+          owner: owner.sample,
+          workspace: workspace
+        )
+      end
     end
+
+    print "\n"
+    puts_project
   end
 
   def activate_projects
@@ -734,6 +740,100 @@ namespace :dev do
     puts_todo
   end
 
+  def create_requests
+    header 'Client requests'
+    puts "Creating client requests\u2026\n"
+    print "\n"
+
+    workspaces = Workspace.active
+
+    workspaces.each do |workspace|
+      5.times do
+        print "\e[32m.\e[0m"
+
+        client = workspace.clients.sample
+        client_contact = client.client_contacts.sample
+
+        ClientRequest::Translation.create(
+          workspace: workspace,
+          client: client,
+          requester: client_contact,
+          service: workspace.services.with_type(:translation).first,
+          source_language: workspace.languages.sample,
+          target_language_ids: workspace.languages.sample(3),
+          unit: workspace.units.sample,
+          unit_count: rand(100..10000),
+          start_date: Date.today + rand(7).days,
+          due_date: Date.today + rand(10..90).days
+        )
+      end
+
+      5.times do
+        print "\e[32m.\e[0m"
+
+        client = workspace.clients.sample
+        client_contact = client.client_contacts.sample
+
+        ClientRequest::Interpreting.create(
+          workspace: workspace,
+          client: client,
+          requester: client_contact,
+          service: workspace.services.with_type(:interpreting).first,
+          source_language: workspace.languages.sample,
+          target_language_ids: workspace.languages.sample(3),
+          equipment_needed: [true, false].sample,
+          interpreter_count: rand(10),
+          start_date: Date.today + rand(7).days,
+          due_date: Date.today + rand(10..90).days
+        )
+      end
+
+      5.times do
+        print "\e[32m.\e[0m"
+
+        client = workspace.clients.sample
+        client_contact = client.client_contacts.sample
+
+        ClientRequest::Localization.create(
+          workspace: workspace,
+          client: client,
+          requester: client_contact,
+          service: workspace.services.with_type(:localization).first,
+          target_language_ids: workspace.languages.sample(3),
+          unit: workspace.units.sample,
+          unit_count: rand(100..10000),
+          start_date: Date.today + rand(7).days,
+          due_date: Date.today + rand(10..90).days
+        )
+      end
+    end
+
+    print "\n"
+    puts_client_requests
+  end
+
+  def create_estimates
+    header 'Estimates'
+    puts "Creating estimates\u2026\n"
+    print "\n"
+
+    Workspace.active.each do |workspace|
+      requests = workspace.client_requests.sample(7)
+      user = workspace.team_members.sample
+
+      requests.each do |request|
+        print "\e[32m.\e[0m"
+
+        request.submit!
+        request.convert(user)
+        request.estimate!
+      end
+    end
+
+    print "\n"
+    puts_estimates
+  end
+
   def create_workspace_currencies
     header 'Workspace Currencies'
 
@@ -758,7 +858,7 @@ namespace :dev do
 
       workspace_account = create(
         :workspace_account,
-        account: team_member,
+        profile: team_member,
         role: workspace.roles.find_by(permission_level: :owner),
         workspace: workspace,
         user: workspace.owner
@@ -775,7 +875,7 @@ namespace :dev do
 
       workspace_account = create(
         :workspace_account,
-        account: contractor,
+        profile: contractor,
         role: workspace.roles.find_by(permission_level: :collaborator),
         workspace: workspace,
         user: User.find_by(email: 'contractor@example.dev')
@@ -783,11 +883,11 @@ namespace :dev do
       puts_workspace_account workspace_account
 
       workspace.clients.find_each do |client|
-        cc = client.client_contacts.first
+        cc = client.client_contacts.sample
 
         workspace_account = create(
           :workspace_account,
-          account: cc,
+          profile: cc,
           role: workspace.roles.find_by(permission_level: :client),
           workspace: workspace,
           user: create(:user, :confirmed_user, first_name: cc.first_name, last_name: cc.first_name, email: cc.email)
@@ -812,16 +912,20 @@ namespace :dev do
     puts "\n\n*** #{msg.upcase} *** \n\n"
   end
 
-  def puts_client(client)
-    puts "Client #{client.name} / #{client.email} in workspace: #{client.workspace.name}"
+  def puts_client
+    puts "\e[32mClients created! ^_^\e[0m"
   end
 
-  def puts_client_contact(client_contact)
-    puts "Contact #{client_contact.first_name} #{client_contact.last_name} / #{client_contact.email} for client #{client_contact.client.name} in workspace: #{client_contact.workspace.name}"
+  def puts_client_contact
+    puts "\e[32mClient contacts created! ^_^\e[0m"
   end
 
   def puts_client_rate(workspace)
     puts "Client rates for workspace: #{workspace.name}"
+  end
+
+  def puts_client_requests
+    puts "\e[32mClient requests created! ^_^\e[0m"
   end
 
   def puts_contractor
@@ -840,6 +944,10 @@ namespace :dev do
     puts "Default contractor rates for workspace: #{workspace.name}"
   end
 
+  def puts_estimates
+    puts "\e[32mEstimates created! ^_^\e[0m"
+  end
+
   def puts_hand_off
     puts "\e[32mHand-offs created! ^_^\e[0m"
   end
@@ -856,16 +964,16 @@ namespace :dev do
     puts "\e[32mNotes created! ^_^\e[0m"
   end
 
-  def puts_project_group(project_group, workspace)
-    puts "Project group #{project_group.name} in workspace: #{workspace.name}"
+  def puts_project_group
+    puts "\e[32mProject groups created! ^_^\e[0m"
   end
 
-  def puts_project_template(workspace)
-    puts "Project templates for workspace: #{workspace.name}"
+  def puts_project_template
+    puts "\e[32mProject templatess created! ^_^\e[0m"
   end
 
-  def puts_project(project, workspace)
-    puts "Project #{project.name} in workspace: #{workspace.name}"
+  def puts_project
+    puts "\e[32mProjects created! ^_^\e[0m"
   end
 
   def puts_role(workspace)

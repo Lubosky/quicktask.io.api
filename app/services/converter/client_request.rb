@@ -150,7 +150,7 @@ class Converter::ClientRequest
 
   def compose_notes
     return nil unless request.interpreting_request?
-    address = I18n.t(:'quotes.interpreting.address', address: request.location.formatted_address)
+    address = I18n.t(:'quotes.interpreting.address', address: request&.location&.formatted_address)
     equipment_needed = I18n.t(:"quotes.interpreting.equipment_needed.#{request.equipment_needed}")
     interpreter_count = I18n.t(:'quotes.interpreting.interpreter_count', interpreter_count: request.interpreter_count)
     [address, equipment_needed, interpreter_count].join("\r\n")

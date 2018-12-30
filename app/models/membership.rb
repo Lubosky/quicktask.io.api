@@ -1,5 +1,5 @@
 class Membership < ApplicationRecord
-  include EnsureUUID
+  include AASM, EnsureUUID
 
   belongs_to :owner,
              inverse_of: :owned_memberships,
@@ -43,13 +43,18 @@ class Membership < ApplicationRecord
 
   attr_accessor :stripe_coupon, :stripe_token
 
-  enum status: { trialing: 0, active: 1, unpaid: 2, deactivated: 3 } do
+  enum status: { trialing: 0, active: 1, unpaid: 2, deactivated: 3 }
+
+  aasm column: :status, enum: true do
+    state :trialing, initial: true
+    state :active, :unpaid, :deactivated
+
     event :activate do
-      transition all - [:active, :deactivated] => :active
+      transitions :from => [:trialing, :unpaid], :to => :active
     end
 
     event :mark_as_unpaid do
-      transition [:trialing, :active] => :unpaid
+      transitions :from => [:trialing, :active], :to => :unpaid
     end
 
     event :deactivate do
@@ -57,7 +62,7 @@ class Membership < ApplicationRecord
         self.deactivated_on = Time.zone.today
       end
 
-      transition all - [:deactivated] => :deactivated
+      transitions :from => [:trialing, :active, :unpaid], :to => :deactivated
     end
 
     event :reactivate do
@@ -66,7 +71,7 @@ class Membership < ApplicationRecord
         reactivate_stripe_subscription
       end
 
-      transition all => :active
+      transitions :from => [:trialing, :active, :unpaid, :deactivated], :to => :active
     end
   end
 
@@ -111,7 +116,6 @@ class Membership < ApplicationRecord
   def create_membership
     if create_stripe_subscription && save
       self.tap do |membership|
-        membership.status ||= :trialing
         membership.stripe_subscription_id = stripe_subscription.id
         membership.trial_period_end_date = Time.current + trial_period_days.days
         membership.save
@@ -151,7 +155,7 @@ class Membership < ApplicationRecord
   end
 
   def activate_workspace
-    workspace.tap(&:activate) unless workspace.stripe_customer_id.blank?
+    workspace.tap(&:activate!) unless workspace.stripe_customer_id.blank?
   end
 
   def update_next_invoice_info

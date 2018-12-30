@@ -304,8 +304,7 @@ RSpec.describe Membership, type: :model do
     it 'updates the membership record by setting deactivated_on to today' do
       membership = create(:active_membership)
 
-      membership.deactivate
-      membership.reload
+      membership.deactivate!
 
       expect(membership.deactivated_on).to eq Time.zone.today
     end

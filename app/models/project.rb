@@ -22,7 +22,6 @@
                                 reject_if: ->(o) { o['title'].blank? }
 
   after_initialize do
-    self.status ||= :draft
     self.workflow_type ||= :default
   end
 

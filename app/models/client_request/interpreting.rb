@@ -1,6 +1,8 @@
 class ClientRequest::Interpreting < ClientRequest
   set_request_type :interpreting
 
+  VALIDATABLE_FIELDS = COMMON_FIELDS + %w(source_language target_language_ids)
+
   include HasLocation
 
   jsonb_accessor :request_data,
@@ -9,9 +11,11 @@ class ClientRequest::Interpreting < ClientRequest
 
   before_validation { self.unit = self.default_unit }
 
-  validates :interpreter_count,
-            numericality: { greater_than: 0, only_integer: true }
-  validates :source_language, :target_language_ids, presence: true
+  with_options unless: :draft? do
+    validates :interpreter_count,
+              numericality: { greater_than: 0, only_integer: true }
+    validates :source_language, :target_language_ids, presence: true
+  end
 
   def unit_count=(value)
     return super unless start_date && due_date
@@ -27,6 +31,10 @@ class ClientRequest::Interpreting < ClientRequest
 
   def default_unit
     workspace.units.with_type(:time).find_by(deletable: false)
+  end
+
+  def submittable_fields
+    attributes.keys & VALIDATABLE_FIELDS
   end
 
   private

@@ -1,9 +1,9 @@
 class Task < ApplicationRecord
-  include BelongsDirectly, EnsureUUID, HasLocation, SQL::Pattern, Taggable
+  include AASM, BelongsDirectly, EnsureUUID, HasLocation, SQL::Pattern, Taggable
 
   TRANSLATION_FIELDS = %w(source_language_id target_language_id task_type_id unit_id)
   INTERPRETING_FIELDS = %w(location source_language_id target_language_id task_type_id unit_id)
-  LOCALIZATION_FIELDS = %w(source_language_id task_type_id unit_id)
+  LOCALIZATION_FIELDS = %w(target_language_id task_type_id unit_id)
   OTHER_FIELDS = %w(task_type_id)
   TASK_FIELDS = {
     translation: TRANSLATION_FIELDS,
@@ -256,14 +256,19 @@ class Task < ApplicationRecord
     :cool_gray
   ]
   enum recurring_type: [:none, :day, :week, :biweekly, :work_day, :month, :quarterly, :half_year, :year], _prefix: true
-  enum status: [:uncompleted, :completed] do
+  enum status: { uncompleted: 0, completed: 1 }
+
+  aasm column: :status, enum: true do
+    state :uncompleted, initial: true
+    state :completed
+
     event :complete do
       before do
         self.completed_date = Time.current
         self.completed_unit_count = self.unit_count if self.unit_count
       end
 
-      transition :uncompleted => :completed
+      transitions :from => :uncompleted, :to => :completed
     end
 
     event :uncomplete do
@@ -271,7 +276,7 @@ class Task < ApplicationRecord
         self.completed_date = nil
       end
 
-      transition :completed => :uncompleted
+      transitions :from => :completed, :to => :uncompleted
     end
 
     event :reset do
@@ -280,14 +285,11 @@ class Task < ApplicationRecord
         self.completed_unit_count = 0
       end
 
-      transition all => :uncompleted
+      transitions :from => [:completed, :uncompleted], :to => :uncompleted
     end
   end
 
-  after_initialize {
-    self.status ||= :uncompleted
-    self.recurring_type ||= :none
-  }
+  after_initialize { self.recurring_type ||= :none }
   before_validation { self.title&.strip! }
   before_validation :set_default_attributes
   before_validation :ensure_location_is_nullified, unless: :interpreting_task?

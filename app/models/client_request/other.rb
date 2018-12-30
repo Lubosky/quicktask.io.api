@@ -5,7 +5,10 @@ class ClientRequest::Other < ClientRequest
 
   def target_language_ids=(value)
     write_attribute(:target_language_ids, [])
+  end
 
+  def submittable_fields
+    attributes.keys & VALIDATABLE_FIELDS
   end
 
   private

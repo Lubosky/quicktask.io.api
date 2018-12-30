@@ -6,6 +6,7 @@ git_source(:github) do |repo_name|
   "https://github.com/#{repo_name}.git"
 end
 
+gem 'aasm'
 gem 'active_interaction', github: 'AaronLasseigne/active_interaction', branch: 'v4.0.0'
 gem 'active_record_union'
 gem 'acts_as_list'
@@ -62,7 +63,6 @@ gem 'sidekiq'
 gem 'sidekiq-unique-jobs', github: 'mhenrixon/sidekiq-unique-jobs'
 gem 'simple_scheduler'
 gem 'sinatra', require: false
-gem 'stateful_enum'
 gem 'stripe'
 gem 'twemoji'
 

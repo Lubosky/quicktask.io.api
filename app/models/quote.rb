@@ -1,5 +1,5 @@
 class Quote < ApplicationRecord
-  include EnsureUUID
+  include AASM, EnsureUUID
 
   belongs_to :client, inverse_of: :quotes
   belongs_to :owner, class_name: 'TeamMember'
@@ -30,10 +30,7 @@ class Quote < ApplicationRecord
                                   o[:unit_price].blank? || o[:quantity].blank?
                                 }
 
-  after_initialize {
-    self.status ||= :draft
-    self.quote_type = :quote
-  }
+  after_initialize { self.quote_type = :quote }
   before_validation :set_default_attributes, on: :create
 
   delegate :languages, :task_types, :units, to: :workspace, prefix: :applicable
@@ -53,13 +50,18 @@ class Quote < ApplicationRecord
   validate :validate_start_date_before_due_date
 
   enum quote_type: [:quote]
-  enum status: { draft: 0, sent: 1, accepted: 2, declined: 3, expired: 4, cancelled: 5 } do
+  enum status: { draft: 0, sent: 1, accepted: 2, declined: 3, expired: 4, cancelled: 5 }
+
+  aasm column: :status, enum: true do
+    state :draft, initial: true
+    state :sent, :accepted, :declined, :expired, :cancelled
+
     event :submit do
       before do
         self.sent_at = DateTime.current
       end
 
-      transition :draft => :sent
+      transitions :from => :draft, :to => :sent
     end
 
     event :accept do
@@ -67,7 +69,7 @@ class Quote < ApplicationRecord
         self.set_metadata(accepted_at: DateTime.current)
       end
 
-      transition all - [:draft] => :accepted
+      transitions :from => [:sent, :accepted, :declined, :expired, :cancelled], :to => :accepted
     end
 
     event :decline do
@@ -75,11 +77,11 @@ class Quote < ApplicationRecord
         self.set_metadata(declined_at: DateTime.current)
       end
 
-      transition all - [:draft] => :declined
+      transitions :from => [:sent, :accepted, :declined, :expired, :cancelled], :to => :declined
     end
 
     event :expire do
-      transition all => :expired
+      transitions :from => [:draft, :sent, :accepted, :declined, :expired, :cancelled], :to => :expired
     end
 
     event :cancel do
@@ -87,7 +89,7 @@ class Quote < ApplicationRecord
         self.set_metadata(cancelled_at: DateTime.current)
       end
 
-      transition all => :cancelled
+      transitions :from => [:draft, :sent, :accepted, :declined, :expired, :cancelled], :to => :cancelled
     end
   end
 

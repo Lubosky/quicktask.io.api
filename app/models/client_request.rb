@@ -1,11 +1,13 @@
 class ClientRequest < ApplicationRecord
-  include EnsureUUID
+  include AASM, EnsureUUID
+
+  COMMON_FIELDS = %w(service_id request_type)
 
   belongs_to :client, inverse_of: :client_requests
-  belongs_to :owner, class_name: 'WorkspaceAccount'
-  belongs_to :service
+  belongs_to :requester, class_name: 'ClientContact'
+  belongs_to :service, optional: true
   belongs_to :source_language, class_name: 'Language', optional: true
-  belongs_to :unit
+  belongs_to :unit, optional: true
   belongs_to :workspace, inverse_of: :client_requests
 
   has_one :proposal
@@ -24,18 +26,14 @@ class ClientRequest < ApplicationRecord
   after_initialize :set_default_attributes, on: :create
   before_save :calculate_estimated_cost
 
-  delegate :classification, :task_types, to: :service
+  delegate :classification, :task_types, to: :service, allow_nil: true
 
   validates :client,
-            :currency,
-            :exchange_rate,
-            :owner,
             :request_type,
             :service,
-            :start_date,
-            :due_date,
-            :unit,
-            :unit_count,
+            :currency,
+            :exchange_rate,
+            :requester,
             :workspace,
             :workspace_currency,
             presence: true
@@ -43,21 +41,26 @@ class ClientRequest < ApplicationRecord
   validate :validate_request_type
   validate :validate_start_date_before_due_date
 
-  enum status: { draft: 0, pending: 1, estimated: 2, cancelled: 3, withdrawn: 4 } do
+  enum status: { draft: 0, pending: 1, estimated: 2, cancelled: 3, withdrawn: 4 }
+
+  aasm column: :status, enum: true do
+    state :draft, initial: true
+    state :pending, :estimated, :cancelled, :withdrawn
+
     event :submit do
-      transition :draft => :pending
+      transitions :from => :draft, :to => :pending
     end
 
     event :estimate do
-      transition :pending => :estimated
+      transitions :from => :pending, :to => :estimated
     end
 
     event :cancel do
-      transition :pending => :cancelled
+      transitions :from => :pending, :to => :cancelled
     end
 
     event :withdraw do
-      transition [:draft, :pending] => :withdrawn
+      transitions :from => [:draft, :pending], :to => :withdrawn
     end
   end
 
@@ -89,17 +92,24 @@ class ClientRequest < ApplicationRecord
     workspace.languages.where(id: target_language_ids)
   end
 
+  def submittable?
+    validatable_fields.none? { |f| send(f).blank? }
+  end
+
   private
 
   def calculate_estimated_cost
     raise NotImplementedError.new
   end
 
+  def validatable_fields
+    raise NotImplementedError.new
+  end
+
   def set_default_attributes
-    self.status ||= :draft
-    self.currency ||= client.currency
-    self.exchange_rate ||= client.exchange_rate
-    self.workspace_currency ||= workspace.currency
+    self.currency ||= client&.currency
+    self.exchange_rate ||= client&.exchange_rate
+    self.workspace_currency ||= workspace&.currency
   end
 
   def validate_request_type

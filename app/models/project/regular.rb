@@ -1,7 +1,10 @@
 class Project::Regular < Project
   set_project_type :regular
 
+  include AASM
+
   GRAPHQL_TYPE = 'Project'.freeze
+  PROJECT_STATUSES = %i(draft no_status planned active on_hold completed cancelled archived)
 
   with_options inverse_of: :projects do
     belongs_to :owner, class_name: 'TeamMember', foreign_key: :owner_id
@@ -44,13 +47,18 @@ class Project::Regular < Project
     completed: 5,
     cancelled: 6,
     archived: 7
-  } do
+  }
+
+  aasm column: :status, enum: true do
+    state :draft, initial: true
+    state :no_status, :planned, :active, :on_hold, :completed, :cancelled, :archived
+
     event :nullify do
       before do
         self.completed_date = nil
       end
 
-      transition all - [:archived] => :no_status
+      transitions :from => PROJECT_STATUSES - [:archived], :to => :no_status
     end
 
     event :prepare do
@@ -58,7 +66,7 @@ class Project::Regular < Project
         self.completed_date = nil
       end
 
-      transition all - [:archived] => :draft
+      transitions :from => PROJECT_STATUSES - [:archived], :to => :draft
     end
 
     event :plan do
@@ -67,7 +75,7 @@ class Project::Regular < Project
         self.completed_date = nil
       end
 
-      transition all - [:archived] => :planned
+      transitions :from => PROJECT_STATUSES - [:archived], :to => :planned
     end
 
     event :activate do
@@ -76,7 +84,7 @@ class Project::Regular < Project
         self.completed_date = nil
       end
 
-      transition all - [:archived] => :active
+      transitions :from => PROJECT_STATUSES - [:archived], :to => :active
     end
 
     event :suspend do
@@ -85,7 +93,7 @@ class Project::Regular < Project
         self.completed_date = nil
       end
 
-      transition all - [:archived] => :on_hold
+      transitions :from => PROJECT_STATUSES - [:archived], :to => :on_hold
     end
 
     event :complete do
@@ -96,7 +104,7 @@ class Project::Regular < Project
         self.completed_date = Time.current
       end
 
-      transition all - [:no_status, :draft, :archived] => :completed
+      transitions :from => PROJECT_STATUSES - [:no_status, :draft, :archived], :to => :completed
     end
 
     event :cancel do
@@ -106,11 +114,11 @@ class Project::Regular < Project
         self.completed_date = nil
       end
 
-      transition all - [:archived] => :cancelled
+      transitions :from => PROJECT_STATUSES - [:archived], :to => :cancelled
     end
 
     event :archive do
-      transition [:active, :completed] => :archived
+      transitions :from => [:active, :completed], :to => :archived
     end
   end
 

@@ -8,5 +8,7 @@ class ClientContact < ApplicationRecord
     belongs_to :workspace
   end
 
+  has_many :client_requests, inverse_of: :requester
+
   validates :email, email: true, allow_blank: true
 end

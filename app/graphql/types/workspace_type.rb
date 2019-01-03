@@ -71,6 +71,23 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     }
   end
 
+  field :client_requests do
+    type types[Types::ClientRequestType]
+    description ''
+
+    authorize ->(_obj, _args, ctx) {
+      ::Team::ClientRequestPolicy.new(ctx[:current_account], ClientRequest).index?
+    }
+
+    argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
+    argument :page, types.Int, 'Indicates the number of the page. All paginated queries start at page 1.'
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :client_requests).load(obj) }
+    resolve ->(promise, args, _ctx) {
+      promise.then(proc { |collection| collection })
+    }
+  end
+
   field :contractors do
     type types[!Types::ContractorType]
     description ''
@@ -194,6 +211,23 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :purchase_orders).load(obj) }
     resolve ->(promise, args, _ctx) {
       promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
+    }
+  end
+
+  field :quotes do
+    type types[Types::QuoteType]
+    description ''
+
+    authorize ->(_obj, _args, ctx) {
+      ::Team::QuotePolicy.new(ctx[:current_account], Quote).index?
+    }
+
+    argument :limit, types.Int, 'A limit on the number of records to be returned, between 1 and 100. The default is 20 if this parameter is omitted.'
+    argument :page, types.Int, 'Indicates the number of the page. All paginated queries start at page 1.'
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Workspace, :quotes).load(obj) }
+    resolve ->(promise, args, _ctx) {
+      promise.then(proc { |collection| collection })
     }
   end
 

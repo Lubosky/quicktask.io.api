@@ -4,7 +4,7 @@ class ClientRequest < ApplicationRecord
   COMMON_FIELDS = %w(service_id request_type)
 
   belongs_to :client, inverse_of: :client_requests
-  belongs_to :requester, class_name: 'ClientContact'
+  belongs_to :requester, class_name: 'ClientContact', inverse_of: :client_requests
   belongs_to :service, optional: true
   belongs_to :source_language, class_name: 'Language', optional: true
   belongs_to :unit, optional: true

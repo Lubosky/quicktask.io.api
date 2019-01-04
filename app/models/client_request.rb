@@ -3,6 +3,11 @@ class ClientRequest < ApplicationRecord
 
   COMMON_FIELDS = %w(service_id request_type)
 
+  searchkick callbacks: :async,
+             index_name: -> { "#{Rails.env}-#{self.model_name.plural}" },
+             routing: true,
+             searchable: [:subject, :identifier, :client, :requester]
+
   belongs_to :client, inverse_of: :client_requests
   belongs_to :requester, class_name: 'ClientContact', inverse_of: :client_requests
   belongs_to :service, optional: true
@@ -40,6 +45,13 @@ class ClientRequest < ApplicationRecord
 
   validate :validate_request_type
   validate :validate_start_date_before_due_date
+
+  scope :search_import, -> {
+    includes(
+      :client, :requester, :service, :quote
+    )
+  }
+
 
   enum status: { draft: 0, pending: 1, estimated: 2, cancelled: 3, withdrawn: 4 }
 
@@ -96,6 +108,10 @@ class ClientRequest < ApplicationRecord
     validatable_fields.none? { |f| send(f).blank? }
   end
 
+  def search_routing
+    workspace_id
+  end
+
   private
 
   def calculate_estimated_cost
@@ -124,5 +140,32 @@ class ClientRequest < ApplicationRecord
       errors.add(:due_date, :greater_than_start_date)
       throw(:abort)
     end
+  end
+
+  def search_data
+    {
+      type: request_type,
+      subject: subject,
+      identifier: identifier,
+      status: status,
+      workspace_id: workspace_id,
+      client_id: client&.id,
+      client: client&.name,
+      requester_id: requester_id,
+      requester: requester&.name,
+      quote_id: quote&.id,
+      quote: quote&.subject,
+      service_id: service_id,
+      service: service&.name,
+      unit_count: unit_count,
+      estimated_cost: estimated_cost,
+      currency: currency,
+      workspace_currency: workspace_currency,
+      exchange_rate: exchange_rate,
+      start_date: start_date,
+      due_date: due_date,
+      created_at: created_at,
+      updated_at: updated_at,
+    }
   end
 end

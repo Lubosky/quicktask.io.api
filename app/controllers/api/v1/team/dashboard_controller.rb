@@ -14,7 +14,7 @@ class Api::V1::Team::DashboardController < Api::V1::Team::ApplicationController
 
   def accessible_records
     @accessible_records ||=
-      Dashboard::TaskFinder.new(
+      Finders::TaskFinder.new(
         user: current_entity,
         workspace: current_workspace,
         filters: filters,
@@ -27,7 +27,7 @@ class Api::V1::Team::DashboardController < Api::V1::Team::ApplicationController
   end
 
   def meta
-    @meta ||= Dashboard::TaskMeta.new(accessible_records, true).call
+    @meta ||= Finders::TaskMeta.new(accessible_records, true).call
   end
 
   def filters

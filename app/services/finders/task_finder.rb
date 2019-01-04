@@ -23,7 +23,7 @@
 #     page: string
 #
 
-module Dashboard
+module Finders
   class TaskFinder
     AGGREGATIONS = %i[status completed_status]
 

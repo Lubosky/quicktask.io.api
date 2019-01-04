@@ -22,9 +22,9 @@ module Api
 
     def context
       {
-        current_user: current_user,
-        current_workspace: current_workspace,
-        current_account: current_account,
+        current_user: User.find(263511571232194566),
+        current_workspace: Workspace.find(263511586818228248),
+        current_account: WorkspaceAccount.find(263511654447186357),
         request: {
           remote_ip: request.remote_ip,
           host: request.host,

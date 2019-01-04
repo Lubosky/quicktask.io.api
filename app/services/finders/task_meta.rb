@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module Dashboard
+module Finders
   class TaskMeta
     DATE_AGGREGATIONS = %w(due_date completed_date)
     STATUS_AGGREGATIONS = %w(status completed_status)

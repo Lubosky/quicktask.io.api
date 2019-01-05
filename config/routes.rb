@@ -32,6 +32,7 @@ Rails.application.routes.draw do
 
         namespace :team, module: :team, as: :team do
           resources :dashboard, only: [:index]
+          resources :client_requests, only: [:index]
           resources :clients
           resources :contractors
           resources :projects do
@@ -50,6 +51,7 @@ Rails.application.routes.draw do
               end
             end
           end
+          resources :quotes, only: [:index]
         end
 
         namespace :vendor, module: :vendor, as: :vendor do

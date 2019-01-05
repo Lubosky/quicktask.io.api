@@ -1,10 +1,9 @@
 # frozen_string_literal: true
 
 module Finders
-  class TaskMeta < Finders::BaseMeta
-    DATE_AGGREGATIONS = %w(due_date completed_date)
-    STATUS_AGGREGATIONS = %w(status completed_status)
-    OTHER_AGGREGATIONS = %w(assignees owners projects)
+  class ClientRequestMeta < Finders::BaseMeta
+    DATE_AGGREGATIONS = %w(created_date start_date)
+    OTHER_AGGREGATIONS = %w(clients requesters services)
 
     private
 
@@ -24,25 +23,19 @@ module Finders
     end
 
     def get_status_aggregations
-      STATUS_AGGREGATIONS.each_with_object({}) do |param|
-        buckets = aggregations.dig(param, param, 'buckets')
+      buckets = aggregations.dig('status', 'status', 'buckets')
 
-        unless buckets.empty?
-          if param == 'status'
-            data = { completed: 0, uncompleted: 0 }
-          else
-            data = { late: 0, on_time: 0 }
-          end
+      unless buckets.empty?
+        data = { draft: 0, pending: 0, estimated: 0, cancelled: 0, withdrawn: 0 }
 
-          buckets.each_with_object({}) do |h|
-            key = h['key']
-            value = h['doc_count'] || 0
+        buckets.each_with_object({}) do |h|
+          key = h['key']
+          value = h['doc_count'] || 0
 
-            data[h_key(key)] = value
-          end
-
-          stats[h_key(param)] = data
+          data[h_key(key)] = value
         end
+
+        stats[h_key(:status)] = data
       end
     end
 

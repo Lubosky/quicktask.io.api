@@ -1,6 +1,11 @@
 class Quote < ApplicationRecord
   include AASM, EnsureUUID
 
+  searchkick callbacks: :async,
+             index_name: -> { "#{Rails.env}-#{self.model_name.plural}" },
+             routing: true,
+             searchable: [:subject, :identifier, :purchase_order_number, :client]
+
   belongs_to :client, inverse_of: :quotes
   belongs_to :owner, class_name: 'TeamMember'
   belongs_to :workspace, inverse_of: :quotes
@@ -48,6 +53,8 @@ class Quote < ApplicationRecord
             :total,
             numericality: { greater_than_or_equal_to: 0 }
   validate :validate_start_date_before_due_date
+
+  scope :search_import, -> { includes(:client, :owner, :client_request, :project) }
 
   enum quote_type: [:quote]
   enum status: { draft: 0, sent: 1, accepted: 2, declined: 3, expired: 4, cancelled: 5 }
@@ -127,6 +134,10 @@ class Quote < ApplicationRecord
     Converter::Quote.convert(self, user)
   end
 
+  def search_routing
+    workspace_id
+  end
+
   private
 
   def set_default_attributes
@@ -139,5 +150,43 @@ class Quote < ApplicationRecord
     if due_date && start_date && due_date < start_date
       errors.add(:due_date, :greater_than_start_date)
     end
+  end
+
+  def search_data
+    {
+      type: quote_type,
+      subject: subject,
+      identifier: identifier,
+      purchase_order_number: purchase_order_number,
+      status: status,
+      workspace_id: workspace_id,
+      client_id: client&.id,
+      client: client&.name,
+      owner_id: owner_id,
+      owner: owner&.name,
+      client_request_id: client_request&.id,
+      client_request: client_request&.subject,
+      project_id: project&.id,
+      project: project&.name,
+      discount: discount,
+      surcharge: surcharge,
+      subtotal: subtotal,
+      total: total,
+      has_client_request: client_request.present?,
+      has_project: project.present?,
+      currency: currency,
+      workspace_currency: workspace_currency,
+      exchange_rate: exchange_rate,
+      issue_date: issue_date,
+      expiry_date: expiry_date,
+      start_date: start_date,
+      due_date: due_date,
+      accepted_at: accepted_at,
+      cancelled_at: cancelled_at,
+      declined_at: declined_at,
+      sent_at: sent_at,
+      created_at: created_at,
+      updated_at: updated_at,
+    }
   end
 end

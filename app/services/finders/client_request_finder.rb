@@ -3,54 +3,13 @@
 #
 # Used to filter ClientRequest collections by set of params
 #
-# Arguments:
-#   user - which account use
-#   params:
-#     assignee_id: integer or 'me' or 'none' or 'any'
-#     owner_id: integer
-#     project_id: integer
-#     start_date: date or 'none', 'all', '30_days', '60_days', '90_days'
-#     due_date: date or 'none', 'overdue', 'today', 'week', or 'month'
-#     created_before: datetime
-#     updated_after: datetime
-#     updated_before: datetime
-#     status: 'completed' or 'uncompleted'
-#     scope: 'created_by_me' or 'assigned_to_me' or 'mine'
-#     search: string
-#     sort: string
-#     limit: string
-#     offset: string
-#     page: string
-#
 
 module Finders
-  class ClientRequestFinder
+  class ClientRequestFinder < Finders::BaseFinder
     AGGREGATIONS = %i[type status]
 
-    ALL = 'all'.freeze
-    ANY = 'any'.freeze
-    NONE = 'none'.freeze
-
-    DUE_DATE = 'due_date'.freeze
-    ANY_DATE = ''.freeze
-    YESTERDAY = 'yesterday'.freeze
-    TODAY = 'today'.freeze
-    TOMORROW = 'tomorrow'.freeze
-    THIS_WEEK = 'week'.freeze
-    PREVIOUS_WEEK = 'previous_week'.freeze
-    THIS_MONTH = 'month'.freeze
-    PREVIOUS_MONTH = 'previous_month'.freeze
-
-    CREATED_TODAY = 'created_today'.freeze
-    CREATED_YESTERDAY = 'created_yesterday'.freeze
-    CREATED_THIS_WEEK = 'created_this_week'.freeze
-    CREATED_THIS_MONTH = 'created_this_month'.freeze
-    CREATED_PREVIOUS_WEEK = 'created_previous_week'.freeze
-    CREATED_PREVIOUS_MONTH = 'created_previous_month'.freeze
-
-    DATE_FORMAT = '%FT%T%:z'.freeze
-
-    attr_accessor :user, :workspace, :filters, :options, :query
+    NOT_URGENT = 'not_urgent'.freeze
+    URGENT = 'urgent'.freeze
 
     def valid_params
       @valid_params ||= %i[
@@ -62,6 +21,8 @@ module Finders
         created_at
         type
         status
+        exclude_status
+        scope
         search
       ]
     end
@@ -75,24 +36,8 @@ module Finders
       ]
     end
 
-    def initialize(user:, workspace: nil, filters: {}, options: {})
-      normalized_filters = filters.delete_if {
-        |k, v| !k.to_sym.in?(valid_params) ||
-          (v.is_a?(Array) ? v.reject!(&:blank?).blank? : v.blank?)
-      }.with_indifferent_access
-
-      normalized_options = options.delete_if { |k, v| !k.to_sym.in?(valid_options) }.with_indifferent_access
-
-      @user = user
-      @workspace = workspace
-      @filters = normalized_filters
-      @options = normalized_options
-      @query = {}
-    end
-
     def execute
-      init_query
-      filter_criteria
+      super
 
       @client_requests ||=
         ClientRequest.search(search_query,
@@ -111,18 +56,11 @@ module Finders
     def filter_criteria
       by_type
       by_status
+      by_scope
       by_requester
       by_client
       by_service
       by_created_date
-    end
-
-    def empty?
-      filters.empty?
-    end
-
-    def search_query
-      filters[:search].presence || '*'
     end
 
     def type_filter
@@ -131,6 +69,14 @@ module Finders
 
     def status_filter
       filters[:status].presence
+    end
+
+    def scope_filter
+      filters[:scope].presence
+    end
+
+    def exclude_status_filter
+      filters[:exclude_status].presence
     end
 
     def client_filter
@@ -159,22 +105,30 @@ module Finders
 
     private
 
-    def init_query
-      query.tap do |hash|
-        hash[:workspace_id] = workspace.id if workspace.present?
-      end
-    end
-
     def by_type
-      query.tap { |h| h[:type] = type_filter } if type_filter.present?
+      return if type_filter == ALL || type_filter.blank?
+      query.tap { |h| h[:type] = type_filter }
     end
 
     def by_status
       query.tap { |h| h[:status] = status_filter } if status_filter.present?
+      query.tap { |h| h[:_and] = [{ status: { not: exclude_status_filter } }] } if exclude_status_filter.present?
     end
 
-    def by_project
-      query.tap { |h| h[:project_id] = project_filter } if project_filter.present?
+    def by_scope
+      return unless scope_filter.present? &&
+        scope_filter.to_s.downcase.in?([URGENT, NOT_URGENT])
+      timestamp = Time.current + 3.days
+      if scope_filter.to_s.downcase == URGENT
+        term = { lte: timestamp.end_of_day }
+      else
+        term = { gt: timestamp.end_of_day }
+      end
+
+      query.tap do |h|
+        h[:start_date] = term
+        h[:status] = 'pending'
+      end
     end
 
     def by_client
@@ -189,39 +143,33 @@ module Finders
       query.tap { |h| h[:service_id] = service_filter } if service_filter.present?
     end
 
-    def filter_by_created_by_me?
-      owner_filter.to_s.downcase == ME
-    end
-
     def by_created_date
       return if created_date_filter == ALL || created_date_filter.blank?
 
-      today = Date.today
-      yesterday = Date.yesterday
-
       if created_date_filter == TODAY
-        term = today.beginning_of_day..today.end_of_day
+        term = start_of_today..end_of_today
       elsif created_date_filter == YESTERDAY
-        term = yesterday.beginning_of_day..yesterday.end_of_day
+        term = start_of_yesterday..end_of_yesterday
       elsif created_date_filter == THIS_WEEK
-        term = today.beginning_of_week.beginning_of_day..today.end_of_week.end_of_day
+        term = start_of_week..end_of_week
       elsif created_date_filter == THIS_MONTH
-        term = today.beginning_of_month.beginning_of_day..today.end_of_month.end_of_day
+        term = start_of_month..end_of_month
       elsif created_date_filter == PREVIOUS_WEEK
-        term = today.prev_week.beginning_of_week.beginning_of_day..today.prev_week.end_of_week.end_of_day
+        term = start_of_previous_week..end_previous_of_week
       elsif created_date_filter == PREVIOUS_MONTH
-        term = today.prev_month.beginning_of_month.beginning_of_day..today.prev_month.end_of_month.end_of_day
+        term = start_of_previous_month..end_of_previous_month
       end
 
-      query.tap { |h| h[:created_at] = date.beginning_of_day }
+      query.tap { |h| h[:created_at] = term }
     end
 
     def order
       case options[:sort].presence.to_s
       when 'created_date_asc'  then { created_at: :asc }
       when 'created_date_desc'  then { created_at: :desc }
+      when 'start_date_asc'  then { start_date: :asc }
       when 'client_name_asc' then { client: :asc }
-      else { updated_at: :desc } end
+      else super end
     end
 
     def limit
@@ -238,7 +186,6 @@ module Finders
 
     def body_options
       @agg_filters ||= set_agg_filters
-      @agg_created_date_ranges ||= set_date_ranges('created_date')
 
       {
         aggs: {
@@ -275,68 +222,45 @@ module Finders
               }
             }
           },
-          created_at: {
+          created_date: {
             filter: @agg_filters,
-            aggs: @agg_created_date_ranges
+            aggs: set_date_ranges(key: 'created', param: 'created_at')
           },
+          start_date: {
+            filter: set_current_agg_filters(:status, 'pending'),
+            aggs: set_date_ranges(key: :start, param: :start_date)
+          }
         }
       }
     end
 
-    def set_agg_filters
-      get_agg_filters
+    def date_ranges(key)
+      case key
+      when :start
+        start_date_ranges
+      else
+        default_date_ranges(key)
+      end
     end
 
-    def get_agg_filters(post_query = nil)
-      q = post_query.blank? ? query : post_query
-
-      agg_filters = Hash.new()
-      predicate = Hash.new()
-
-      where_filters = Elastic::Query.transform(q)
-
-      predicate[:must] = where_filters
-      agg_filters[:bool] = predicate
-      return agg_filters
-    end
-
-    def set_date_ranges(param)
-      agg_hash = Hash.new()
-      date_range = Hash.new()
-      predicate = Hash.new()
-      agg_key = "#{param}_count".to_sym
-
-      predicate[:field] = param
-      predicate[:missing] = Date.new(0, 1, 1).strftime(DATE_FORMAT)
-      predicate[:ranges] = send("#{param}_ranges")
-
-      date_range[:date_range] = predicate
-      agg_hash[agg_key] = date_range
-
-      return agg_hash
-    end
-
-    def created_date_ranges
-      start_of_today          = Date.today.beginning_of_day.strftime(DATE_FORMAT)
-      end_of_today            = Date.today.end_of_day.strftime(DATE_FORMAT)
-      start_of_yesterday      = Date.yesterday.beginning_of_day.strftime(DATE_FORMAT)
-      end_of_yesterday        = Date.yesterday.end_of_day.strftime(DATE_FORMAT)
-      start_of_week           = Date.today.beginning_of_week.beginning_of_day.strftime(DATE_FORMAT)
-      end_of_week             = Date.today.end_of_week.end_of_day.strftime(DATE_FORMAT)
-      start_of_month          = Date.today.beginning_of_month.beginning_of_day.strftime(DATE_FORMAT)
-      end_of_month            = Date.today.end_of_month.end_of_day.strftime(DATE_FORMAT)
-      start_of_previous_week  = Date.today.prev_week.beginning_of_week.beginning_of_day.strftime(DATE_FORMAT)
-      end_of_previous_week    = Date.today.prev_week.end_of_week.end_of_day.strftime(DATE_FORMAT)
-      start_of_previous_month = Date.today.prev_month.beginning_of_month.beginning_of_day.strftime(DATE_FORMAT)
-      end_of_previous_month   = Date.today.prev_month.end_of_month.end_of_day.strftime(DATE_FORMAT)
+    def start_date_ranges
+      three_days_from_now = Time.current + 3.days
 
       return [
-        { key: CREATED_TODAY, from: start_of_today, to: end_of_today },
-        { key: CREATED_YESTERDAY, from: start_of_yesterday, to: end_of_yesterday },
-        { key: CREATED_THIS_WEEK, from: start_of_week, to: end_of_week },
-        { key: CREATED_THIS_MONTH, from: start_of_month, to: end_of_month },
-        { key: CREATED_PREVIOUS_WEEK, from: start_of_previous_week, to: end_of_previous_month },
-        { key: CREATED_PREVIOUS_MONTH, from: start_of_previous_month, to: end_of_previous_week }
+        { key: 'no_start_date', to: past_date.end_of_day.strftime(DATE_FORMAT) },
+        { key: 'urgent', from: past_date.tomorrow.strftime(DATE_FORMAT), to: three_days_from_now.end_of_day },
+        { key: 'remaining', from: three_days_from_now.tomorrow.beginning_of_day }
+      ]
+    end
+
+    def default_date_ranges(key)
+      [
+        { key: "#{key}_today", from: start_of_today, to: end_of_today },
+        { key: "#{key}_yesterday", from: start_of_yesterday, to: end_of_yesterday },
+        { key: "#{key}_this_week", from: start_of_week, to: end_of_week },
+        { key: "#{key}_this_month", from: start_of_month, to: end_of_month },
+        { key: "#{key}_previous_week", from: start_of_previous_week, to: end_of_previous_month },
+        { key: "#{key}_previous_month", from: start_of_previous_month, to: end_of_previous_week }
       ]
     end
   end

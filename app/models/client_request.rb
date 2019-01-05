@@ -46,12 +46,7 @@ class ClientRequest < ApplicationRecord
   validate :validate_request_type
   validate :validate_start_date_before_due_date
 
-  scope :search_import, -> {
-    includes(
-      :client, :requester, :service, :quote
-    )
-  }
-
+  scope :search_import, -> { includes(:client, :requester, :service, :quote) }
 
   enum status: { draft: 0, pending: 1, estimated: 2, cancelled: 3, withdrawn: 4 }
 

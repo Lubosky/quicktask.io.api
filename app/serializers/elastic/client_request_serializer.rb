@@ -37,6 +37,10 @@ class Elastic::ClientRequestSerializer < BaseSerializer
              :exchange_rate,
              :start_date,
              :due_date,
+             :submitted_at,
+             :estimated_at,
+             :cancelled_at,
+             :withdrawn_at,
              :created_at,
              :updated_at
 end

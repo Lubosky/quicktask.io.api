@@ -229,6 +229,22 @@ module Finders
           start_date: {
             filter: set_current_agg_filters(:status, 'pending'),
             aggs: set_date_ranges(key: :start, param: :start_date)
+          },
+          submitted_date: {
+            filter: @agg_filters,
+            aggs: set_date_ranges(key: :submitted, param: :submitted_at)
+          },
+          estimated_date: {
+            filter: set_current_agg_filters(:status, 'estimated'),
+            aggs: set_date_ranges(key: :estimated, param: :estimated_at)
+          },
+          cancelled_date: {
+            filter: set_current_agg_filters(:status, 'cancelled'),
+            aggs: set_date_ranges(key: :cancelled, param: :cancelled_at)
+          },
+          withdrawn_date: {
+            filter: set_current_agg_filters(:status, 'withdrawn'),
+            aggs: set_date_ranges(key: :withdrawn, param: :withdrawn_at)
           }
         }
       }

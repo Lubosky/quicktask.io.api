@@ -2,7 +2,7 @@
 
 module Finders
   class ClientRequestMeta < Finders::BaseMeta
-    DATE_AGGREGATIONS = %w(created_date start_date)
+    DATE_AGGREGATIONS = %w(created_date start_date submitted_date estimated_date cancelled_date withdrawn_date)
     OTHER_AGGREGATIONS = %w(clients requesters services)
 
     private

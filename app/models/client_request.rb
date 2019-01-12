@@ -28,6 +28,16 @@ class ClientRequest < ApplicationRecord
     exchange_rate: :decimal,
     workspace_currency: :string
 
+  jsonb_accessor :metadata,
+    submitted_at: [:datetime, default: nil],
+    estimated_at: [:datetime, default: nil],
+    cancelled_at: [:datetime, default: nil],
+    withdrawn_at: [:datetime, default: nil]
+
+  jsonb_accessor :request_data,
+    cancellation_reason: [:text, default: nil],
+    withdrawal_reason: [:text, default: nil]
+
   after_initialize :set_default_attributes, on: :create
   before_save :calculate_estimated_cost
 
@@ -55,18 +65,34 @@ class ClientRequest < ApplicationRecord
     state :pending, :estimated, :cancelled, :withdrawn
 
     event :submit do
+      before do
+        self.submitted_at = DateTime.current
+      end
+
       transitions :from => :draft, :to => :pending
     end
 
     event :estimate do
+      before do
+        self.estimated_at = DateTime.current
+      end
+
       transitions :from => :pending, :to => :estimated
     end
 
     event :cancel do
-      transitions :from => :pending, :to => :cancelled
+      before do
+        self.cancelled_at = DateTime.current
+      end
+
+      transitions :from => [:pending, :estimated], :to => :cancelled
     end
 
     event :withdraw do
+      before do
+        self.withdrawn_at = DateTime.current
+      end
+
       transitions :from => [:draft, :pending], :to => :withdrawn
     end
   end
@@ -159,6 +185,10 @@ class ClientRequest < ApplicationRecord
       exchange_rate: exchange_rate,
       start_date: start_date,
       due_date: due_date,
+      submitted_at: submitted_at,
+      estimated_at: estimated_at,
+      cancelled_at: cancelled_at,
+      withdrawn_at: withdrawn_at,
       created_at: created_at,
       updated_at: updated_at,
     }

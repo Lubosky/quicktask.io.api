@@ -46,11 +46,11 @@ module Finders
         unless buckets.empty?
           data = {}
           buckets.each_with_object({}) do |h|
+            key = h['key']
+            param_name = "#{param.to_s.singularize}_name"
             values = {}
 
-            key = h['key']
-
-            values[h_key(:name)] = h.dig('name', 'hits', 'hits', 0,  '_source', param.to_s.singularize)
+            values[h_key(:name)] = h.dig('name', 'hits', 'hits', 0,  '_source', param_name)
             values[h_key(:count)] = h['doc_count'] || 0
 
             data[h_key(key)] = values

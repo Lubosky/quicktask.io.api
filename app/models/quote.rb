@@ -4,7 +4,7 @@ class Quote < ApplicationRecord
   searchkick callbacks: :async,
              index_name: -> { "#{Rails.env}-#{self.model_name.plural}" },
              routing: true,
-             searchable: [:subject, :identifier, :purchase_order_number, :client]
+             searchable: [:subject, :identifier, :purchase_order_number, :client_name]
 
   belongs_to :client, inverse_of: :quotes
   belongs_to :owner, class_name: 'TeamMember'
@@ -76,7 +76,7 @@ class Quote < ApplicationRecord
         self.set_metadata(accepted_at: DateTime.current)
       end
 
-      transitions :from => [:sent, :accepted, :declined, :expired, :cancelled], :to => :accepted
+      transitions :from => [:sent, :declined, :expired, :cancelled], :to => :accepted
     end
 
     event :decline do
@@ -84,11 +84,11 @@ class Quote < ApplicationRecord
         self.set_metadata(declined_at: DateTime.current)
       end
 
-      transitions :from => [:sent, :accepted, :declined, :expired, :cancelled], :to => :declined
+      transitions :from => [:sent, :accepted, :expired, :cancelled], :to => :declined
     end
 
     event :expire do
-      transitions :from => [:draft, :sent, :accepted, :declined, :expired, :cancelled], :to => :expired
+      transitions :from => [:draft, :sent, :accepted, :declined, :cancelled], :to => :expired
     end
 
     event :cancel do
@@ -96,28 +96,8 @@ class Quote < ApplicationRecord
         self.set_metadata(cancelled_at: DateTime.current)
       end
 
-      transitions :from => [:draft, :sent, :accepted, :declined, :expired, :cancelled], :to => :cancelled
+      transitions :from => [:draft, :sent, :accepted, :declined, :expired], :to => :cancelled
     end
-  end
-
-  def accepted?
-    status == 'accepted'
-  end
-
-  def cancelled?
-    status == 'cancelled'
-  end
-
-  def declined?
-    status == 'declined'
-  end
-
-  def expired?
-    status == 'expired'
-  end
-
-  def sent?
-    status == 'sent'
   end
 
   def set_metadata(accepted_at: nil, cancelled_at: nil, declined_at: nil)
@@ -161,13 +141,13 @@ class Quote < ApplicationRecord
       status: status,
       workspace_id: workspace_id,
       client_id: client&.id,
-      client: client&.name,
+      client_name: client&.name,
       owner_id: owner_id,
-      owner: owner&.name,
+      owner_name: owner&.name,
       client_request_id: client_request&.id,
-      client_request: client_request&.subject,
+      client_request_identifier: client_request&.subject,
       project_id: project&.id,
-      project: project&.name,
+      project_name: project&.name,
       discount: discount,
       surcharge: surcharge,
       subtotal: subtotal,

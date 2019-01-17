@@ -8,6 +8,7 @@ module Finders
   class TaskFinder < Finders::BaseFinder
     AGGREGATIONS = %i[status completed_status]
 
+    LATE = 'late'.freeze
     OVERDUE = 'overdue'.freeze
     COMPLETED = 'completed'.freeze
     UNCOMPLETED = 'uncompleted'.freeze
@@ -228,9 +229,9 @@ module Finders
 
     def order
       case options[:sort].presence.to_s
-      when 'due_date_asc'  then { due_date: :asc }
-      when 'due_date_desc' then { due_date: :desc }
-      when 'completed_date_desc' then { completed_date: :desc }
+      when 'due_date_asc'  then { due_date: { order: :asc, unmapped_type: :long } }
+      when 'due_date_desc' then { due_date: { order: :desc, unmapped_type: :long } }
+      when 'completed_date_desc' then { completed_date: { order: :desc, unmapped_type: :long } }
       else super end
     end
 
@@ -245,7 +246,7 @@ module Finders
               assignees: {
                 terms: { field: 'assignee_id', size: 100 },
                 aggs: {
-                  name: { top_hits: { size: 1, _source: { include: ['assignee'] } } }
+                  name: { top_hits: { size: 1, _source: { include: ['assignee_name'] } } }
                 }
               }
             }
@@ -256,7 +257,7 @@ module Finders
               owners: {
                 terms: { field: 'owner_id', size: 100 },
                 aggs: {
-                  name: { top_hits: { size: 1, _source: { include: ['owner'] } } }
+                  name: { top_hits: { size: 1, _source: { include: ['owner_name'] } } }
                 }
               }
             }
@@ -267,7 +268,7 @@ module Finders
               projects: {
                 terms: { field: 'project_id', size: 100 },
                 aggs: {
-                  name: { top_hits: { size: 1, _source: { include: ['project'] } } }
+                  name: { top_hits: { size: 1, _source: { include: ['project_name'] } } }
                 }
               }
             }
@@ -289,7 +290,7 @@ module Finders
       when :due
         due_date_ranges
       else
-        default_date_ranges(key)
+        default_date_ranges
       end
     end
 

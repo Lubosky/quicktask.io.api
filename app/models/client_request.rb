@@ -6,7 +6,7 @@ class ClientRequest < ApplicationRecord
   searchkick callbacks: :async,
              index_name: -> { "#{Rails.env}-#{self.model_name.plural}" },
              routing: true,
-             searchable: [:subject, :identifier, :client, :requester]
+             searchable: [:subject, :identifier, :client_name, :requester_name]
 
   belongs_to :client, inverse_of: :client_requests
   belongs_to :requester, class_name: 'ClientContact', inverse_of: :client_requests
@@ -171,13 +171,13 @@ class ClientRequest < ApplicationRecord
       status: status,
       workspace_id: workspace_id,
       client_id: client&.id,
-      client: client&.name,
+      client_name: client&.name,
       requester_id: requester_id,
-      requester: requester&.name,
+      requester_name: requester&.name,
       quote_id: quote&.id,
-      quote: quote&.subject,
+      quote_identifier: quote&.subject,
       service_id: service_id,
-      service: service&.name,
+      service_name: service&.name,
       unit_count: unit_count,
       estimated_cost: estimated_cost,
       currency: currency,

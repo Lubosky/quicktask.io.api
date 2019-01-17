@@ -155,7 +155,7 @@ module Finders
       elsif created_date_filter == THIS_MONTH
         term = start_of_month..end_of_month
       elsif created_date_filter == PREVIOUS_WEEK
-        term = start_of_previous_week..end_previous_of_week
+        term = start_of_previous_week..end_of_previous_week
       elsif created_date_filter == PREVIOUS_MONTH
         term = start_of_previous_month..end_of_previous_month
       end
@@ -167,21 +167,9 @@ module Finders
       case options[:sort].presence.to_s
       when 'created_date_asc'  then { created_at: :asc }
       when 'created_date_desc'  then { created_at: :desc }
-      when 'start_date_asc'  then { start_date: :asc }
-      when 'client_name_asc' then { client: :asc }
+      when 'start_date_asc'  then { start_date: { order: :asc, unmapped_type: :long } }
+      when 'client_name_asc' then { client_name: { order: :asc, unmapped_type: :long } }
       else super end
-    end
-
-    def limit
-      options[:limit].presence
-    end
-
-    def offset
-      options[:offset].presence
-    end
-
-    def page
-      options[:page].presence
     end
 
     def body_options
@@ -195,7 +183,7 @@ module Finders
               clients: {
                 terms: { field: 'client_id', size: 100 },
                 aggs: {
-                  name: { top_hits: { size: 1, _source: { include: ['client'] } } }
+                  name: { top_hits: { size: 1, _source: { include: ['client_name'] } } }
                 }
               }
             }
@@ -206,7 +194,7 @@ module Finders
               requesters: {
                 terms: { field: 'requester_id', size: 100 },
                 aggs: {
-                  name: { top_hits: { size: 1, _source: { include: ['requester'] } } }
+                  name: { top_hits: { size: 1, _source: { include: ['requester_name'] } } }
                 }
               }
             }
@@ -217,7 +205,7 @@ module Finders
               services: {
                 terms: { field: 'service_id', size: 100 },
                 aggs: {
-                  name: { top_hits: { size: 1, _source: { include: ['service'] } } }
+                  name: { top_hits: { size: 1, _source: { include: ['service_name'] } } }
                 }
               }
             }
@@ -255,7 +243,7 @@ module Finders
       when :start
         start_date_ranges
       else
-        default_date_ranges(key)
+        default_date_ranges
       end
     end
 
@@ -266,17 +254,6 @@ module Finders
         { key: 'no_start_date', to: past_date.end_of_day.strftime(DATE_FORMAT) },
         { key: 'urgent', from: past_date.tomorrow.strftime(DATE_FORMAT), to: three_days_from_now.end_of_day },
         { key: 'remaining', from: three_days_from_now.tomorrow.beginning_of_day }
-      ]
-    end
-
-    def default_date_ranges(key)
-      [
-        { key: "#{key}_today", from: start_of_today, to: end_of_today },
-        { key: "#{key}_yesterday", from: start_of_yesterday, to: end_of_yesterday },
-        { key: "#{key}_this_week", from: start_of_week, to: end_of_week },
-        { key: "#{key}_this_month", from: start_of_month, to: end_of_month },
-        { key: "#{key}_previous_week", from: start_of_previous_week, to: end_of_previous_month },
-        { key: "#{key}_previous_month", from: start_of_previous_month, to: end_of_previous_week }
       ]
     end
   end

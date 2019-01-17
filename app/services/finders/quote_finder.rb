@@ -8,11 +8,12 @@ module Finders
   class QuoteFinder < Finders::BaseFinder
     AGGREGATIONS = %i[status]
 
-    NO_DUE_DATE = 'no_due_date'.freeze
-    DUE_TODAY = 'due_today'.freeze
-    DUE_TOMORROW = 'due_tomorrow'.freeze
-    DUE_THIS_WEEK = 'due_this_week'.freeze
-    DUE_THIS_MONTH = 'due_this_month'.freeze
+    NO_EXPIRY_DATE = 'no_expiry_date'.freeze
+    EXPIRED = 'expired'.freeze
+    EXPIRY_DATE_TODAY = 'expiry_date_today'.freeze
+    EXPIRY_DATE_TOMORROW = 'expiry_date_tomorrow'.freeze
+    EXPIRY_DATE_THIS_WEEK = 'expiry_date_this_week'.freeze
+    EXPIRY_DATE_THIS_MONTH = 'expiry_date_this_month'.freeze
 
     def valid_params
       @valid_params ||= %i[
@@ -21,6 +22,7 @@ module Finders
         status
         exclude_status
         expiry_date
+        sent_at
         accepted_at
         cancelled_at
         declined_at
@@ -45,7 +47,6 @@ module Finders
       @tasks ||=
         Quote.search(search_query,
           where: query,
-          misspellings: { fields: [:description] },
           routing: workspace&.id,
           aggs: AGGREGATIONS,
           body_options: body_options,
@@ -64,6 +65,7 @@ module Finders
       by_owner
       by_expiry_date
       by_created_date
+      by_date('sent')
       by_date('accepted')
       by_date('cancelled')
       by_date('declined')
@@ -91,6 +93,10 @@ module Finders
 
     def expiry_date_filter
       filters[:expiry_date].presence
+    end
+
+    def sent_date_filter
+      filters[:sent_at].presence
     end
 
     def accepted_date_filter
@@ -144,8 +150,8 @@ module Finders
     def by_created_date
       return if created_date_filter == ALL || created_date_filter.blank?
 
-      if created_date_filter == NONE
-        date = nil
+      if created_date_filter == SEVEN_DAYS
+        date = Date.today - 1.week
       elsif created_date_filter == THIRTY_DAYS
         date = Date.today - 30.days
       elsif created_date_filter == SIXTY_DAYS
@@ -161,17 +167,17 @@ module Finders
 
     def by_expiry_date
       if expiry_date_filter.present?
-        if expiry_date_filter == NONE
+        if expiry_date_filter == NO_EXPIRY_DATE
           term = nil
         elsif expiry_date_filter == EXPIRED
           term = { lte: Time.current }
-        elsif expiry_date_filter == TODAY
+        elsif expiry_date_filter == EXPIRY_DATE_TODAY
           term = start_of_today..end_of_today
-        elsif expiry_date_filter == TOMORROW
+        elsif expiry_date_filter == EXPIRY_DATE_TOMORROW
           term = start_of_tomorrow..end_of_tomorrow
-        elsif expiry_date_filter == THIS_WEEK
+        elsif expiry_date_filter == EXPIRY_DATE_THIS_WEEK
           term = start_of_week..end_of_week
-        elsif expiry_date_filter == THIS_MONTH
+        elsif expiry_date_filter == EXPIRY_DATE_THIS_MONTH
           term = start_of_previous_month..end_of_previous_month
         end
 
@@ -195,7 +201,7 @@ module Finders
         elsif filter == THIS_MONTH
           term = start_of_month..end_of_month
         elsif filter == PREVIOUS_WEEK
-          term = start_of_previous_week..end_previous_of_week
+          term = start_of_previous_week..end_of_previous_week
         elsif filter == PREVIOUS_MONTH
           term = start_of_previous_month..end_of_previous_month
         end
@@ -206,11 +212,13 @@ module Finders
 
     def order
       case options[:sort].presence.to_s
-      when 'expiry_date_desc'  then { expiry_date: :desc }
-      when 'accepted_date_desc'  then { accepted_date: :desc }
-      when 'cancelled_date_desc'  then { cancelled_at: :desc }
-      when 'declined_date_desc'  then { declined_at: :desc }
-      when 'created_date_desc'  then { created_at: :desc }
+      when 'client_name_asc'     then { client_name: { order: :asc, unmapped_type: :long } }
+      when 'expiry_date_desc'     then { expiry_date: { order: :desc, unmapped_type: :long } }
+      when 'sent_date_desc'       then { sent_at: { order: :desc, unmapped_type: :long } }
+      when 'accepted_date_desc'   then { accepted_at: { order: :desc, unmapped_type: :long } }
+      when 'cancelled_date_desc'  then { cancelled_at: { order: :desc, unmapped_type: :long } }
+      when 'declined_date_desc'   then { declined_at: { order: :desc, unmapped_type: :long } }
+      when 'created_date_desc'    then { created_at: :desc }
       else super end
     end
 
@@ -225,7 +233,7 @@ module Finders
               clients: {
                 terms: { field: 'client_id', size: 100 },
                 aggs: {
-                  name: { top_hits: { size: 1, _source: { include: ['client'] } } }
+                  name: { top_hits: { size: 1, _source: { include: ['client_name'] } } }
                 }
               }
             }
@@ -236,14 +244,22 @@ module Finders
               owners: {
                 terms: { field: 'owner_id', size: 100 },
                 aggs: {
-                  name: { top_hits: { size: 1, _source: { include: ['owner'] } } }
+                  name: { top_hits: { size: 1, _source: { include: ['owner_name'] } } }
                 }
               }
             }
           },
+          created_date: {
+            filter: @agg_filters,
+            aggs: set_date_ranges(key: 'created', param: 'created_at')
+          },
           expiry_date: {
             filter: @agg_filters,
             aggs: set_date_ranges(key: :expiry, param: :expiry_date)
+          },
+          sent_date: {
+            filter: @agg_filters,
+            aggs: set_date_ranges(key: :sent, param: :sent_at)
           },
           accepted_date: {
             filter: set_current_agg_filters(:status, 'accepted'),
@@ -257,27 +273,31 @@ module Finders
             filter: set_current_agg_filters(:status, 'declined'),
             aggs: set_date_ranges(key: :declined, param: :declined_at)
           },
+          expired_date: {
+            filter: set_current_agg_filters(:status, 'expired'),
+            aggs: set_date_ranges(key: :expired, param: :expiry_date)
+          },
         }
       }
     end
 
     def date_ranges(key)
       case key
-      when :expired
+      when :expiry
         expired_date_ranges
       else
-        default_date_ranges(key)
+        default_date_ranges
       end
     end
 
     def expired_date_ranges
       [
-        { key: 'no_expired_date', to: past_date.end_of_day.strftime(DATE_FORMAT) },
+        { key: 'no_expiry_date', to: past_date.end_of_day.strftime(DATE_FORMAT) },
         { key: 'expired', from: past_date.tomorrow.strftime(DATE_FORMAT), to: Time.current },
-        { key: 'expired_today', from: start_of_today, to: end_of_today },
-        { key: 'expired_tomorrow', from: start_of_tomorrow, to: end_of_tomorrow },
-        { key: 'expired_this_week', from: start_of_week, to: end_of_week },
-        { key: 'expired_this_month', from: start_of_month, to: end_of_month }
+        { key: 'expiry_date_today', from: start_of_today, to: end_of_today },
+        { key: 'expiry_date_tomorrow', from: start_of_today, to: end_of_tomorrow },
+        { key: 'expiry_date_this_week', from: start_of_today, to: end_of_week },
+        { key: 'expiry_date_this_month', from: start_of_today, to: end_of_month }
       ]
     end
   end

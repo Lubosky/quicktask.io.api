@@ -2,7 +2,7 @@
 
 module Finders
   class QuoteMeta < Finders::BaseMeta
-    DATE_AGGREGATIONS = %w(expiry_date accepted_date declined_date cancelled_date)
+    DATE_AGGREGATIONS = %w(accepted_date cancelled_date created_date declined_date expired_date expiry_date sent_date)
     STATUS_AGGREGATIONS = %w(status)
     OTHER_AGGREGATIONS = %w(clients owners)
 
@@ -47,13 +47,13 @@ module Finders
         buckets = aggregations.dig(param, param, 'buckets')
 
         unless buckets.empty?
-          data = {}
+          data = Hash.new()
           buckets.each_with_object({}) do |h|
-            values = {}
-
             key = h['key']
+            param_name = "#{param.to_s.singularize}_name"
+            values = Hash.new()
 
-            values[h_key(:name)] = h.dig('name', 'hits', 'hits', 0,  '_source', param.to_s.singularize)
+            values[h_key(:name)] = h.dig('name', 'hits', 'hits', 0,  '_source', param_name)
             values[h_key(:count)] = h['doc_count'] || 0
 
             data[h_key(key)] = values
@@ -71,7 +71,7 @@ module Finders
     end
 
     def count_by_date(param)
-      aggs_data = {}
+      aggs_data = Hash.new()
       count_param = "#{param}_count"
       params = aggregations.dig(param, count_param, 'buckets')
 

@@ -1,28 +1,5 @@
 # frozen_string_literal: true
 
-#
-# Used to filter Quote collections by set of params
-#
-# Arguments:
-#   user - which account to use
-#   params:
-#     assignee_id: integer or 'me' or 'none' or 'any'
-#     owner_id: integer
-#     project_id: integer
-#     start_date: date or 'none', 'all', '30_days', '60_days', '90_days'
-#     due_date: date or 'none', 'overdue', 'today', 'week', or 'month'
-#     created_before: datetime
-#     updated_after: datetime
-#     updated_before: datetime
-#     status: 'completed' or 'uncompleted'
-#     scope: 'created_by_me' or 'assigned_to_me' or 'mine'
-#     search: string
-#     sort: string
-#     limit: string
-#     offset: string
-#     page: string
-#
-
 module Finders
   class BaseFinder
     AGGREGATIONS = %i[status completed_status]
@@ -41,6 +18,7 @@ module Finders
     PREVIOUS_WEEK = 'previous_week'.freeze
     PREVIOUS_MONTH = 'previous_month'.freeze
 
+    SEVEN_DAYS = '7_days'.freeze
     THIRTY_DAYS = '30_days'.freeze
     SIXTY_DAYS = '60_days'.freeze
     NINETY_DAYS = '90_days'.freeze
@@ -87,6 +65,72 @@ module Finders
 
     def search_query
       filters[:search].presence || '*'
+    end
+
+    private
+
+    def init_query
+      query.tap do |hash|
+        hash[:workspace_id] = workspace.id if workspace.present?
+      end
+    end
+
+    def order
+      { updated_at: :desc }
+    end
+
+    def limit
+      options[:limit].presence
+    end
+
+    def offset
+      options[:offset].presence
+    end
+
+    def page
+      options[:page].presence
+    end
+
+    def set_agg_filters
+      get_agg_filters
+    end
+
+    def set_current_agg_filters(key, value)
+      where = query.dup
+      where.merge!({ key => value })
+
+      get_agg_filters(where)
+    end
+
+    def get_agg_filters(post_query = nil)
+      q = post_query.blank? ? query : post_query
+      where_filters = Elastic::Query.transform(q)
+
+      return { bool: { must: where_filters } }
+    end
+
+    def set_date_ranges(key:, param:)
+      agg_hash = Hash.new()
+      agg_key = "#{key}_date_count".to_sym
+      missing = Date.new(0, 1, 1).strftime(DATE_FORMAT)
+
+      return { agg_key => { date_range: { field: param, missing: missing, ranges: date_ranges(key) } } }
+    end
+
+    def date_ranges(key)
+      default_date_ranges
+    end
+
+    def default_date_ranges
+      [
+        { key: "none", to: past_date.end_of_day.strftime(DATE_FORMAT) },
+        { key: "today", from: start_of_today, to: end_of_today },
+        { key: "yesterday", from: start_of_yesterday, to: end_of_yesterday },
+        { key: "this_week", from: start_of_week, to: end_of_week },
+        { key: "this_month", from: start_of_month, to: end_of_month },
+        { key: "previous_week", from: start_of_previous_week, to: end_of_previous_week },
+        { key: "previous_month", from: start_of_previous_month, to: end_of_previous_month }
+      ]
     end
 
     def past_date
@@ -147,86 +191,6 @@ module Finders
 
     def end_of_previous_month
       Date.today.prev_month.end_of_month.end_of_day.strftime(DATE_FORMAT)
-    end
-
-    private
-
-    def init_query
-      query.tap do |hash|
-        hash[:workspace_id] = workspace.id if workspace.present?
-      end
-    end
-
-    def order
-      { updated_at: :desc }
-    end
-
-    def limit
-      options[:limit].presence
-    end
-
-    def offset
-      options[:offset].presence
-    end
-
-    def page
-      options[:page].presence
-    end
-
-    def set_agg_filters
-      get_agg_filters
-    end
-
-    def set_current_agg_filters(key, value)
-      where = query.dup
-      where.merge!({ key => value })
-
-      get_agg_filters(where)
-    end
-
-    def get_agg_filters(post_query = nil)
-      q = post_query.blank? ? query : post_query
-
-      agg_filters = Hash.new()
-      predicate = Hash.new()
-
-      where_filters = Elastic::Query.transform(q)
-
-      predicate[:must] = where_filters
-      agg_filters[:bool] = predicate
-      return agg_filters
-    end
-
-    def set_date_ranges(key:, param:)
-      agg_hash = Hash.new()
-      date_range = Hash.new()
-      predicate = Hash.new()
-      agg_key = "#{key}_date_count".to_sym
-
-      predicate[:field] = param
-      predicate[:missing] = Date.new(0, 1, 1).strftime(DATE_FORMAT)
-      predicate[:ranges] = date_ranges(key)
-
-      date_range[:date_range] = predicate
-      agg_hash[agg_key] = date_range
-
-      return agg_hash
-    end
-
-    def date_ranges(key)
-      default_date_ranges(key)
-    end
-
-    def default_date_ranges(key)
-      [
-        { key: "no_#{key}_date", to: past_date.end_of_day.strftime(DATE_FORMAT) },
-        { key: "#{key}_today", from: start_of_today, to: end_of_today },
-        { key: "#{key}_yesterday", from: start_of_yesterday, to: end_of_yesterday },
-        { key: "#{key}_this_week", from: start_of_week, to: end_of_week },
-        { key: "#{key}_this_month", from: start_of_month, to: end_of_month },
-        { key: "#{key}_previous_week", from: start_of_previous_week, to: end_of_previous_week },
-        { key: "#{key}_previous_month", from: start_of_previous_month, to: end_of_previous_month }
-      ]
     end
   end
 end

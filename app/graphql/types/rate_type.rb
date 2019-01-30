@@ -5,6 +5,39 @@ Types::RateType = GraphQL::ObjectType.define do
   field :id, !types.ID, 'Globally unique ID of the rate.'
   field :uuid, !types.String, 'A unique substitute for a rate ID.'
 
+
+  field :source_language_id, types.ID, 'Globally unique ID of the language.'
+  field :source_language, Types::LanguageType do
+    description ''
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Rate, :source_language).load(obj) }
+    resolve ->(resource, _args, _ctx) { resource }
+  end
+
+  field :target_language_id, types.ID, 'Globally unique ID of the language.'
+  field :target_language, Types::LanguageType do
+    description ''
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Rate, :target_language).load(obj) }
+    resolve ->(resource, _args, _ctx) { resource }
+  end
+
+  field :task_type_id, types.ID, 'Globally unique ID of the task type.'
+  field :task_type, Types::TaskTypeType do
+    description ''
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Rate, :task_type).load(obj) }
+    resolve ->(resource, _args, _ctx) { resource }
+  end
+
+  field :unit_id, types.ID, 'Globally unique ID of the unit.'
+  field :unit, Types::UnitType do
+    description ''
+
+    before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Rate, :unit).load(obj) }
+    resolve ->(resource, _args, _ctx) { resource }
+  end
+
   field :rate_type, types.String, ''
   field :classification, types.String, ''
   field :price, !Types::BigDecimalType, ''

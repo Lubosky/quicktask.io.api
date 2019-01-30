@@ -1,5 +1,5 @@
 class Contractor < ApplicationRecord
-  include EnsureUUID, HasMember, HasName, Taggable
+  include EnsureUUID, HasLocation, HasMember, HasName, Taggable
 
   belongs_to :workspace, inverse_of: :contractors, class_name: 'Workspace'
 

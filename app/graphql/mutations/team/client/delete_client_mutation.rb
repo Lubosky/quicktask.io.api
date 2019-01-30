@@ -3,26 +3,26 @@ module Mutations
     module Client
       DeleteClientMutation = GraphQL::Field.define do
         type Types::ClientType
-        description 'Deletes the project from the workspace.'
+        description 'Deletes the client from the workspace.'
 
         argument :workspaceId, !types.ID, as: :workspace_id
         argument :accountType, !Types::ImpersonationType, as: :account_type
 
-        argument :id, !types.ID, 'Globally unique ID of the project.'
+        argument :id, !types.ID, 'Globally unique ID of the client.'
 
         resource! ->(_obj, args, ctx) {
-          ctx[:current_workspace].projects.find(args[:id])
+          ctx[:current_workspace].clients.find(args[:id])
         }
 
-        authorize! ->(project, _args, ctx) {
-          ::Team::ClientPolicy.new(ctx[:current_account], project).destroy?
+        authorize! ->(client, _args, ctx) {
+          ::Team::ClientPolicy.new(ctx[:current_account], client).destroy?
         }
 
         resolve DeleteClientMutationResolver.new
       end
 
       class DeleteClientMutationResolver
-        def call(project, args, ctx)
+        def call(client, args, ctx)
           context = ctx.to_h.slice(
             :current_user,
             :current_workspace,
@@ -30,7 +30,7 @@ module Mutations
             :request
           )
 
-          action = ::Team::Client::Destroy.run(context: context, project: project)
+          action = ::Team::Client::Destroy.run(context: context, client: client)
 
           if action.valid?
             action.result

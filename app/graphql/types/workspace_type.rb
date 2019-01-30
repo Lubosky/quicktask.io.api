@@ -71,6 +71,22 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     }
   end
 
+  field :client, Types::ClientType do
+    description ''
+
+    argument :client_id, types.ID, 'Globally unique ID of the client.'
+
+    resource ->(obj, args, _ctx) {
+      obj.clients.find(args[:client_id])
+    }, pass_through: true
+
+    authorize! ->(client, _args, ctx) {
+      ::Team::ClientPolicy.new(ctx[:current_account], client).show?
+    }
+
+    resolve ->(client, _args, _ctx) { client }
+  end
+
   field :client_requests do
     type types[Types::ClientRequestType]
     description ''
@@ -103,6 +119,22 @@ Types::WorkspaceType = GraphQL::ObjectType.define do
     resolve ->(promise, args, _ctx) {
       promise.then(proc { |collection| collection.page(args[:page]).per(args[:limit]) })
     }
+  end
+
+  field :contractor, Types::ContractorType do
+    description ''
+
+    argument :contractor_id, types.ID, 'Globally unique ID of the contractor.'
+
+    resource ->(obj, args, _ctx) {
+      obj.contractors.find(args[:contractor_id])
+    }, pass_through: true
+
+    authorize! ->(contractor, _args, ctx) {
+      ::Team::ContractorPolicy.new(ctx[:current_account], contractor).show?
+    }
+
+    resolve ->(contractor, _args, _ctx) { contractor }
   end
 
   field :languages do

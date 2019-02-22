@@ -27,6 +27,8 @@ class Task < ApplicationRecord
     belongs_to :workspace
   end
 
+  belongs_to :regular_project, -> { regular }, class_name: 'Project::Regular', foreign_key: :project_id
+
   with_options optional: true do
     belongs_to :source_language, class_name: 'Language'
     belongs_to :target_language, class_name: 'Language'
@@ -224,10 +226,10 @@ class Task < ApplicationRecord
 
   scope :for_project, -> { joins(:project).where(projects: { project_type: :regular }) }
   scope :search_import, -> {
-    includes(
-      :owner, :task_type, :tasklist, :source_language, :target_language,
+    preload(
+      :regular_project, :owner, :task_type, :tasklist, :source_language, :target_language,
       :unit, :task_type, assignment: :assignee
-    )
+    ).for_project
   }
 
   validates :owner, :project, :tasklist, :task_type, :title, :workspace, presence: true
@@ -458,7 +460,7 @@ class Task < ApplicationRecord
       assignee_id: assignee&.id,
       assignee_name: assignee&.name,
       project_id: project_id,
-      project_name: project&.name,
+      project_name: regular_project&.name,
       tasklist_id: tasklist_id,
       tasklist_title: tasklist&.title,
       source_language_id: source_language_id,

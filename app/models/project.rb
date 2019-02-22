@@ -29,6 +29,7 @@
   after_create :refresh_project_cache
   after_destroy :refresh_project_cache
 
+  scope :regular, -> { where(project_type: :regular) }
   scope :with_preloaded, -> {
     joins(tasklists: { tasks: [:task_type, :todos] }).
       preload(tasklists: { tasks: [:task_type, :todos] })

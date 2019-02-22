@@ -4,7 +4,7 @@ class Project::Regular < Project
   include AASM
 
   GRAPHQL_TYPE = 'Project'.freeze
-  PROJECT_STATUSES = %i(draft no_status planned active on_hold completed cancelled archived)
+  PROJECT_STATUSES = %i(no_status draft planned active on_hold completed cancelled archived)
 
   with_options inverse_of: :projects do
     belongs_to :owner, class_name: 'TeamMember', foreign_key: :owner_id

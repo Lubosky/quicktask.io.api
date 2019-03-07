@@ -38,7 +38,7 @@ Types::RateType = GraphQL::ObjectType.define do
     resolve ->(resource, _args, _ctx) { resource }
   end
 
-  field :rate_type, types.String, ''
+  field :rate_type, !Types::RateTypeType, ''
   field :classification, types.String, ''
   field :price, !Types::BigDecimalType, ''
   field :currency, Types::CurrencyType, 'The currency of the contractor.'

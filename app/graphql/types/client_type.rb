@@ -13,6 +13,16 @@ Types::ClientType = GraphQL::ObjectType.define do
   field :currency, Types::CurrencyType, 'The currency of the client.'
   field :tax_number, types.String, 'The tax number of the client.'
 
+  connection :rates_connection, Connections::RatesConnection do
+    description ''
+
+    before_scope ->(obj, _args, _ctx) {
+      AssociationLoader.for(Client, :client_rates).load(obj)
+    }
+
+    resolve ->(collection, _args, _ctx) { collection }
+  end
+
   field :client_rates, types[!Types::RateType] do
     description ''
 

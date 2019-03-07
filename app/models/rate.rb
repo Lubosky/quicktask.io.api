@@ -1,5 +1,5 @@
 class Rate < ApplicationRecord
-  include EnsureUUID
+  include BelongsDirectly, EnsureUUID
 
   with_options class_name: 'Language', optional: true do
     belongs_to :source_language, foreign_key: :source_language_id
@@ -13,6 +13,8 @@ class Rate < ApplicationRecord
              class_name: '::Workspace',
              foreign_key: :workspace_id,
              inverse_of: :rates
+
+  belongs_directly_to :workspace, foreign_key: :workspace_id
 
   has_one :rate_assignment, foreign_key: :rate_id, inverse_of: :rate, dependent: :delete
   has_one :default_contractor,

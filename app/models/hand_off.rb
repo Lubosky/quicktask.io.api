@@ -6,11 +6,6 @@ class HandOff < ApplicationRecord
 
   belongs_to :assignee, polymorphic: true
 
-  with_options foreign_key: :assignee_id do
-    belongs_to :assigned_contractor, class_name: 'Contractor', foreign_type: 'Contractor'
-    belongs_to :assigned_team_member, class_name: 'TeamMember', foreign_type: 'TeamMember'
-  end
-
   with_options class_name: 'TeamMember' do
     belongs_to :assigner, foreign_key: :assigner_id
     belongs_to :canceller, foreign_key: :canceller_id, optional: true

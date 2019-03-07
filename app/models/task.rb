@@ -27,7 +27,10 @@ class Task < ApplicationRecord
     belongs_to :workspace
   end
 
-  belongs_to :regular_project, -> { regular }, class_name: 'Project::Regular', foreign_key: :project_id
+  belongs_to :regular_project, -> { regular },
+             class_name: 'Project::Regular',
+             foreign_key: :project_id,
+             optional: true
 
   with_options optional: true do
     belongs_to :source_language, class_name: 'Language'

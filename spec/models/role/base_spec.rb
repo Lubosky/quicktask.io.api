@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Role::Base, type: :model do
-  subject { build(:owner_role) }
+  subject { create(:owner_role) }
 
   context 'validations' do
     before do

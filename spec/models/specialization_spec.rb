@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Specialization, type: :model do
-  subject { build(:specialization) }
+  subject { create(:specialization) }
 
   context 'validations' do
     before do

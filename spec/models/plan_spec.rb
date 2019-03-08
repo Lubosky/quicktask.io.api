@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Plan, type: :model do
-  subject { build(:plan) }
+  subject { create(:plan) }
 
   context 'validations' do
     before do

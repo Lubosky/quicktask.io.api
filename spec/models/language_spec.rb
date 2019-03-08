@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Language, type: :model do
-  subject { build(:language) }
+  subject { create(:language) }
 
   context 'validations' do
     before do

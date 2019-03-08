@@ -6,20 +6,18 @@ RSpec.describe Rate, type: :model do
   context 'validations' do
     it { is_expected.to belong_to(:source_language).
       class_name('Language').
-      with_foreign_key(:source_language_id)
+      with_foreign_key(:source_language_id).without_validating_presence
     }
     it { is_expected.to belong_to(:target_language).
       class_name('Language').
-      with_foreign_key(:target_language_id)
+      with_foreign_key(:target_language_id).without_validating_presence
     }
     it { is_expected.to belong_to(:task_type) }
     it { is_expected.to belong_to(:unit) }
-    it { is_expected.to belong_to(:workspace) }
+    it { is_expected.to belong_to(:workspace).without_validating_presence }
 
-    it { is_expected.to validate_presence_of(:owner) }
     it { is_expected.to validate_presence_of(:task_type) }
     it { is_expected.to validate_presence_of(:unit) }
-    it { is_expected.to validate_presence_of(:workspace) }
     it { is_expected.to validate_presence_of(:uuid) }
     it { is_expected.to validate_uniqueness_of(:uuid) }
   end

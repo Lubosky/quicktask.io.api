@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Client, type: :model do
-  subject { build(:client) }
+  subject { create(:client) }
 
   context 'validations' do
     before do

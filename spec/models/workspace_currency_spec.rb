@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe WorkspaceCurrency, type: :model do
-  subject { build(:workspace_currency) }
+  subject { create(:workspace_currency) }
 
   context 'validations' do
     before do

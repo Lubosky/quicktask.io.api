@@ -30,7 +30,7 @@ class WorkspaceAccount < ApplicationRecord
   validate :profile_allowed_for_role?, if: :role_id_changed?
 
   delegate :first_name, :last_name, :email, :locale, :time_zone, :settings, to: :user
-  delegate :permission_level, :permissions, to: :role
+  delegate :permission_level, :permissions, to: :role, allow_nil: true
 
   enum project_sort_option: { due_date: 0, identifier: 1, title: 2, updated_at: 3 }, _prefix: true
   enum project_view_type: { grid: 0, list: 1 }, _prefix: true
@@ -93,9 +93,11 @@ class WorkspaceAccount < ApplicationRecord
   end
 
   def profile_allowed_for_role?
+    return false if role.blank?
+
     case symbolized_profile_type
     when :team_member
-      errors.add(:role, :invalid) unless self.permission_level.to_sym.in?([:profile, :owner])
+      errors.add(:role, :invalid) unless self.permission_level.to_sym.in?([:member, :owner])
     when :contractor
       errors.add(:role, :invalid) unless self.permission_level.to_sym == :collaborator
     when :client

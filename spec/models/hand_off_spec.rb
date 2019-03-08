@@ -1,7 +1,28 @@
 require 'rails_helper'
 
 RSpec.describe HandOff, type: :model do
-  subject { build(:hand_off) }
+  let!(:workspace) { create(:workspace) }
+  let!(:contractor) { create(:contractor, workspace: workspace) }
+  let!(:rate) { create_rate(owner: contractor, workspace: workspace) }
+  let!(:task) {
+    create(
+      :task,
+      workspace: workspace,
+      source_language: rate.source_language,
+      target_language: rate.target_language,
+      task_type: rate.task_type,
+      unit: rate.unit
+    )
+  }
+
+  subject {
+    create(
+      :hand_off,
+      assignee: contractor,
+      task: task,
+      workspace: workspace
+    )
+  }
 
   context 'validations' do
     before do
@@ -11,7 +32,7 @@ RSpec.describe HandOff, type: :model do
     it { is_expected.to belong_to(:task) }
     it { is_expected.to belong_to(:assignee) }
     it { is_expected.to belong_to(:assigner).class_name('TeamMember') }
-    it { is_expected.to belong_to(:workspace) }
+    it { is_expected.to belong_to(:workspace).without_validating_presence }
 
     it { is_expected.to validate_presence_of(:assignee) }
     it { is_expected.to validate_presence_of(:assigner) }
@@ -91,5 +112,24 @@ RSpec.describe HandOff, type: :model do
 
       expect(hand_off.pending?).to eq(true)
     end
+  end
+
+  def create_rate(owner: nil, workspace: nil, task: :translation, source: :en, target: :de, unit: 'word')
+    workspace = workspace.nil? ? create(:workspace) : workspace
+    owner = owner.nil? ? create(:contractor, workspace: workspace) : owner
+    source_language = create(:language, code: source, workspace: workspace)
+    target_language = create(:language, code: target, workspace: workspace)
+    task_type = create(:task_type, classification: task, workspace: workspace)
+    unit = create(:unit, workspace: workspace)
+
+    Rate::Contractor.create(
+      task_type: task_type,
+      source_language: source_language,
+      target_language: target_language,
+      unit: unit,
+      price: rand(100),
+      owner: owner,
+      workspace: workspace
+    )
   end
 end

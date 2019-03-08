@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Contractor, type: :model do
-  subject { build(:contractor) }
+  subject { create(:contractor) }
 
   context 'validations' do
     before do

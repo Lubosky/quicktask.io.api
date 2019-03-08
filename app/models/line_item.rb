@@ -3,8 +3,11 @@ class LineItem < ApplicationRecord
 
   belongs_to :bookkeepable, polymorphic: true
 
-  belongs_to :source_language, class_name: 'Language', optional: true
-  belongs_to :target_language, class_name: 'Language', optional: true
+  with_options class_name: 'Language', optional: true do
+    belongs_to :source_language
+    belongs_to :target_language
+  end
+
   belongs_to :task_type
   belongs_to :unit
   belongs_to :workspace
@@ -26,9 +29,9 @@ class LineItem < ApplicationRecord
   validates :target_language, presence: true, unless: :other_task?
   validates_associated :bookkeepable
 
-  delegate :classification, to: :task_type
+  delegate :classification, to: :task_type, allow_nil: true
   delegate :unit_type, to: :unit
-  delegate :workspace, to: :bookkeepable
+  delegate :workspace, to: :bookkeepable, allow_nil: true
 
   after_validation :calculate_totals
 

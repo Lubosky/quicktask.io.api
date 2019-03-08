@@ -27,9 +27,9 @@ class Tasklist < ApplicationRecord
   }
 
   validates :project, :title, :workspace, presence: true
-  validates :owner, presence: true, if: -> { project.project_type == 'regular' }
+  validates :owner, presence: true, if: -> { project&.project_type == 'regular' }
 
-  delegate :workspace, to: :project
+  delegate :workspace, to: :project, allow_nil: true
 
   before_validation { self.title&.strip! }
 end

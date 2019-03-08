@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe ProjectGroup, type: :model do
-  subject { build(:project_group) }
+  subject { create(:project_group) }
 
   context 'validations' do
     before do

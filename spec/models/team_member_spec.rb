@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe TeamMember, type: :model do
-  subject { build(:team_member) }
+  subject { create(:team_member) }
 
   context 'validations' do
     before do

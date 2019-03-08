@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe TaskType, type: :model do
-  subject { build(:task_type) }
+  subject { create(:task_type) }
 
   context 'validations' do
     before do

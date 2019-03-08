@@ -100,7 +100,7 @@ RSpec.describe Tagged::TagNames do
     end
 
     it 'allows setting of tag names on unpersisted objects' do
-      contractor = build(:contractor, tag_names: %w[ whitelisted blacklisted ])
+      contractor = build(:contractor, workspace: workspace, tag_names: %w[ whitelisted blacklisted ])
       contractor.save!
 
       expect(contractor.tag_names).to eq(%w[ whitelisted blacklisted ])
@@ -114,7 +114,7 @@ RSpec.describe Tagged::TagNames do
     end
 
     it 'ignores blank tags' do
-      contractor = build(:contractor, tag_names: ['', 'whitelisted'])
+      contractor = build(:contractor, workspace: workspace, tag_names: ['', 'whitelisted'])
       contractor.save!
 
       expect(contractor.tag_names).to eq(%w[ whitelisted ])

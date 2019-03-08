@@ -20,7 +20,7 @@ class Percentage < Numeric
 
   def fractionify
     begin
-      BigDecimal.new(@value.to_s).round(5, BigDecimal::ROUND_HALF_UP)
+      BigDecimal(@value.to_s).round(5, BigDecimal::ROUND_HALF_UP)
     rescue
       ZERO
     end

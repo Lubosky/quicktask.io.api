@@ -1,8 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Tag, type: :model do
-  subject { build(:tag) }
   let(:workspace) { create(:workspace) }
+  subject { create(:tag) }
 
   context 'validations' do
     before do

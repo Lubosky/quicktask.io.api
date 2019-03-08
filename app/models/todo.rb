@@ -23,7 +23,7 @@ class Todo < ApplicationRecord
 
   validates :task, :title, :workspace, presence: true
 
-  delegate :workspace, to: :task
+  delegate :workspace, to: :task, allow_nil: true
 
   before_validation { self.title&.strip! }
   with_options on: :create do

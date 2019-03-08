@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Service, type: :model do
-  subject { build(:service) }
+  subject { create(:service) }
 
   context 'validations' do
     before do

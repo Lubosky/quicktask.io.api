@@ -32,11 +32,10 @@ class Membership < ApplicationRecord
       where(scheduled_for_reactivation_on: Time.zone.today + 2.days)
   }
 
-  validates :owner_id, presence: true
-  validates :plan_id, presence: true
-  validates :workspace_id,
-            presence: true,
-            uniqueness: { conditions: -> { where(deleted_at: nil) } }
+  with_options presence: true do
+    validates :owner, :plan
+    validates :workspace, uniqueness: { conditions: -> { where(deleted_at: nil) } }
+  end
 
   delegate :billing_interval, :stripe_plan_id, :trial_period_days, to: :plan
   delegate :stripe_customer_id, to: :workspace

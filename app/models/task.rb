@@ -92,6 +92,13 @@ class Task < ApplicationRecord
 
   belongs_directly_to :workspace
 
+  validates :owner, :project, :tasklist, :task_type, :title, :workspace, presence: true
+  validates :location, absence: true, unless: :interpreting_task?
+  validate :validate_start_date_before_due_date
+
+  delegate :project, :workspace, to: :tasklist, allow_nil: true
+  delegate :classification, to: :task_type, allow_nil: true
+
   jsonb_accessor :task_data,
     equipment_needed: [:boolean, default: false]
 
@@ -234,13 +241,6 @@ class Task < ApplicationRecord
       :unit, :task_type, assignment: :assignee
     ).for_project
   }
-
-  validates :owner, :project, :tasklist, :task_type, :title, :workspace, presence: true
-  validates :location, absence: true, unless: :interpreting_task?
-  validate :validate_start_date_before_due_date
-
-  delegate :project, :workspace, to: :tasklist
-  delegate :classification, to: :task_type
 
   enum color: [
     :no_color,

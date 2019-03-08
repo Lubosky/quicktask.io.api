@@ -1,7 +1,10 @@
 require 'rails_helper'
 
 RSpec.describe Task, type: :model do
-  subject { build(:task) }
+  let!(:workspace) { create(:workspace) }
+  let!(:project) { create(:project, workspace: workspace) }
+  let!(:tasklist) { create(:tasklist, project: project, workspace: workspace) }
+  subject { create(:task, tasklist: tasklist) }
 
   context 'validations' do
     before do
@@ -9,12 +12,12 @@ RSpec.describe Task, type: :model do
     end
 
     it { is_expected.to belong_to(:owner).class_name('TeamMember').with_foreign_key(:owner_id) }
-    it { is_expected.to belong_to(:project) }
-    it { is_expected.to belong_to(:source_language).class_name('Language') }
-    it { is_expected.to belong_to(:target_language).class_name('Language') }
+    it { is_expected.to belong_to(:project).without_validating_presence }
+    it { is_expected.to belong_to(:source_language).class_name('Language').optional }
+    it { is_expected.to belong_to(:target_language).class_name('Language').optional }
     it { is_expected.to belong_to(:task_type) }
     it { is_expected.to belong_to(:tasklist) }
-    it { is_expected.to belong_to(:unit) }
+    it { is_expected.to belong_to(:unit).optional }
 
     it { is_expected.to have_many(:invitees).class_name('Contractor').with_foreign_key(:assignee_id) }
     it { is_expected.to have_many(:hand_offs) }

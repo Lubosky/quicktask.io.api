@@ -1,13 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe WorkspaceAccount, type: :model do
-  subject { build(:workspace_account) }
+  let(:role) { create(:role) }
+  subject { create(:workspace_account, role: role) }
 
   context 'validations' do
     before do
       WorkspaceAccount.any_instance.stubs(:ensure_uuid).returns(true)
     end
-
     it { is_expected.to belong_to(:profile) }
     it { is_expected.to belong_to(:role).class_name('Role::Base') }
     it { is_expected.to belong_to(:user) }

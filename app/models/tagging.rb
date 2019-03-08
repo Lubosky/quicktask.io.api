@@ -7,10 +7,10 @@ class Tagging < ApplicationRecord
 
   belongs_directly_to :workspace
 
-  validates :taggable, :tag, presence: true
+  validates :taggable, :tag, :workspace, presence: true
   validates :tag_id, uniqueness: { scope: %i[ taggable_id taggable_type ] }
 
   counter_culture :tag, column_name: :tagging_count, touch: true
 
-  delegate :workspace, to: :taggable
+  delegate :workspace, to: :taggable, allow_nil: true
 end

@@ -49,7 +49,7 @@ class HandOff < ApplicationRecord
   validate :assignee_not_invited, on: :create
   validate :contractor_with_rate, on: :create
 
-  delegate :workspace, to: :task
+  delegate :workspace, to: :task, allow_nil: true
   delegate :hand_off_valid_period, to: :workspace
 
   before_create :set_valid_through

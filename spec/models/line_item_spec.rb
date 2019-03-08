@@ -17,7 +17,8 @@ RSpec.describe LineItem, type: :model do
       source_language: source_language,
       target_language: target_language,
       task_type: task_type,
-      unit: unit
+      unit: unit,
+      workspace: workspace
     )
   }
 
@@ -27,11 +28,11 @@ RSpec.describe LineItem, type: :model do
     end
 
     it { is_expected.to belong_to(:bookkeepable) }
-    it { is_expected.to belong_to(:source_language).class_name('Language') }
-    it { is_expected.to belong_to(:target_language).class_name('Language') }
+    it { is_expected.to belong_to(:source_language).class_name('Language').without_validating_presence }
+    it { is_expected.to belong_to(:target_language).class_name('Language').without_validating_presence }
     it { is_expected.to belong_to(:task_type) }
     it { is_expected.to belong_to(:unit) }
-    it { is_expected.to belong_to(:workspace) }
+    it { is_expected.to belong_to(:workspace).without_validating_presence }
 
     it { is_expected.to validate_presence_of(:quantity) }
     it { is_expected.to validate_presence_of(:unit) }

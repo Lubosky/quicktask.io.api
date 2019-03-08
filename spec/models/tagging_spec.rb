@@ -1,14 +1,14 @@
 require 'rails_helper'
 
 RSpec.describe Tagging, type: :model do
-  subject { build(:tagging) }
+  subject { create(:tagging) }
 
   context 'validations' do
     before do
       Tagging.any_instance.stubs(:ensure_uuid).returns(true)
     end
 
-    it { is_expected.to belong_to(:workspace) }
+    it { is_expected.to belong_to(:workspace).without_validating_presence }
     it { is_expected.to belong_to(:taggable) }
     it { is_expected.to belong_to(:tag) }
   end

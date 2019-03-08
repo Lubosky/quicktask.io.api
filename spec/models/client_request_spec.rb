@@ -33,9 +33,9 @@ RSpec.describe ClientRequest, type: :model do
 
     it { is_expected.to belong_to(:client) }
     it { is_expected.to belong_to(:requester).class_name('ClientContact') }
-    it { is_expected.to belong_to(:service) }
-    it { is_expected.to belong_to(:source_language).class_name('Language') }
-    it { is_expected.to belong_to(:unit) }
+    it { is_expected.to belong_to(:service).without_validating_presence }
+    it { is_expected.to belong_to(:source_language).class_name('Language').optional }
+    it { is_expected.to belong_to(:unit).optional }
     it { is_expected.to belong_to(:workspace) }
 
     it { is_expected.to have_one(:proposal) }

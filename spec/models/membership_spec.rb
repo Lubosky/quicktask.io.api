@@ -1,7 +1,7 @@
 require 'rails_helper'
 
 RSpec.describe Membership, type: :model do
-  subject { build(:membership) }
+  subject { create(:membership) }
 
   context 'validations' do
     before do
@@ -14,9 +14,9 @@ RSpec.describe Membership, type: :model do
 
     it { is_expected.to have_many(:charges) }
 
-    it { is_expected.to validate_presence_of(:workspace_id) }
-    it { is_expected.to validate_presence_of(:plan_id) }
-    it { is_expected.to validate_presence_of(:owner_id) }
+    it { is_expected.to validate_presence_of(:workspace) }
+    it { is_expected.to validate_presence_of(:plan) }
+    it { is_expected.to validate_presence_of(:owner) }
 
     it { is_expected.to validate_presence_of(:uuid) }
     it { is_expected.to validate_uniqueness_of(:uuid) }
@@ -228,7 +228,8 @@ RSpec.describe Membership, type: :model do
     end
 
     it 'creates a membership' do
-      membership = build(:membership)
+      workspace = create(:workspace)
+      membership = build(:membership, workspace: workspace)
 
       expect{ membership.fulfill }.to change(Membership, :count).by(1)
     end
@@ -236,7 +237,8 @@ RSpec.describe Membership, type: :model do
     it 'does not fulfill with a bad credit card' do
       StripeMock.prepare_card_error(:card_declined, :new_customer)
 
-      membership = build(:membership)
+      workspace = create(:workspace)
+      membership = build(:membership, workspace: workspace)
 
       expect{ membership.fulfill }.not_to change(Membership, :count)
     end

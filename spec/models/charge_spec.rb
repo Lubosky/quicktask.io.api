@@ -1,7 +1,8 @@
 require 'rails_helper'
 
 RSpec.describe Charge, type: :model do
-  subject { build(:charge) }
+  let!(:workspace) { create(:workspace) }
+  subject { build(:charge, workspace: workspace) }
 
   context 'validations' do
     before do

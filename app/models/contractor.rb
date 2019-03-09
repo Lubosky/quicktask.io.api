@@ -50,4 +50,8 @@ class Contractor < ApplicationRecord
       union(workspace.default_contractor_rates).
       without_duplicates
   end
+
+  def rates_count
+    Contractors::RatesCountService.new(self).count
+  end
 end

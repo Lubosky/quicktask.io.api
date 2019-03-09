@@ -12,6 +12,7 @@ Types::ClientType = GraphQL::ObjectType.define do
   field :phone, types.String, 'The phone of the client.'
   field :currency, Types::CurrencyType, 'The currency of the client.'
   field :tax_number, types.String, 'The tax number of the client.'
+  field :rates_count, Types::BigDecimalType, ''
 
   connection :rates_connection, Connections::RatesConnection do
     description ''

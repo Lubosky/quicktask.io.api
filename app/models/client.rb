@@ -47,4 +47,8 @@ class Client < ApplicationRecord
       union(workspace.default_client_rates).
       without_duplicates
   end
+
+  def rates_count
+    Clients::RatesCountService.new(self).count
+  end
 end

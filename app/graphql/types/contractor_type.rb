@@ -14,10 +14,7 @@ Types::ContractorType = GraphQL::ObjectType.define do
   field :email, types.String, 'The email of the contractor.'
   field :phone, types.String, 'The phone of the contractor.'
   field :currency, Types::CurrencyType, 'The currency of the contractor.'
-
-  field :created_at, Types::DateTimeType, 'The time at which this record was created.'
-  field :updated_at, Types::DateTimeType, 'The time at which this record was last modified.'
-  field :deleted_at, Types::DateTimeType, 'The time at which this record was deleted.'
+  field :rates_count, Types::BigDecimalType, ''
 
   connection :rates_connection, Connections::RatesConnection do
     description ''
@@ -67,4 +64,8 @@ Types::ContractorType = GraphQL::ObjectType.define do
     before_scope ->(obj, _args, _ctx) { AssociationLoader.for(Contractor, :tags).load(obj) }
     resolve ->(collection, _args, _ctx) { collection }
   end
+
+  field :created_at, Types::DateTimeType, 'The time at which this record was created.'
+  field :updated_at, Types::DateTimeType, 'The time at which this record was last modified.'
+  field :deleted_at, Types::DateTimeType, 'The time at which this record was deleted.'
 end
